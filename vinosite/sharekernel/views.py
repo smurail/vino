@@ -1385,6 +1385,8 @@ def kerneluploadfile(request):
     software_id=request.POST.get('software_id', 'None') # may be None
     if "metadata" in request.POST:
         metadata = json.loads(request.POST['metadata'])
+        print "metadate avant kernel"
+        print metadata
         if file:
             # a file has been submitted with its metadata in POST parameters at the same time
             tmpfile = tempfile.NamedTemporaryFile(delete=False)
@@ -1475,7 +1477,7 @@ def kerneluploadfile(request):
             else:
                 passage = "yaya"
             #pique a populatedatabase
-            tmpfiletobesaved = tempfile.NamedTemporaryFile(prefix=slugify("youyou"),suffix=".h5")
+            tmpfiletobesaved = tempfile.NamedTemporaryFile(prefix=slugify(metadata[METADATA.results_title]),suffix=".h5")
             filenametobesaved = tmpfiletobesaved.name
             tmpfiletobesaved.close()
             hdf5manager.writeKernel(kernel, filenametobesaved)

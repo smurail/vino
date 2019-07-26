@@ -16,7 +16,7 @@
 #parameters.stateconstraintparametervalues:0.2,0.2
 #parameters.targetparametervalues:none
 
-#software.title: Viabilitree
+#software.title:Viabilitree
 #software.website: https://github.com/ISCPIF/viabilitree
 #software.author : Alvarez et Reuillon
 #software.parameters:Exploration domain, control step, maximal division deepness, dilatation parameter, Runge-Kutta integration step, Runge-Kutta time step, random seed
