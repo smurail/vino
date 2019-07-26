@@ -1386,6 +1386,7 @@ def kerneluploadfile(request):
     if "metadata" in request.POST:
         metadata = json.loads(request.POST['metadata'])
         print "metadate avant kernel"
+        print metadata[u'software.title']
         print metadata
         if file:
             # a file has been submitted with its metadata in POST parameters at the same time

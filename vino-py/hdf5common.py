@@ -25,8 +25,15 @@ class HDF5Writer:
     print "metadata du kernel"
     print metadata
     for key,value in metadata.iteritems():
-      print value
-      self.f['data'].attrs[key.encode('utf8')] = value.encode('utf8')
+      if type(key)==unicode:
+          keyutf8 = key.encode('utf8')
+      else:
+          keyutf8 = key
+      if type(value)==unicode:
+          valueutf8 = value.encode('utf8')
+      else:
+          valueutf8 = value
+      self.f['data'].attrs[keyutf8] = valueutf8
   
   def writeData(self, data, attrs, **datasets_options):
     '''
