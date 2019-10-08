@@ -30,7 +30,7 @@ class PspModifiedLoader(FileFormatLoader):
         line = f.readline()
         columnNumbertoIgnore = len(re.findall('empty', line))
         permutVector = list(map(int, re.findall('[0-9]+', line)))
-        permutation = np.zeros(dimension * dimension,int).reshape(dimension,dimension)
+        permutation = np.zeros((dimension, dimension), int)
         for i in range(dimension):
             permutation[i][permutVector[i]-1]=1
         # Ok, creating the container object
