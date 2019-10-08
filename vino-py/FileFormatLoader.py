@@ -94,6 +94,7 @@ class ViabilitreeLoader(FileFormatLoader):
         k = KdTree.readViabilitree(filename, metadata)
         return k
 
+# XXX Moved in vino.loaders
 class PspLoader(FileFormatLoader):
     '''
     Reader for the raw output format of the software of Patrick Saint-Pierre.
@@ -137,6 +138,7 @@ class PspLoader(FileFormatLoader):
             # TODO what is done with modelMetadata and nbDim
         return bgk
 
+# XXX Moved in vino.loaders
 class PspModifiedLoader(FileFormatLoader):
     '''
     Reader for the modified output format of the software of Patrick Saint-Pierre.
