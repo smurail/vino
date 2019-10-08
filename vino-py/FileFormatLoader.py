@@ -10,6 +10,7 @@ class FileFormatException(Exception):
 
 import logging
 
+# XXX Moved in vino.loaders
 class Loader(object):
     def __init__(self):
         self.loaders = [Hdf5Loader(), PspLoader(), PspModifiedLoader(), ViabilitreeLoader()]
@@ -30,6 +31,8 @@ class Loader(object):
                 logging.getLogger(__name__).info("Loading of %s fails with the %s loader: %s",filename, loader, e)
         return None
 
+
+# XXX Moved in vino.loaders
 class FileFormatLoader(object):
     '''
     Abstract class for loaders that implements a specific format parser.
