@@ -1,6 +1,3 @@
-# XXX Moved to vino/METADATA.py
-# TODO Replace this module by a better system
-
 class _constants:
     class ConstError(TypeError): pass
 
