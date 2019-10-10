@@ -22,13 +22,13 @@ class Kernel(object):
     '''
     Return the object representing the data of the kernel
     '''
-    
+
   def getDataAttributes(self):
     return {
         METADATA.resultformat_title : self.getFormatCode()
           }
-  
-  @staticmethod   
+
+  @staticmethod
   @abc.abstractmethod
   def getFormatCode():
     '''
@@ -36,19 +36,19 @@ class Kernel(object):
     This identifier is used to code the format used in the metadata of the hdf5 file.
     '''
     pass
-  
+
   @abc.abstractmethod
   def toBarGridKernel(self, newOriginCoords, newOppositeCoords, newIntervalNumberperaxis):
     pass
-  
-  
+
+
   @classmethod
   @abc.abstractmethod
   def initFromHDF5(cls, metadata, dataAttributes, hdf5data):
     '''
     Init a kernel from Vino HDF5 data.
     '''
-  
+
   @abc.abstractmethod
   def isInSet(self, point):
     '''

@@ -1,5 +1,3 @@
-# -*- coding: utf8 -*-
-
 import h5py
 import METADATA
 
@@ -10,7 +8,7 @@ class HDF5Writer:
 
   def __enter__(self):
     return self
-      
+
   def __exit__(self, type, value, traceback):
     self.f.close()
 
@@ -35,13 +33,13 @@ class HDF5Writer:
     for key,value in attrs.iteritems():
       self.f['data'].attrs[key] = value
 
-class HDF5Reader:    
+class HDF5Reader:
   def __init__(self, filename):
     self.f = h5py.File(filename, 'r')
 
   def __enter__(self):
     return self
-      
+
   def __exit__(self, type, value, traceback):
     self.f.close()
 
@@ -77,5 +75,5 @@ class HDF5Manager:
     Write a kernel to a Vino HDF5 file
     '''
     with HDF5Writer(filename) as w:
-      w.writeData(kernel.getData(), kernel.getDataAttributes(), **datasets_options)   
+      w.writeData(kernel.getData(), kernel.getDataAttributes(), **datasets_options)
       w.writeMetadata(kernel.getMetadata())

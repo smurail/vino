@@ -14,6 +14,7 @@ class KdTree(Kernel):
     KdTree store for each cell the coordinate of the sample point in the cell,
     and then for each dimension the min and the max of the cell.
     '''
+
     def __init__(self, cells=[], metadata={},origin=None,opposite=None):
         super(KdTree, self).__init__(metadata)
         self.cells = cells
@@ -26,7 +27,6 @@ class KdTree(Kernel):
             self.oppositeCoords = np.array(opposite,float)
         else:
             self.oppositeCoords = self.getMaxBounds()
-
 
     @property
     def cells(self):
@@ -42,14 +42,14 @@ class KdTree(Kernel):
         # sort cells by ascendant order of lower boundaries
         maxCoordinatesIndex = self.getMaxBoundsCoordinates()
         self.__cells = SortedListWithKey(cells, key=lambda cell: [cell[i] for i in maxCoordinatesIndex])
-    
+
     def getMinBoundsCoordinates(self):
         '''
         Returns the indexes for retrieving the min bounds in the array of data of a tree node.
         '''
         dim = self.getStateDimension()
         return [dim + x * 2 for x in range(dim)]
-    
+
     def getMaxBoundsCoordinates(self):
         '''
         Returns the indexes for retrieving the max bounds in the array of data of a tree node.
@@ -68,8 +68,8 @@ class KdTree(Kernel):
 
     def getMaxFrameworkBounds(self):
         return list(self.oppositeCoords)
-    
-    @staticmethod   
+
+    @staticmethod
     @overrides
     def getFormatCode():
         return "kdtree"
@@ -79,7 +79,7 @@ class KdTree(Kernel):
         da = super(KdTree, self).getDataAttributes()
         da['origin'] = self.originCoords
         da['opposite'] = self.oppositeCoords
-        return da         
+        return da
 
     def getDataToPlot(self):
         data = []
@@ -90,16 +90,15 @@ class KdTree(Kernel):
     @overrides
     def initFromHDF5(cls, metadata, attrs, data):
         '''
-      Create an object of class KdTree from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
-      '''
+        Create an object of class KdTree from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
+        '''
         return cls(cells=data.tolist(), metadata=metadata,origin=attrs['origin'], opposite=attrs['opposite'], )
 
     @overrides
     def getData(self):
         return np.array(list(self.cells), dtype='float')
 
-
-    @classmethod  
+    @classmethod
     def readViabilitreeFile(cls, f, metadata,origin=None,opposite=None):
         cells = []
         dim = int(metadata[METADATA.statedimension])
@@ -107,10 +106,10 @@ class KdTree(Kernel):
         f.readline()
         for line in f:
             row = line.split()
-            cells.append(map(float, row[:3 * dim]))  
+            cells.append(map(float, row[:3 * dim]))
         return cls(cells, metadata,origin,opposite)
-    
-    @classmethod  
+
+    @classmethod
     def readViabilitree(cls, filename, metadata,origin=None,opposite=None):
         '''
         Returns a kernel loaded from an output file from the software viabilitree.
@@ -137,7 +136,7 @@ class KdTree(Kernel):
             if all([point[i] >= cellBefore[minCoords[i]] and point[i] <= cellBefore[minCoords[i] + 1] for i in range(self.getStateDimension())]):
                 return True
         return False
-  
+
     @overrides
     def toBarGridKernel(self, newOriginCoords, newOppositeCoords, intervalNumberperaxis):
         '''
@@ -179,6 +178,7 @@ class KdTree(Kernel):
                     else:
                         next_point[i] = start_int[i]
                 bgk.addBar(next_point, start_int[-1], end_int[-1])
+
         return bgk
 
 
@@ -201,14 +201,14 @@ if __name__ == "__main__":
 
     else :
         minbounds = list(np.array(bargrid.getMinBounds())-intervalSizes/2)
-	maxbounds = list(np.array(bargrid.getMaxBounds())+intervalSizes/2)
+        maxbounds = list(np.array(bargrid.getMaxBounds())+intervalSizes/2)
     '''
     #To delete to show the original bargrid
     distancegriddimensions = [10,10]#[int(ppa),int(ppa)] #[301,301]
     distancegridintervals = map(lambda e: e-1, distancegriddimensions)
     bargridbis = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
     data.append(bargridbis.getDataToPlot())
-    '''  
+    '''
     distancegriddimensions = [10,10]
     newintervalsizes = (np.array(maxbounds)-np.array(minbounds))/np.array(distancegriddimensions)
     neworigin = list(np.array(minbounds)+newintervalsizes/2)
