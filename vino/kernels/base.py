@@ -24,9 +24,7 @@ class Kernel(object):
     '''
 
   def getDataAttributes(self):
-    return {
-        METADATA.resultformat_title : self.getFormatCode()
-          }
+    return {METADATA.resultformat_title: self.getFormatCode()}
 
   @staticmethod
   @abc.abstractmethod
@@ -40,7 +38,6 @@ class Kernel(object):
   @abc.abstractmethod
   def toBarGridKernel(self, newOriginCoords, newOppositeCoords, newIntervalNumberperaxis):
     pass
-
 
   @classmethod
   @abc.abstractmethod

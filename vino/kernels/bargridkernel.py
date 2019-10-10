@@ -107,6 +107,7 @@ class BarGridKernel(Kernel):
         permutIntervalNumberperaxis = np.dot(self.permutation, self.intervalNumberperaxis)
         minbounds = list(np.dot(np.transpose(self.permutation),permutOriginCoords+(permutOppositeCoords-permutOriginCoords)*self.kernelMinPoint/permutIntervalNumberperaxis))
         minbounds = minbounds - intervalSizes/2
+
         return minbounds
 
     def getMaxBounds(self):
@@ -128,10 +129,13 @@ class BarGridKernel(Kernel):
         permutOriginCoords = np.dot(self.permutation, self.originCoords)
         permutOppositeCoords = np.dot(self.permutation, self.oppositeCoords)
         permutIntervalNumberperaxis = np.dot(self.permutation, self.intervalNumberperaxis)
+
         for i in range(len(self.bars)):
            data.append(list(permutOriginCoords+(permutOppositeCoords-permutOriginCoords)*np.array(self.bars[i][:-1])/permutIntervalNumberperaxis)+[permutOriginCoords[-1]+(permutOppositeCoords[-1]-permutOriginCoords[-1])*self.bars[i][-1]/permutIntervalNumberperaxis[-1]])
+
         perm = np.dot(self.permutation,np.arange(len(self.originCoords)))
         data = [self.getMinFrameworkBounds()+self.getMaxFrameworkBounds()+self.getIntervalSizes()+list(perm)]+list(data)
+
         return data
 
     def getTotalPointNumber(self):
@@ -148,9 +152,11 @@ class BarGridKernel(Kernel):
         dimensionsExtents = maxPoint - minPoint + 1
         grid = RegularGridKernel(self.originCoords, self.intervalNumberperaxis,
                                dimensionsExtents, metadata=self.metadata)
+
         for bar in self.bars:
             barPosition = (bar[:-2]-minPoint[:-1]).tolist()
             grid.grid[tuple(barPosition)].put(list(range(bar[-2], bar[-1] + 1)), True)
+
         return grid
 
     def getInside(self):
@@ -164,11 +170,12 @@ class BarGridKernel(Kernel):
         nbBars = len(self.bars)
         insidegrid = BarGridKernel(self.originCoords,self.oppositeCoords,self.intervalNumberperaxis,self.permutation,data,self.metadata)
         barsindex = 0
+
         for i in range(2*dimension):
             tabaroundbarsindices.append(0)
 
-        while (barsindex < len(self.bars)):
-            if (self.bars[barsindex][-1] - self.bars[barsindex][-2])>2:
+        while barsindex < len(self.bars):
+            if self.bars[barsindex][-1] - self.bars[barsindex][-2] > 2:
                 actualbarposition = self.bars[barsindex][:-2]
                 totalborder = False
                 tabaroundpositions = []
@@ -786,6 +793,7 @@ class BarGridKernel(Kernel):
                   permutegrid.bars.add(list(np.dot(tpermutation,bar[:-1]))+[bar[-1]])
       else:
           permutegrid = BarGridKernel(self.originCoords,self.oppositeCoords,self.intervalNumberperaxis,np.dot(np.transpose(permutation),self.permutation),np.dot(np.transpose(permutation),self.kernelMinPoint),np.dot(np.transpose(permutation),self.kernelMaxPoint),list(self.bars),self.metadata)
+
       return permutegrid
 
     def buildNewBars(self,barposition,permutation,data):
