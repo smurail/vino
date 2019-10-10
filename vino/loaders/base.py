@@ -25,6 +25,13 @@ class Loader(object):
         return None
 
 
+class FileFormatException(Exception):
+    '''
+    This exception is raised when an syntax error occurs while trying to read a file.
+    '''
+    pass
+
+
 class FileFormatLoader(object):
     '''
     Abstract class for loaders that implements a specific format parser.
