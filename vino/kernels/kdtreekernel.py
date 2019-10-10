@@ -221,23 +221,3 @@ if __name__ == "__main__":
     hm = HDF5Manager([KdTree])
     kdt = hm.readKernel('2D_lake_Isa.h5')
 #    data.append(kdt.getDataToPlot())
-    
-'''
-if __name__ == "__main__":
-    import re
-    metadata = {}
-    myre = re.compile('^#(.*):(.*)$')
-    with open('../samples/lake/2D_lake_Isa_metadata.txt') as f:
-        for line in f:
-            if line.startswith('#'):
-                k, v = myre.match(line).groups()
-                metadata[k.strip()] = v.strip()
-    metadata[METADATA.statedimension] = int(metadata[METADATA.statedimension])
-    k = KdTree.readViabilitree("../samples/lake/lake_Isa_R1_dat.txt", metadata)
-    print(k.cells[0])
-    print("Kdtree loaded with %d cells" % len(k.cells))
-    print([1]*k.getStateDimension())
-    bgk = k.toBarGridKernelbis([50]*k.getStateDimension())
-    print("KdTree converted to BarGrid with %d bars" % len(bgk.bars))
-    data = k.getDataToPlot()
-'''

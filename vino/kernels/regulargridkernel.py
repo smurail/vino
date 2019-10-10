@@ -45,9 +45,3 @@ class RegularGridKernel(Kernel):
   def isInSet(self, point):
     # TODO
     raise NotImplementedError
-
-if __name__ == "__main__":
-  from .hdf5common import HDF5Manager
-  grid = RegularGridKernel([0,0,0], [1,1,1], [10,10,10])
-  grid.set([3,1,0], True)
-  HDF5Manager.writeKernel(grid, 'test.h5')
