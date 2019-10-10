@@ -22,19 +22,11 @@ class HDF5Writer:
      - kernel approximation algorithm and its parameters
     '''
     # TODO puts metadata in hierarchical form
-    print "metadata du kernel"
-    print metadata
-    for key,value in metadata.iteritems():
-      if type(key)==unicode:
-          keyutf8 = key.encode('utf8')
-      else:
-          keyutf8 = key
-      if type(value)==unicode:
-          valueutf8 = value.encode('utf8')
-      else:
-          valueutf8 = value
-      self.f['data'].attrs[keyutf8] = valueutf8
-  
+    print("metadata du kernel", metadata)
+
+    for key, value in metadata.iteritems():
+      self.f['data'].attrs[key] = value
+
   def writeData(self, data, attrs, **datasets_options):
     '''
     Writes data and their attributes (metadata on the format, boundaries, …). Options can also be passed to the writer for enabling a compression method.
