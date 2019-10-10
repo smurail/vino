@@ -2,6 +2,7 @@
 
 import abc
 
+# XXX Moved in vino.loaders
 class FileFormatException(Exception):
     '''
     This exception is raised when an syntax error occurs while trying to read a file.

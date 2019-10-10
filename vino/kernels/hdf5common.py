@@ -3,7 +3,6 @@
 import h5py
 import METADATA
 
-# XXX Moved in vino.kernels
 class HDF5Writer:
   def __init__(self, filename):
     self.f = h5py.File(filename, 'w')
@@ -44,7 +43,6 @@ class HDF5Writer:
     for key,value in attrs.iteritems():
       self.f['data'].attrs[key] = value
 
-# XXX Moved in vino.kernels
 class HDF5Reader:    
   def __init__(self, filename):
     self.f = h5py.File(filename, 'r')
@@ -65,7 +63,6 @@ class HDF5Reader:
   def readDataAttributes(self):
     return {key:value for key,value in self.f['data'].attrs.items()}
 
-# XXX Moved in vino.kernels
 class HDF5Manager:
   def __init__(self, strategies):
     self.formatsStrategies = { s.getFormatCode():s for s in strategies }

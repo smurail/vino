@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import abc
-import METADATA
 
-# XXX Moved in vino.kernels
+from vino import METADATA
+
+
 class Kernel(object):
   def __init__(self, metadata={}):
     self.__metadata = metadata

@@ -1,10 +1,8 @@
-# -*- coding: utf8 -*-
-
 import numpy as np
-from Kernel import Kernel
 from overrides import overrides
+from .base import Kernel
 
-# XXX Moved in vino.kernels
+
 class RegularGridKernel(Kernel):
   def __init__(self, originCoords, dimensionsSteps, dimensionsExtents=None, data=None, metadata = {}):
     super(RegularGridKernel, self).__init__(metadata)
@@ -49,7 +47,7 @@ class RegularGridKernel(Kernel):
     raise NotImplementedError
 
 if __name__ == "__main__":
-  from hdf5common import HDF5Manager
+  from .hdf5common import HDF5Manager
   grid = RegularGridKernel([0,0,0], [1,1,1], [10,10,10])
   grid.set([3,1,0], True)
   HDF5Manager.writeKernel(grid, 'test.h5')

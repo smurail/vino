@@ -1,13 +1,14 @@
-# -*- coding: utf8 -*-
+import math
+import copy
 import numpy as np
+
 from overrides import overrides
 from sortedcontainers import SortedList
-import math
-from Kernel import Kernel
-from RegularGridKernel import RegularGridKernel
-import copy
 
-# XXX Moved in vino.kernels
+from .base import Kernel
+from .regulargridkernel import RegularGridKernel
+
+
 class BarGridKernel(Kernel):
     '''
   Store a kernel of n dimensions as a list of bars in the space of dimension (n-1).
@@ -886,7 +887,7 @@ if __name__ == "__main__":
     resizebargrid = grid.toBarGridKernel(grid.originCoords, grid.oppositeCoords, distancegridintervals)
 #  print resizebargrid.bars
 
-    from hdf5common import HDF5Manager
+    from .hdf5common import HDF5Manager
     hm = HDF5Manager([BarGridKernel])
 #  startTime = time.time()
 #  regularGrid = grid.toRegularGridKernel()
@@ -997,3 +998,4 @@ if __name__ == "__main__":
 #        print('{} in {:.2f}s'.format(message, timeit.timeit(command,setup=setup,number=20)/20))
 
   
+ 
