@@ -1,8 +1,9 @@
 import re
-import numpy as np
+from overrides import overrides
 
-from vino.loaders import FileFormatLoader
 from vino import METADATA
+from .base import FileFormatLoader
+from ..kernels import BarGridKernel
 
 
 class PspLoader(FileFormatLoader):
