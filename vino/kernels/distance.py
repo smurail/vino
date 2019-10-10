@@ -281,7 +281,7 @@ class Matrix(object):
                     icurrent = icurrent % spacesizes[j]
                 point[direction-1] = point[direction-1]-1
                 if (point[direction-1]>0):
-                    print "ouille"
+                    print("ouille")
 #                print positions[0]
 #                print self.data[positions[0]]
 #               print point
