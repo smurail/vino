@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-from BarGridKernel import BarGridKernel
-from Equation import Expression
 import numpy as np
 
-# XXX Moved in vino.kernels
+from .bargridkernel import BarGridKernel
+
+
 class Line(object):
     '''
 	The algorithm used to evaluate the distance map in the Matrix class uses what we call Line which gathers the values when one coordinate varies and the n-1 others are fixed
@@ -204,7 +203,6 @@ class Line(object):
             self.data[k] = norm.newdistance(tab[index],kbis-index)            
 #        print self.data
         
-# XXX Moved to vino.kernels
 class EucNorm(object):
     '''
     This class is designed to describe the norm from which the distance is computed. In the algorithm of distance evaluation (distance method of Matrix class below), 
@@ -223,7 +221,6 @@ class EucNorm(object):
         newdist = olddistance + gap*gap                
         return newdist
         
-# XXX Moved to vino.kernels
 class Matrix(object):
     def __init__(self, dimensions = [], data = []):
         self.dimensions = map(lambda e: int(e), dimensions)
@@ -615,7 +612,7 @@ class Matrix(object):
 if __name__ == "__main__":
     
     import time
-    import FileFormatLoader
+    from ..loaders import FileFormatLoader
     
     norm = EucNorm()
    
