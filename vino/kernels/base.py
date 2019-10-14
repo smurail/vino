@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from vino import METADATA
+from .hdf5common import HDF5Manager
 
 
 class KernelMeta(ABCMeta):
@@ -56,6 +57,10 @@ class Kernel(metaclass=KernelMeta):
         '''
         Init a kernel from Vino HDF5 data.
         '''
+
+    @classmethod
+    def createFromHDF5(cls, path):
+        return HDF5Manager(cls.KERNELS.values()).readKernel(path)
 
     @abstractmethod
     def isInSet(self, point):
