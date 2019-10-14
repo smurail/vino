@@ -49,7 +49,7 @@ class HDF5Reader:
         return self.readDataAttributes()
 
     def readData(self):
-        return self.f['data'].value
+        return self.f['data'][...]
 
     def readDataAttributes(self):
         def unicode(s):
