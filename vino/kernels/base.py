@@ -1,9 +1,8 @@
-import abc
-
+from abc import ABCMeta, abstractmethod
 from vino import METADATA
 
+class Kernel(metaclass=ABCMeta):
 
-class Kernel(object):
     def __init__(self, metadata={}):
         self.__metadata = metadata
 
@@ -17,7 +16,7 @@ class Kernel(object):
     def getStateDimension(self):
         return int(self.metadata[METADATA.statedimension])
 
-    @abc.abstractmethod
+    @abstractmethod
     def getData(self):
         '''
         Return the object representing the data of the kernel
@@ -27,26 +26,25 @@ class Kernel(object):
         return {METADATA.resultformat_title: self.getFormatCode()}
 
     @staticmethod
-    @abc.abstractmethod
+    @abstractmethod
     def getFormatCode():
         '''
         Return a string that identifies of the format.
         This identifier is used to code the format used in the metadata of the hdf5 file.
         '''
-        pass
 
-    @abc.abstractmethod
-    def toBarGridKernel(self, newOriginCoords, newOppositeCoords, newIntervalNumberperaxis):
+    @abstractmethod
+    def toBarGridKernel(self, origin, opposite, intervals):
         pass
 
     @classmethod
-    @abc.abstractmethod
+    @abstractmethod
     def initFromHDF5(cls, metadata, dataAttributes, hdf5data):
         '''
         Init a kernel from Vino HDF5 data.
         '''
 
-    @abc.abstractmethod
+    @abstractmethod
     def isInSet(self, point):
         '''
         Return a boolean to indicate if a point is inside or outside from this kernel.
