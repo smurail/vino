@@ -9,14 +9,14 @@ from .bargridkernel import BarGridKernel
 from .hdf5common import HDF5Manager
 
 
-class KdTree(Kernel):
+class KdTreeKernel(Kernel):
     '''
-    KdTree store for each cell the coordinate of the sample point in the cell,
+    KdTreeKernel store for each cell the coordinate of the sample point in the cell,
     and then for each dimension the min and the max of the cell.
     '''
 
     def __init__(self, cells=[], metadata={},origin=None,opposite=None):
-        super(KdTree, self).__init__(metadata)
+        super(KdTreeKernel, self).__init__(metadata)
         self.cells = cells
         if np.any(origin):
             self.originCoords = np.array(origin,float)
@@ -76,7 +76,7 @@ class KdTree(Kernel):
 
     @overrides
     def getDataAttributes(self):
-        da = super(KdTree, self).getDataAttributes()
+        da = super(KdTreeKernel, self).getDataAttributes()
         da['origin'] = self.originCoords
         da['opposite'] = self.oppositeCoords
         return da
@@ -90,7 +90,7 @@ class KdTree(Kernel):
     @overrides
     def initFromHDF5(cls, metadata, attrs, data):
         '''
-        Create an object of class KdTree from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
+        Create an object of class KdTreeKernel from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
         '''
         return cls(cells=data.tolist(), metadata=metadata,origin=attrs['origin'], opposite=attrs['opposite'], )
 
@@ -218,6 +218,6 @@ if __name__ == "__main__":
     data.append(resizebargrids[-1].getDataToPlot())
     data2=resizebargrids[-1].getDataToPlot()
 
-    hm = HDF5Manager([KdTree])
+    hm = HDF5Manager([KdTreeKernel])
     kdt = hm.readKernel('2D_lake_Isa.h5')
 #    data.append(kdt.getDataToPlot())
