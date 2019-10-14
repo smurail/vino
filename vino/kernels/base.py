@@ -1,3 +1,4 @@
+import numpy as np
 from abc import ABCMeta, abstractmethod
 from vino import METADATA
 from .hdf5common import HDF5Manager
@@ -28,7 +29,7 @@ class Kernel(metaclass=KernelMeta):
         return self.__metadata
 
     def getStateDimension(self):
-        return int(self.metadata[METADATA.statedimension])
+        return int(self.metadata.get(METADATA.statedimension, 2))
 
     @abstractmethod
     def getData(self):
@@ -50,6 +51,17 @@ class Kernel(metaclass=KernelMeta):
     @abstractmethod
     def toBarGridKernel(self, origin, opposite, intervals):
         pass
+
+    def resized(self, pointsPerAxis: int):
+        grid_dimensions = np.array([pointsPerAxis] * self.getStateDimension())
+        grid_intervals = [ x - 1 for x in grid_dimensions ]
+        min_bounds = np.array(self.getMinBounds())
+        max_bounds = np.array(self.getMaxBounds())
+        intervals = (max_bounds - min_bounds) / grid_dimensions
+        origin = list(min_bounds + intervals / 2)
+        opposite = list(max_bounds - intervals / 2)
+
+        return self.toBarGridKernel(origin, opposite, grid_intervals)
 
     @classmethod
     @abstractmethod
