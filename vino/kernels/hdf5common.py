@@ -62,7 +62,7 @@ class HDF5Reader:
 
 class HDF5Manager:
     def __init__(self, strategies):
-        self.formatsStrategies = { s.getFormatCode():s for s in strategies }
+        self.formatsStrategies = {s.getFormatCode(): s for s in strategies}
 
     def readKernel(self, filename):
         '''
@@ -72,9 +72,14 @@ class HDF5Manager:
         with HDF5Reader(filename) as f:
             # TODO nothing is done with these metadata
             metadata = f.readMetadata()
+
             # reading the data attributes for determining the format
             dataAttributes = f.readDataAttributes()
-            return self.formatsStrategies[dataAttributes[METADATA.resultformat_title]].initFromHDF5(metadata, dataAttributes, f.readData())
+
+            rf = dataAttributes[METADATA.resultformat_title]
+            k = self.formatsStrategies[rf]
+
+            return k.initFromHDF5(metadata, dataAttributes, f.readData())
 
     @staticmethod
     def writeKernel(kernel, filename, **datasets_options):
