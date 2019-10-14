@@ -1,7 +1,20 @@
 from abc import ABCMeta, abstractmethod
 from vino import METADATA
 
-class Kernel(metaclass=ABCMeta):
+
+class KernelMeta(ABCMeta):
+    def __new__(cls, name, bases, dict):
+        cls = super().__new__(cls, name, bases, dict)
+
+        format_code = cls.getFormatCode()
+        if format_code is not None:
+            cls.KERNELS[format_code] = cls
+
+        return cls
+
+
+class Kernel(metaclass=KernelMeta):
+    KERNELS = {}
 
     def __init__(self, metadata={}):
         self.__metadata = metadata
