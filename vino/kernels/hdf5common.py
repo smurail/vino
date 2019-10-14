@@ -1,5 +1,6 @@
 import h5py
-import METADATA
+
+from vino import METADATA
 
 class HDF5Writer:
     def __init__(self, filename):
