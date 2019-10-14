@@ -46,13 +46,19 @@ class HDF5Reader:
 
     def readMetadata(self):
         # TODO puts metadata in hierarchical form
-        return {key:value for key,value in self.f['data'].attrs.items()}
+        return self.readDataAttributes()
 
     def readData(self):
         return self.f['data'].value
 
     def readDataAttributes(self):
-        return {key:value for key,value in self.f['data'].attrs.items()}
+        def unicode(s):
+            return s.decode('utf-8') if isinstance(s, bytes) else s
+
+        return {
+            unicode(key): unicode(value)
+            for key, value in self.f['data'].attrs.items()
+        }
 
 class HDF5Manager:
     def __init__(self, strategies):
