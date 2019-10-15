@@ -14,7 +14,10 @@ __all__ = [
 
 class Loader(object):
     def __init__(self):
-        self.loaders = []
+        self.loaders = [
+            Hdf5Loader(), PspLoader(), PspModifiedLoader(),
+            ViabilitreeLoader()
+        ]
 
     def loadersdoc(self):
         for loader in self.loaders:
