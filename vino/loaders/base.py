@@ -1,5 +1,5 @@
 import logging
-from abc import ABCMeta, abstractmethod
+from abc import ABC
 
 
 class Loader(object):
@@ -32,12 +32,11 @@ class FileFormatException(Exception):
     pass
 
 
-class FileFormatLoader(metaclass=ABCMeta):
+class FileFormatLoader(ABC):
     '''
     Abstract class for loaders that implements a specific format parser.
     '''
 
-    @abstractmethod
     def readFile(self, f):
         pass
 
