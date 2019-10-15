@@ -69,6 +69,7 @@ import numpy as np
 import os
 import METADATA
 
+# XXX Moved to vino.loaders
 class ViabilitreeLoader(FileFormatLoader):
     '''
     Loader for the output format of the software viabilitree.
