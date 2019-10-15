@@ -52,6 +52,7 @@ from BarGridKernel import BarGridKernel
 from KdTree import KdTree
 from hdf5common import HDF5Manager
 
+# XXX Moved to vino.loaders
 class Hdf5Loader(FileFormatLoader):
     '''
     Loader for the Vino HDF5 file format.
