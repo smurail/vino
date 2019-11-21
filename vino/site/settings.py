@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 from pathlib import Path
+from dynaconf import LazySettings
+
+settings = LazySettings(
+    DEBUG_LEVEL_FOR_DYNACONF='DEBUG',
+    ENVVAR_PREFIX_FOR_DYNACONF='VINO',
+)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.as_posix()
@@ -21,10 +27,10 @@ DATA_DIR = Path(BASE_DIR, 'data').as_posix()
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'd^&x7*dxo%4402o!89q0sc3(6t$%zges_(abn98(7zy^e2@)y2'
+SECRET_KEY = settings.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = settings.get('DEBUG', True)
 
 ALLOWED_HOSTS = []
 
@@ -106,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = settings.get('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 

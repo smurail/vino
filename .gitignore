@@ -4,3 +4,6 @@ Thumbs.db
 /vino-py/test-reports/
 /vinosite/static/
 /data/
+# Ignore dynaconf settings and secrets
+/settings.*
+/.secrets.*
