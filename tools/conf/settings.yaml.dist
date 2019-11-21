@@ -1,0 +1,3 @@
+default:
+    DEBUG: true
+    TIME_ZONE: Europe/Paris
