@@ -1,6 +1,6 @@
 import logging
 
-from .base import Loader, FileFormatException, FileFormatLoader
+from .base import FileFormatException, FileFormatLoader
 from .psploader import PspLoader
 from .pspmodifiedloader import PspModifiedLoader
 from .viabilitreeloader import ViabilitreeLoader
@@ -33,6 +33,6 @@ class Loader(object):
             try:
                 return loader.read(filename)
             except Exception as e:
-                logging.getLogger(__name__).info("Loading of %s fails with the %s loader: %s",filename, loader, e)
+                logging.getLogger(__name__).info("Loading of %s fails with the %s loader: %s", filename, loader, e)
 
         return None

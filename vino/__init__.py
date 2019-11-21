@@ -1,1 +1,1 @@
-from . import METADATA
+from . import METADATA # noqa

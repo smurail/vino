@@ -16,5 +16,3 @@ class Hdf5Loader(FileFormatLoader):
     @overrides
     def read(self, filename):
         return self.hdf5manager.readKernel(filename)
-
-

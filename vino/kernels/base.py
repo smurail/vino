@@ -49,12 +49,20 @@ class Kernel(metaclass=KernelMeta):
         '''
 
     @abstractmethod
+    def getMinBounds(self):
+        pass
+
+    @abstractmethod
+    def getMaxBounds(self):
+        pass
+
+    @abstractmethod
     def toBarGridKernel(self, origin, opposite, intervals):
         pass
 
     def resized(self, pointsPerAxis: int):
         grid_dimensions = np.array([pointsPerAxis] * self.getStateDimension())
-        grid_intervals = [ x - 1 for x in grid_dimensions ]
+        grid_intervals = [x - 1 for x in grid_dimensions]
         min_bounds = np.array(self.getMinBounds())
         max_bounds = np.array(self.getMaxBounds())
         intervals = (max_bounds - min_bounds) / grid_dimensions
