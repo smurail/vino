@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+mypy = "*"
+
+[packages]
+numpy = "*"
+sortedcontainers = "*"
+h5py = "*"
+equation = "*"
+dynaconf = {extras = ["yaml"],version = "*"}
+django = "==2.2.*"
+django-fieldsignals = "*"
+pillow = "*"
+
+[requires]
+python_version = "3.7"
