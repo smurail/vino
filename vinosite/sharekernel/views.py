@@ -217,35 +217,6 @@ def visitviabilityproblem(request,viabilityproblem_id):
     context.update(mathinfo(vp))
     return render(request, 'sharekernel/visitviabilityproblem.html', context)
 
-pspModifiedLoader = FileFormatLoader.PspModifiedLoader()
-def bargrid2json(request):
-    if request.method == 'POST':
-        source=request.FILES['docfile'] # InMemoryUploadedFile instance
-        bargrid = pspModifiedLoader.read(source)
-        distancegriddimensions = [31,31] #[301,301]
-        distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-        resizebargrid = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-        distancegrid = Matrix.initFromBarGridKernel(resizebargrid)
-        norm = EucNorm()
-        lowborders = []
-        upborders = []
-        for i in range(len(distancegrid.dimensions)):
-            lowborders.append(False)
-            upborders.append(False)
-
-        distancegrid.distance(norm,lowborders,upborders)
-        data = distancegrid.toDataPointDistance()
-
-#        insidegrid = grid.getInside()
-#        minusgrid = grid.MinusBarGridKernel(insidegrid)
-
-#        out_json = json.dumps(list(resizebargrid.bars), sort_keys = True, indent = 4, ensure_ascii=False)
-
-        out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-        return HttpResponse(out_json)#, mimetype='text/plain')
-    return HttpResponse("Nothing to do")
-
 def compareTwoVinos(vinoA, vinoB, ppa):
     vinos = []
     pyvinos = []
@@ -318,46 +289,6 @@ def ViNOComparison2D(request, vinoA_id, vinoB_id, ppa):
       data, aminusb = compareTwoVinos(Results.objects.get(id=vinoA_id), Results.objects.get(id=vinoB_id), ppa)
       out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
       return HttpResponse(out_json)#, mimetype='text/plain')
-
-    return HttpResponse("Nothing to do")
-
-def saveVinoDifference(request, vinoA_id, vinoB_id, ppa):
-  vinoA = Results.objects.get(id=vinoA_id)
-  vinoB = Results.objects.get(id=vinoB_id)
-  data, aminusb = compareTwoVinos(vinoA, vinoB, ppa)
-  tmpfile = tempfile.NamedTemporaryFile(prefix=slugify(aminusb.metadata[METADATA.title]),suffix=".h5")
-  filename = tmpfile.name
-  tmpfile.close()
-  hdf5manager.writeKernel(aminusb, filename)
-  obj = StateSet(resultformat=ResultFormat.objects.get(title="bars"), datafile=File(open(filename), name=filename))
-  obj.save()
-  obj.parents.add(vinoA)
-  obj.parents.add(vinoB)
-  return HttpResponseRedirect(reverse('sharekernel:viewStateSet', args=[obj.pk]))
-
-
-def ViNOView2Dancien(request,result_id,ppa):
-    if request.method == 'POST':
-        vino = Results.objects.get(id=result_id)
-        if vino.resultformat.title =='bars':
-            hm = HDF5Manager([BarGridKernel])
-            bargrid = hm.readKernel(vino.datafile.path)
-
-            distancegriddimensions = [int(ppa),int(ppa)] #[301,301]
-
-            distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-            resizebargrid = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-            data = resizebargrid.getDataToPlot()
-            out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-            return HttpResponse(out_json)#, mimetype='text/plain')
-        elif vino.resultformat.title =='kdtree':
-            hm = HDF5Manager([KdTree])
-            kdt = hm.readKernel(vino.datafile.path)
-            data = kdt.getDataToPlot()
-            out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-            return HttpResponse(out_json)#, mimetype='text/plain')
 
     return HttpResponse("Nothing to do")
 
@@ -435,43 +366,6 @@ def ViNOView3D(request,result_id,ppa):
             return HttpResponse(out_json)#, mimetype='text/plain')
         else :
             data = vinopy.getDataToPlot()
-            out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-            return HttpResponse(out_json)#, mimetype='text/plain')
-
-    return HttpResponse("Nothing to do")
-
-def ViNOView3Dancien(request,result_id,ppa):
-    if request.method == 'POST':
-        vino = Results.objects.get(id=result_id)
-        if vino.resultformat.title =='bars':
-            hm = HDF5Manager([BarGridKernel])
-            bargrid = hm.readKernel(vino.datafile.path)
-            distancegridintervals = [150]*3
-            bargrid = bargrid.toBarGridKernel(bargrid.originCoords,bargrid.oppositeCoords,distancegridintervals)
-            print len(bargrid.bars)
-            data = bargrid.getDataToPlot()
-            permutation = np.eye(3,dtype = int)
-            permutation[0][0] = 0
-            permutation[0][2] = 1
-            permutation[2][0] = 1
-            permutation[2][2] = 0
-            data1 =bargrid.permute(permutation).getDataToPlot()
-            permutation = np.eye(3,dtype = int)
-            permutation[1][1] = 0
-            permutation[1][2] = 1
-            permutation[2][1] = 1
-            permutation[2][2] = 0
-            data2 =bargrid.permute(permutation).getDataToPlot()
-
-            out_json = json.dumps(list(data+data1+data2), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-#            out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-            return HttpResponse(out_json)#, mimetype='text/plain')
-        elif vino.resultformat.title =='kdtree':
-            hm = HDF5Manager([KdTree])
-            kdtree = hm.readKernel(vino.datafile.path)
-            data = kdtree.getDataToPlot()
             out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
 
             return HttpResponse(out_json)#, mimetype='text/plain')
@@ -560,8 +454,6 @@ def ViNODistanceView(request,result_id,ppa,permutnumber,withdefdom=1):
         return HttpResponse(out_json)#, mimetype='text/plain')
     return HttpResponse("Nothing to do")
 
-
-
 def ViNOHistogramDistance(request,result_id,ppa,hist_maxvalue):
     if request.method == 'POST':
         vino = Results.objects.get(id=result_id)
@@ -602,144 +494,6 @@ def ViNOHistogramDistance(request,result_id,ppa,hist_maxvalue):
         return HttpResponse(out_json)#, mimetype='text/plain')
     return HttpResponse("Nothing to do")
 
-def bargrid2jsonNew(request,result_id):
-    if request.method == 'POST':
-        vino = Results.objects.get(id=result_id)
-        bargrid = hdf5manager.readKernel(vino.datafile.path)
-
-        distancegriddimensions = [31,31] #[301,301]
-        distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-#.kernelMinPoint
-        resizebargrid = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-        distancegrid = Matrix.initFromBarGridKernel(resizebargrid)
-        norm = EucNorm()
-        lowborders = []
-        upborders = []
-        for i in range(len(distancegrid.dimensions)):
-            lowborders.append(False)
-            upborders.append(False)
-
-        distancegrid.distance(norm,lowborders,upborders)
-        data = distancegrid.toDataPointDistance()
-
-#        insidegrid = grid.getInside()
-#        minusgrid = grid.MinusBarGridKernel(insidegrid)
-
-#        out_json = json.dumps(list(resizebargrid.bars), sort_keys = True, indent = 4, ensure_ascii=False)
-
-#        data = [(0,0,1),(0,1,1),(1,0,1),(1,1,10)]
-        out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-        return HttpResponse(out_json)#, mimetype='text/plain')
-    return HttpResponse("Nothing to do")
-
-def bargrid2json2(request,hist_maxvalue):
-    if request.method == 'POST':
-        source=request.FILES['docfile'] # InMemoryUploadedFile instance
-        bargrid = pspModifiedLoader.readFile(source)
-        distancegriddimensions = [31,31] #[301,301]
-        distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-        resizebargrid = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-        distancegrid = Matrix.initFromBarGridKernel(resizebargrid)
-        norm = EucNorm()
-        lowborders = []
-        upborders = []
-        for i in range(len(distancegrid.dimensions)):
-            lowborders.append(False)
-            upborders.append(False)
-
-        distancegrid.distance(norm,lowborders,upborders)
-        data = distancegrid.toDataPointDistance()
-	histo = distancegrid.histogram(12,int(hist_maxvalue))
-
-#        insidegrid = grid.getInside()
-#        minusgrid = grid.MinusBarGridKernel(insidegrid)
-
-#        out_json = json.dumps(list(resizebargrid.bars), sort_keys = True, indent = 4, ensure_ascii=False)
-
-#        out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-	out_json = json.dumps(histo, sort_keys = True, ensure_ascii=False)
-        return HttpResponse(out_json)#, mimetype='text/plain')
-    return HttpResponse("Nothing to do")
-
-
-def bargrid2json2New(request,result_id,hist_maxvalue):
-    if request.method == 'POST':
-        vino = Results.objects.get(id=result_id)
-        bargrid = hdf5manager.readKernel(vino.datafile.path)
-        distancegriddimensions = [31,31] #[301,301]
-        distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-        resizebargrid = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-        distancegrid = Matrix.initFromBarGridKernel(resizebargrid)
-        norm = EucNorm()
-        lowborders = []
-        upborders = []
-        for i in range(len(distancegrid.dimensions)):
-            lowborders.append(False)
-            upborders.append(False)
-
-        distancegrid.distance(norm,lowborders,upborders)
-        data = distancegrid.toDataPointDistance()
-	histo = distancegrid.histogram(12,int(hist_maxvalue))
-
-#        insidegrid = grid.getInside()
-#        minusgrid = grid.MinusBarGridKernel(insidegrid)
-
-#        out_json = json.dumps(list(resizebargrid.bars), sort_keys = True, indent = 4, ensure_ascii=False)
-
-#        out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-	out_json = json.dumps(histo, sort_keys = True, ensure_ascii=False)
-        return HttpResponse(out_json)#, mimetype='text/plain')
-    return HttpResponse("Nothing to do")
-
-def bargrid2json3(request,hist_maxvalue):
-    if request.method == 'POST':
-        source=request.FILES['docfile'] # InMemoryUploadedFile instance
-        bargrid = pspModifiedLoader.read(source)
-        distancegriddimensions = [31,31] #[301,301]
-        distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-        resizebargrid = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-	resizebargrid2 = bargrid.toBarGridKernel(bargrid.originCoords, bargrid.oppositeCoords, distancegridintervals)
-        for bar in resizebargrid2.bars:
-            bar[1]=bar[1]+1
-            bar[2]=bar[2]-1
-        minusgrid12 = resizebargrid.MinusBarGridKernel(resizebargrid2)
-	distancegrid = Matrix.initFromBarGridKernel(resizebargrid)
-        norm = EucNorm()
-        lowborders = []
-        upborders = []
-        for i in range(len(distancegrid.dimensions)):
-            lowborders.append(False)
-            upborders.append(False)
-
-        distancegrid.distance(norm,lowborders,upborders)
-        data = distancegrid.toDataPointDistance()
-	histo = distancegrid.histogram(10,int(hist_maxvalue))
-        histo1 = distancegrid.histogramFromBarGrid(minusgrid12,10,int(hist_maxvalue))
-
-        limits=[]
-        occurnumber = []
-        occurnumber1 = []
-
-        for key in histo.keys():
-	    limits.append(histo.get(key)[0])
-            occurnumber.append(histo.get(key)[1])
-	    occurnumber1.append(histo1.get(key)[1])
-	histoCompar = {}
-	histoCompar = dict(zip(histo.keys(),zip(limits,occurnumber,occurnumber1)))
-#        insidegrid = grid.getInside()
-#        minusgrid = grid.MinusBarGridKernel(insidegrid)
-
-#        out_json = json.dumps(list(resizebargrid.bars), sort_keys = True, indent = 4, ensure_ascii=False)
-
-#        out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
-
-	out_json = json.dumps(histoCompar, sort_keys = True, ensure_ascii=False)
-        return HttpResponse(out_json)#, mimetype='text/plain')
-    return HttpResponse("Nothing to do")
-
 @ensure_csrf_cookie
 def visualizeresult(request,result_id):
 #    forms = []
@@ -759,9 +513,6 @@ def visualizeresult(request,result_id):
     context = {'result':r,'viabilityproblem':vp,'resultformat':rf,'staab':staab}
     context.update(mathinfo(r))
     return render(request, 'sharekernel/visualizeresult.html', context)
-
-
-
 
 @ensure_csrf_cookie
 def visualizeresulttrajectories(request,result_id):
@@ -787,28 +538,6 @@ def visualizeresulttrajectories(request,result_id):
     context = {'ldesadm':ldesadm,'desadm':desadm,'ldescon':ldescon,'descon' : descon,'controlabbrevs' : controlabbrevs,'stateabbrevs' : stateabbrevs,'result':r,'results':r_list,'viabilityproblem':vp}
     return render(request, 'sharekernel/visualizeresulttrajectories.html', context)
 
-def visualizeresulttrajectoriesancien(request,result_id):
-    from Equation import Expression
-    forms = []
-    form = TrajForm()
-    stanaab = []
-    r=Results.objects.get(id=result_id)
-    vp=r.parameters.viabilityproblem
-    stateabbrevs = vp.stateabbreviation()
-    controlabbrevs = vp.controlabbreviation()
-    rf=r.resultformat
-    for i in range(vp.statevariables.count()):
-        forms.append(TrajForm())
-    hm = HDF5Manager([BarGridKernel])
-    bargrid = hm.readKernel(r.datafile.path)
-
-    for i in vp.statevariables:
-        stanaab.append(j[1])
-
-    context = {'controlabbrevs' : controlabbrevs,'stateabbrevs' : stateabbrevs,'result':r,'viabilityproblem':vp,'resultformat':rf,'stanaab':stanaab,'fn': fn,'bargrid' : bargrid,'forms' : forms}
-    return render(request, 'sharekernel/visualizeresulttrajectories.html', context)
-
-
 def compareresult(request, vinoA_id, vinoB_id):
     vinoA = Results.objects.get(id=vinoA_id)
     vinoB = Results.objects.get(id=vinoB_id)
@@ -817,31 +546,6 @@ def compareresult(request, vinoA_id, vinoB_id):
     vpB=vinoB.parameters.viabilityproblem
     rfB=vinoB.resultformat
     context = {'vinoA':vinoA,'viabilityproblemA':vpA,'resultformatA':rfA,'vinoB':vinoB,'viabilityproblemB':vpB,'resultformatB':rfB}
-    return render(request, 'sharekernel/compareTwoVinos.html', context)
-
-
-def compareresultbis(request, vinoA_id, vinoB_id):
-    vinoA = Results.objects.get(id=vinoA_id)
-    vinoB = Results.objects.get(id=vinoB_id)
-    # TODO configurable new dimensions
-    distancegriddimensions = [31]*vinoA.parameters.viabilityproblem.statevariables.count()
-    distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-    gridA = hdf5manager.readKernel(vinoA.datafile.path)
-    gridA = gridA.toBarGridKernel(gridA.originCoords, gridA.oppositeCoords, distancegridintervals)
-    # TODO remove this fake
-    for bar in gridA.bars:
-        bar[1]=bar[1]+1
-        bar[2]=bar[2]-1
-    gridB = hdf5manager.readKernel(vinoB.datafile.path)
-    gridB = gridB.toBarGridKernel(gridB.originCoords, gridB.oppositeCoords, distancegridintervals)
-    minusgridAB = gridA.MinusBarGridKernel(gridB)
-    minusgridBA = gridB.MinusBarGridKernel(gridA)
-    intersection = gridA.intersectionwithBarGridKernel(gridB)
-    context = {
-        'vinoA': vinoA, 'vinoB': vinoB
-    }
-    for key,grid in [['gridA',gridA], ['gridB',gridB], ['minusgridAB', minusgridAB], ['minusgridBA', minusgridBA], ['intersection', intersection]]:
-        context[key] = json.dumps(list(grid.bars), sort_keys = True, ensure_ascii=False)
     return render(request, 'sharekernel/compareTwoVinos.html', context)
 
 def algorithmlist(request):
@@ -1082,7 +786,6 @@ def viableEvolution(Tmax,dt,method,controltrajectories,startingstate,vp,p,vino,c
                 print "Can't build viable evolution"
 #    print statetrajectories
     return statetrajectories
-
 
 def makeEvolutionViable(request,result_id):
     if request.method == 'POST':
