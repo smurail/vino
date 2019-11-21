@@ -317,7 +317,7 @@ def ViNOView2D(request,result_id,ppa):
         data = vinopy.getDataToPlot()
     out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
 
-    return HttpResponse(out_json)#, mimetype='text/plain')
+    return HttpResponse(out_json, content_type='application/json')
 
 def ViNOView3D(request,result_id,ppa):
     if request.method == 'POST':
