@@ -292,35 +292,32 @@ def ViNOComparison2D(request, vinoA_id, vinoB_id, ppa):
 
     return HttpResponse("Nothing to do")
 
+@require_POST
 def ViNOView2D(request,result_id,ppa):
-    if request.method == 'POST':
-        vino = Results.objects.get(id=result_id)
-        if vino.resultformat.title =='bars':
-            hm = HDF5Manager([BarGridKernel])
-        elif vino.resultformat.title =='kdtree':
-            hm = HDF5Manager([KdTree])
+    vino = Results.objects.get(id=result_id)
+    if vino.resultformat.title =='bars':
+        hm = HDF5Manager([BarGridKernel])
+    elif vino.resultformat.title =='kdtree':
+        hm = HDF5Manager([KdTree])
 
-        vinopy = hm.readKernel(vino.datafile.path)
-        if (int(ppa) > 0):
-            distancegriddimensions = [int(ppa)]*2
+    vinopy = hm.readKernel(vino.datafile.path)
+    if (int(ppa) > 0):
+        distancegriddimensions = [int(ppa)]*2
 
-            distancegridintervals = map(lambda e: e-1, distancegriddimensions)
-            minbounds = list(vinopy.getMinBounds())
-            maxbounds = list(vinopy.getMaxBounds())
-            newintervalsizes = (np.array(maxbounds)-np.array(minbounds))/np.array(distancegriddimensions)
-            neworigin = list(np.array(minbounds)+newintervalsizes/2)
-            newopposite = list(np.array(maxbounds)-newintervalsizes/2)
+        distancegridintervals = map(lambda e: e-1, distancegriddimensions)
+        minbounds = list(vinopy.getMinBounds())
+        maxbounds = list(vinopy.getMaxBounds())
+        newintervalsizes = (np.array(maxbounds)-np.array(minbounds))/np.array(distancegriddimensions)
+        neworigin = list(np.array(minbounds)+newintervalsizes/2)
+        newopposite = list(np.array(maxbounds)-newintervalsizes/2)
 
-            resizevinopy = vinopy.toBarGridKernel(neworigin,newopposite, distancegridintervals)
-            data = resizevinopy.getDataToPlot()
-        else :
-            data = vinopy.getDataToPlot()
-        out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
+        resizevinopy = vinopy.toBarGridKernel(neworigin,newopposite, distancegridintervals)
+        data = resizevinopy.getDataToPlot()
+    else :
+        data = vinopy.getDataToPlot()
+    out_json = json.dumps(list(data), sort_keys = True, ensure_ascii=False) #si on veut afficher les distances
 
-        return HttpResponse(out_json)#, mimetype='text/plain')
-
-
-    return HttpResponse("Nothing to do")
+    return HttpResponse(out_json)#, mimetype='text/plain')
 
 def ViNOView3D(request,result_id,ppa):
     if request.method == 'POST':
