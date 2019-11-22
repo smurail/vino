@@ -134,11 +134,8 @@ class ViabilityProblem(Entity, Metadata):
                 vtype, ptype = field.types
 
                 # Add variable
-                if left_name not in symbols:
-                    symbols[left_name] = (symbols_order[vtype], vtype)
-                    symbols_order[vtype] += 1
-                else:
-                    symbols[left_name] = (symbols[left_name][0], vtype)
+                symbols[left] = (symbols_order[vtype], vtype)
+                symbols_order[vtype] += 1
 
                 # Add parameters
                 for name in right:
