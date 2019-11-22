@@ -91,18 +91,14 @@ class ViabilityProblem(Entity, Metadata):
     DISCRETE = 1
     CONTINUOUS = 2
 
-    STATEMENTS = OrderedDict([
-        ('dynamics', (Symbol.STATE, Symbol.DYNAMICS)),
-        ('constraints', (Symbol.STATE, Symbol.CONSTRAINT)),
-        ('controls', (Symbol.CONTROL, Symbol.DYNAMICS)),
-    ])
-    STATEMENTS_SET = set(STATEMENTS.keys())
-
-    dynamics = StatementsField()
-    constraints = StatementsField()
+    dynamics = StatementsField((Symbol.STATE, Symbol.DYNAMICS))
+    constraints = StatementsField((Symbol.STATE, Symbol.CONSTRAINT))
     domain = StatementsField()
-    controls = StatementsField()
+    controls = StatementsField((Symbol.CONTROL, Symbol.DYNAMICS))
     target = StatementsField()
+
+    STATEMENTS = [dynamics, constraints, controls]
+    STATEMENTS_SET = set(STATEMENTS)
 
     def update_symbols(self):
         from Equation import Expression
@@ -116,8 +112,8 @@ class ViabilityProblem(Entity, Metadata):
             raise Exception("Invalid dynamics left side: %s" % s)
 
         statements_items = [
-            (field, getattr(self, field)) for field in self.STATEMENTS.keys()
-            if getattr(self, field)]
+            (f, getattr(self, f.name)) for f in self.STATEMENTS
+            if getattr(self, f.name)]
 
         dynamics_type = None
         symbols = {}
@@ -127,7 +123,7 @@ class ViabilityProblem(Entity, Metadata):
         for field, statements in statements_items:
             for left, op, right in statements:
                 # Left side of relation: variable
-                if field == 'dynamics':
+                if field.name == 'dynamics':
                     left_name, new_dynamics_type = dynamics_variable(left)
                     if dynamics_type is None:
                         dynamics_type = new_dynamics_type
@@ -139,8 +135,10 @@ class ViabilityProblem(Entity, Metadata):
                 # Right side of relation: parameters
                 expr = Expression(right)
 
+                # Variable and parameter types
+                vtype, ptype = field.types
+
                 # Add variable
-                vtype = self.STATEMENTS[field][0]
                 if left_name not in symbols:
                     symbols[left_name] = (symbols_order[vtype], vtype)
                     symbols_order[vtype] += 1
@@ -149,7 +147,6 @@ class ViabilityProblem(Entity, Metadata):
 
                 # Add parameters
                 for name in expr:
-                    ptype = self.STATEMENTS[field][1]
                     if name not in symbols:
                         symbols[name] = (symbols_order[ptype], ptype)
                         symbols_order[ptype] += 1
@@ -163,7 +160,7 @@ class ViabilityProblem(Entity, Metadata):
 
     @staticmethod
     def post_save(sender, instance, changed_fields=None, **kwargs):
-        fields = set((f.name for f in changed_fields.keys()))
+        fields = set(changed_fields.keys())
         if fields & instance.STATEMENTS_SET:
             instance.update_symbols()
 

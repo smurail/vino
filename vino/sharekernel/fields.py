@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 class StatementsField(models.CharField):
     _relation = re.compile(r'(<=|>=|=)')
 
-    def __init__(self, max_length=200, blank=True, **kwargs):
+    def __init__(self, types=None, max_length=200, blank=True, **kwargs):
+        self.types = types or (None, None)
         if kwargs.get('null'):
             raise NotImplementedError("StatementsField can't be null.")
         kwargs['null'] = False
