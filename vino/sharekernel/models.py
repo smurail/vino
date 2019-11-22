@@ -3,7 +3,7 @@ from collections import OrderedDict, defaultdict
 from django.db import models
 from django.conf import settings
 
-from .fields import StatementsField
+from .fields import StatementsField, EquationsField, InequationsField
 
 
 class Entity(models.Model):
@@ -91,10 +91,10 @@ class ViabilityProblem(Entity, Metadata):
     DISCRETE = 1
     CONTINUOUS = 2
 
-    dynamics = StatementsField((Symbol.STATE, Symbol.DYNAMICS))
-    constraints = StatementsField((Symbol.STATE, Symbol.CONSTRAINT))
-    domain = StatementsField()
-    controls = StatementsField((Symbol.CONTROL, Symbol.DYNAMICS))
+    dynamics = EquationsField((Symbol.STATE, Symbol.DYNAMICS))
+    constraints = InequationsField((Symbol.STATE, Symbol.CONSTRAINT))
+    domain = InequationsField()
+    controls = InequationsField((Symbol.CONTROL, Symbol.DYNAMICS))
     target = StatementsField()
 
     STATEMENTS = [dynamics, constraints, controls]
