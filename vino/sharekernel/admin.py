@@ -15,6 +15,7 @@ class SymbolAdmin(admin.ModelAdmin):
 
 class SymbolInline(admin.TabularInline):
     model = Symbol
+    extra = 0
     ordering = ('type', 'order')
 
 
