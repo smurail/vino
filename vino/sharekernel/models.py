@@ -3,6 +3,8 @@ from collections import OrderedDict, defaultdict
 from django.db import models
 from django.conf import settings
 
+from .fields import StatementsField
+
 
 class Entity(models.Model):
     class Meta:
@@ -96,14 +98,13 @@ class ViabilityProblem(Entity, Metadata):
     ])
     STATEMENTS_SET = set(STATEMENTS.keys())
 
-    dynamics = models.CharField(max_length=200, blank=True)
-    constraints = models.CharField(max_length=200, blank=True)
-    domain = models.CharField(max_length=200, blank=True)
-    controls = models.CharField(max_length=200, blank=True)
-    target = models.CharField(max_length=200, blank=True)
+    dynamics = StatementsField()
+    constraints = StatementsField()
+    domain = StatementsField()
+    controls = StatementsField()
+    target = StatementsField()
 
     def update_symbols(self):
-        import re
         from Equation import Expression
 
         def dynamics_variable(s):
@@ -114,22 +115,16 @@ class ViabilityProblem(Entity, Metadata):
                 return s[5:], self.DISCRETE
             raise Exception("Invalid dynamics left side: %s" % s)
 
-        # Parse statements
-        sep = ','
-        relation = re.compile(r'(<=|>=|=)')
-        all_statements = (
-            (
-                field,
-                [relation.split(s) for s in getattr(self, field).split(sep)]
-            )
-            for field in self.STATEMENTS.keys()
-        )
+        statements_items = [
+            (field, getattr(self, field)) for field in self.STATEMENTS.keys()
+            if getattr(self, field)]
+
         dynamics_type = None
         symbols = {}
         symbols_order = defaultdict(int)
 
         # Extract variables and parameters
-        for field, statements in all_statements:
+        for field, statements in statements_items:
             for left, op, right in statements:
                 # Left side of relation: variable
                 if field == 'dynamics':
