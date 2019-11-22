@@ -24,5 +24,5 @@ class ViabilityProblemAdin(admin.ModelAdmin):
     readonly_fields = ('date_created', 'date_updated')
     fields = (
         'owner', 'state', 'date_created', 'date_updated', 'title', 'description', 'publication',
-        'author', 'url', 'image', 'dynamics', 'constraints', 'domain', 'target')
+        'author', 'url', 'image', 'dynamics', 'constraints', 'domain', 'controls', 'target')
     inlines = (SymbolInline,)
