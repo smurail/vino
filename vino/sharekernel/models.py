@@ -101,8 +101,6 @@ class ViabilityProblem(Entity, Metadata):
     STATEMENTS_SET = set(STATEMENTS)
 
     def update_symbols(self):
-        from Equation import Expression
-
         def dynamics_variable(s):
             s = s.strip()
             if s.endswith("'"):
@@ -132,9 +130,6 @@ class ViabilityProblem(Entity, Metadata):
                 else:
                     left_name = left
 
-                # Right side of relation: parameters
-                expr = Expression(right)
-
                 # Variable and parameter types
                 vtype, ptype = field.types
 
@@ -146,7 +141,7 @@ class ViabilityProblem(Entity, Metadata):
                     symbols[left_name] = (symbols[left_name][0], vtype)
 
                 # Add parameters
-                for name in expr:
+                for name in right:
                     if name not in symbols:
                         symbols[name] = (symbols_order[ptype], ptype)
                         symbols_order[ptype] += 1

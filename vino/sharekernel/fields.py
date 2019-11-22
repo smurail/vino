@@ -1,8 +1,19 @@
 import re
 
+from Equation import Expression as _Expression
+
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+
+
+class Expression(_Expression):
+    def __init__(self, expression, argorder=[], *args, **kwargs):
+        self.value = expression
+        super().__init__(expression, argorder, *args, **kwargs)
+
+    def __str__(self):
+        return self.value
 
 
 class StatementsField(models.CharField):
@@ -17,7 +28,7 @@ class StatementsField(models.CharField):
 
     @staticmethod
     def get_prep_value(value):
-        return ','.join((''.join(statement) for statement in value))
+        return ','.join((''.join(map(str, statement)) for statement in value))
 
     @classmethod
     def to_python(cls, value):
@@ -33,5 +44,14 @@ class StatementsField(models.CharField):
         if len(statements) != len(valid_statements):
             raise ValidationError(
                 _("Each statement must contain =, <= or >=."), code='invalid')
+
+        try:
+            for i, (left, op, right) in enumerate(valid_statements):
+                valid_statements[i] = (left, op, Expression(right))
+        except: # noqa
+            raise ValidationError(
+                _("Invalid syntax: %(value)s"),
+                params={'value': right},
+                code='invalid')
 
         return valid_statements
