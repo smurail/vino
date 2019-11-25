@@ -58,6 +58,9 @@ class Statements:
         return (isinstance(other, Statements) and
             (self.statements, self.time_type) == (other.statements, other.time_type))
 
+    def __hash__(self):
+        return hash(str(self))
+
     def __str__(self):
         return ','.join(
             ''.join((self.NAME[self.time_type] % left, op, str(right)))
