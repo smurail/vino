@@ -21,6 +21,7 @@ class Statements:
     DISCRETE = 1
     CONTINUOUS = 2
 
+    RELATIONS = ('=', '<=', '>=')
     NAME = {
         None: '%s',
         DISCRETE: 'next_%s',
@@ -28,8 +29,11 @@ class Statements:
     }
 
     def __init__(self, statements, time_type=None):
-        self.statements = statements
-        self.time_type = time_type
+        if isinstance(statements, str):
+            self.statements, self.time_type = self.parse(statements)
+        else:
+            self.statements = statements
+            self.time_type = time_type
 
     @classmethod
     def dynamics_variable(cls, name):
@@ -41,6 +45,41 @@ class Statements:
             _("Invalid dynamics left side: %(name)s."),
             params={'name': name},
             code='invalid')
+
+    @classmethod
+    def split(cls, statement):
+        # Compile regex used to split relations (ie. "x=y", "a>=b"...)
+        if not hasattr(cls, '_relation'):
+            cls._relation = re.compile(
+                r'\s*(%s)\s*' % '|'.join(cls.RELATIONS))
+        return tuple(filter(None, map(str.strip, cls._relation.split(statement))))
+
+    @classmethod
+    def parse(cls, value):
+        statements = [s for s in (s.strip() for s in value.split(',')) if s]
+        splitted_statements = (cls.split(stmt) for stmt in statements)
+        valid_statements = [s for s in splitted_statements if len(s) == 3]
+
+        if len(statements) != len(valid_statements):
+            raise ValidationError(
+                _("Each statement must contain one of: %(relations)s."),
+                params={'relations': ', '.join(cls.RELATIONS)},
+                code='invalid')
+
+        try:
+            for i, (left, op, right) in enumerate(valid_statements):
+                valid_statements[i] = (left, op, Expression(right))
+        except: # noqa
+            raise ValidationError(
+                _("Invalid syntax: %(value)s"),
+                params={'value': right},
+                code='invalid')
+
+        return valid_statements, None
+
+    @classmethod
+    def from_string(cls, value):
+        return Statements(*cls.parse(value))
 
     def __len__(self):
         return len(self.statements)
@@ -70,67 +109,12 @@ class Statements:
         return 'Statements(%r)' % self.statements
 
 
-class StatementsField(models.CharField):
-    RELATIONS = ('=', '<=', '>=')
-
-    def __init__(self, types=None, max_length=200, blank=True, **kwargs):
-        if kwargs.get('null'):
-            raise NotImplementedError("StatementsField can't be null.")
-        super().__init__(max_length=max_length, blank=blank, **kwargs)
-        self.types = types or (None, None)
-        # Compile regex used to split relations (ie. "x=y", "a>=b"...)
-        self._relation = re.compile(
-            r'\s*(%s)\s*' % '|'.join(self.RELATIONS))
-
-    def split(self, statement):
-        return tuple(filter(None, map(str.strip, self._relation.split(statement))))
-
-    @staticmethod
-    def get_prep_value(value):
-        return str(value)
-
-    # XXX See https://stackoverflow.com/questions/14756790/why-are-uncompiled-repeatedly-used-regexes-so-much-slower-in-python-3
-    @lru_cache(maxsize=500, typed=True)
-    def to_python(self, value):
-        assert value is not None
-
-        if isinstance(value, Statements):
-            return value
-
-        statements = [s for s in (s.strip() for s in value.split(',')) if s]
-        splitted_statements = (self.split(stmt) for stmt in statements)
-        valid_statements = [s for s in splitted_statements if len(s) == 3]
-
-        if len(statements) != len(valid_statements):
-            raise ValidationError(
-                _("Each statement must contain one of: %(relations)s."),
-                params={'relations': ', '.join(self.RELATIONS)},
-                code='invalid')
-
-        try:
-            for i, (left, op, right) in enumerate(valid_statements):
-                valid_statements[i] = (left, op, Expression(right))
-        except: # noqa
-            raise ValidationError(
-                _("Invalid syntax: %(value)s"),
-                params={'value': right},
-                code='invalid')
-
-        return Statements(valid_statements)
-
-
-class EquationsField(StatementsField):
+class Equations(Statements):
     RELATIONS = ('=')
 
-    # XXX See StatementsField.to_python
-    @lru_cache(maxsize=500, typed=True)
-    def to_python(self, value):
-        assert value is not None
-
-        if isinstance(value, Statements):
-            return value
-
-        statements = super().to_python(value)
+    @classmethod
+    def from_string(cls, value):
+        statements = super().from_string(value)
         time_type = statements.time_type
 
         for i, (left, op, right) in enumerate(statements):
@@ -146,5 +130,37 @@ class EquationsField(StatementsField):
         return Statements(statements, time_type)
 
 
-class InequationsField(StatementsField):
+class Inequations(Statements):
     RELATIONS = ('<=', '>=')
+
+
+class StatementsField(models.CharField):
+    STATEMENTS_CLS = Statements
+
+    def __init__(self, types=None, max_length=200, blank=True, **kwargs):
+        if kwargs.get('null'):
+            raise NotImplementedError("StatementsField can't be null.")
+        super().__init__(max_length=max_length, blank=blank, **kwargs)
+        self.types = types or (None, None)
+
+    @staticmethod
+    def get_prep_value(value):
+        return str(value)
+
+    # XXX See https://stackoverflow.com/questions/14756790/why-are-uncompiled-repeatedly-used-regexes-so-much-slower-in-python-3
+    @lru_cache(maxsize=500, typed=True)
+    def to_python(self, value):
+        assert value is not None
+
+        if isinstance(value, Statements):
+            return value
+
+        return self.STATEMENTS_CLS(value)
+
+
+class EquationsField(StatementsField):
+    STATEMENTS_CLS = Equations
+
+
+class InequationsField(StatementsField):
+    STATEMENTS_CLS = Inequations
