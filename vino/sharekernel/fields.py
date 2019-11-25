@@ -17,6 +17,10 @@ class Expression(_Expression):
         return self.value
 
 
+class StatementsError(Exception):
+    pass
+
+
 class Statements:
     DISCRETE = 1
     CONTINUOUS = 2
@@ -41,10 +45,9 @@ class Statements:
             return name[:-1], cls.CONTINUOUS
         if name.startswith('next_'):
             return name[5:], cls.DISCRETE
-        raise ValidationError(
-            _("Invalid dynamics left side: %(name)s."),
-            params={'name': name},
-            code='invalid')
+        raise StatementsError(
+            "Invalid dynamics left side: %(name)s.",
+            {'name': name})
 
     @classmethod
     def split(cls, statement):
@@ -61,19 +64,17 @@ class Statements:
         valid_statements = [s for s in splitted_statements if len(s) == 3]
 
         if len(statements) != len(valid_statements):
-            raise ValidationError(
-                _("Each statement must contain one of: %(relations)s."),
-                params={'relations': ', '.join(cls.RELATIONS)},
-                code='invalid')
+            raise StatementsError(
+                "Each statement must contain one of: %(relations)s.",
+                {'relations': ', '.join(cls.RELATIONS)})
 
         try:
             for i, (left, op, right) in enumerate(valid_statements):
                 valid_statements[i] = (left, op, Expression(right))
         except: # noqa
-            raise ValidationError(
-                _("Invalid syntax: %(value)s"),
-                params={'value': right},
-                code='invalid')
+            raise StatementsError(
+                "Invalid syntax: %(value)s",
+                {'value': right})
 
         return valid_statements, None
 
@@ -123,9 +124,7 @@ class Equations(Statements):
             if time_type is None:
                 time_type = new_time_type
             elif time_type != new_time_type:
-                raise ValidationError(
-                    _("Can't mix different dynamics types."),
-                    code='invalid')
+                raise StatementsError("Can't mix different dynamics types.")
 
         return Statements(statements, time_type)
 
@@ -155,7 +154,11 @@ class StatementsField(models.CharField):
         if isinstance(value, Statements):
             return value
 
-        return self.STATEMENTS_CLS(value)
+        try:
+            return self.STATEMENTS_CLS(value)
+        except StatementsError as e:
+            message, params = e.args
+            raise ValidationError(_(message), params=params, code='invalid')
 
 
 class EquationsField(StatementsField):
