@@ -89,9 +89,9 @@ class ViabilityProblem(Entity, Metadata):
         ]
 
     dynamics = EquationsField((Symbol.STATE, Symbol.DYNAMICS))
+    controls = InequationsField((Symbol.CONTROL, Symbol.DYNAMICS))
     constraints = InequationsField((Symbol.STATE, Symbol.CONSTRAINT))
     domain = InequationsField()
-    controls = InequationsField((Symbol.CONTROL, Symbol.DYNAMICS))
     target = StatementsField()
 
     STATEMENTS = [dynamics, constraints, controls]
