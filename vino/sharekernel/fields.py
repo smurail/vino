@@ -18,9 +18,29 @@ class Expression(_Expression):
 
 
 class Statements:
+    DISCRETE = 1
+    CONTINUOUS = 2
+
+    NAME = {
+        None: '%s',
+        DISCRETE: 'next_%s',
+        CONTINUOUS: "%s'"
+    }
+
     def __init__(self, statements, time_type=None):
         self.statements = statements
         self.time_type = time_type
+
+    @classmethod
+    def dynamics_variable(cls, name):
+        if name.endswith("'"):
+            return name[:-1], cls.CONTINUOUS
+        if name.startswith('next_'):
+            return name[5:], cls.DISCRETE
+        raise ValidationError(
+            _("Invalid dynamics left side: %(name)s."),
+            params={'name': name},
+            code='invalid')
 
     def __len__(self):
         return len(self.statements)
@@ -37,6 +57,11 @@ class Statements:
     def __eq__(self, other):
         return (isinstance(other, Statements) and
             (self.statements, self.time_type) == (other.statements, other.time_type))
+
+    def __str__(self):
+        return ','.join(
+            ''.join((self.NAME[self.time_type] % left, op, str(right)))
+            for left, op, right in self.statements)
 
     def __repr__(self):
         return 'Statements(%r)' % self.statements
@@ -59,7 +84,7 @@ class StatementsField(models.CharField):
 
     @staticmethod
     def get_prep_value(value):
-        return ','.join((''.join(map(str, statement)) for statement in value))
+        return str(value)
 
     # XXX See https://stackoverflow.com/questions/14756790/why-are-uncompiled-repeatedly-used-regexes-so-much-slower-in-python-3
     @lru_cache(maxsize=500, typed=True)
@@ -92,30 +117,7 @@ class StatementsField(models.CharField):
 
 
 class EquationsField(StatementsField):
-    DISCRETE = 1
-    CONTINUOUS = 2
-
     RELATIONS = ('=')
-    NAME = {
-        DISCRETE: 'next_%s',
-        CONTINUOUS: "%s'"
-    }
-
-    def get_prep_value(self, value):
-        return ','.join(
-            ''.join((self.NAME[value.time_type] % left, op, str(right)))
-            for left, op, right in value)
-
-    @classmethod
-    def dynamics_variable(cls, name):
-        if name.endswith("'"):
-            return name[:-1], cls.CONTINUOUS
-        if name.startswith('next_'):
-            return name[5:], cls.DISCRETE
-        raise ValidationError(
-            _("Invalid dynamics left side: %(name)s."),
-            params={'name': name},
-            code='invalid')
 
     # XXX See StatementsField.to_python
     @lru_cache(maxsize=500, typed=True)
@@ -129,7 +131,7 @@ class EquationsField(StatementsField):
         time_type = statements.time_type
 
         for i, (left, op, right) in enumerate(statements):
-            left, new_time_type = self.dynamics_variable(left)
+            left, new_time_type = Statements.dynamics_variable(left)
             statements[i] = (left, op, right)
             if time_type is None:
                 time_type = new_time_type
