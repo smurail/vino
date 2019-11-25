@@ -85,11 +85,56 @@ class StatementsField(models.CharField):
                 params={'value': right},
                 code='invalid')
 
-        return valid_statements
+        return Statements(valid_statements)
 
 
 class EquationsField(StatementsField):
+    DISCRETE = 1
+    CONTINUOUS = 2
+
     RELATIONS = ('=')
+    NAME = {
+        DISCRETE: 'next_%s',
+        CONTINUOUS: "%s'"
+    }
+
+    def get_prep_value(self, value):
+        return ','.join(
+            ''.join((self.NAME[value.time_type] % left, op, str(right)))
+            for left, op, right in value.statements)
+
+    @classmethod
+    def dynamics_variable(cls, name):
+        name = name.strip()
+        if name.endswith("'"):
+            return name[:-1], cls.CONTINUOUS
+        if name.startswith('next_'):
+            return name[5:], cls.DISCRETE
+        raise ValidationError(
+            _("Invalid dynamics left side: %(name)s."),
+            params={'name': name},
+            code='invalid')
+
+    def to_python(self, value):
+        assert value is not None
+
+        if isinstance(value, Statements):
+            return value
+
+        statements = super().to_python(value)
+        time_type = statements.time_type
+
+        for i, (left, op, right) in enumerate(statements):
+            left, new_time_type = self.dynamics_variable(left)
+            statements[i] = (left, op, right)
+            if time_type is None:
+                time_type = new_time_type
+            elif time_type != new_time_type:
+                raise ValidationError(
+                    _("Can't mix different dynamics types."),
+                    code='invalid')
+
+        return Statements(statements, time_type)
 
 
 class InequationsField(StatementsField):

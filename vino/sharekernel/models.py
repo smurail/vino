@@ -88,9 +88,6 @@ class ViabilityProblem(Entity, Metadata):
             )
         ]
 
-    DISCRETE = 1
-    CONTINUOUS = 2
-
     dynamics = EquationsField((Symbol.STATE, Symbol.DYNAMICS))
     constraints = InequationsField((Symbol.STATE, Symbol.CONSTRAINT))
     domain = InequationsField()
@@ -101,35 +98,16 @@ class ViabilityProblem(Entity, Metadata):
     STATEMENTS_SET = set(STATEMENTS)
 
     def update_symbols(self):
-        def dynamics_variable(s):
-            s = s.strip()
-            if s.endswith("'"):
-                return s[:-1], self.CONTINUOUS
-            if s.startswith('next_'):
-                return s[5:], self.DISCRETE
-            raise Exception("Invalid dynamics left side: %s" % s)
-
         statements_items = [
             (f, getattr(self, f.name)) for f in self.STATEMENTS
             if getattr(self, f.name)]
 
-        dynamics_type = None
         symbols = {}
         symbols_order = defaultdict(int)
 
         # Extract variables and parameters
         for field, statements in statements_items:
-            for left, op, right in statements:
-                # Left side of relation: variable
-                if field.name == 'dynamics':
-                    left_name, new_dynamics_type = dynamics_variable(left)
-                    if dynamics_type is None:
-                        dynamics_type = new_dynamics_type
-                    elif dynamics_type != new_dynamics_type:
-                        raise Exception("Can't mix different dynamics types")
-                else:
-                    left_name = left
-
+            for left, _, right in statements:
                 # Variable and parameter types
                 vtype, ptype = field.types
 
