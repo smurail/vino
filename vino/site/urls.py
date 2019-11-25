@@ -17,6 +17,10 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.utils.translation import ugettext_lazy as _
+
+admin.site.site_header = _("ViNO administration")
+admin.site.site_title = _("ViNO site admin")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
