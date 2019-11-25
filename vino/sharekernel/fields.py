@@ -101,11 +101,10 @@ class EquationsField(StatementsField):
     def get_prep_value(self, value):
         return ','.join(
             ''.join((self.NAME[value.time_type] % left, op, str(right)))
-            for left, op, right in value.statements)
+            for left, op, right in value)
 
     @classmethod
     def dynamics_variable(cls, name):
-        name = name.strip()
         if name.endswith("'"):
             return name[:-1], cls.CONTINUOUS
         if name.startswith('next_'):
