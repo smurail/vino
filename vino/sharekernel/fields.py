@@ -16,6 +16,31 @@ class Expression(_Expression):
         return self.value
 
 
+class Statements:
+    def __init__(self, statements, time_type=None):
+        self.statements = statements
+        self.time_type = time_type
+
+    def __len__(self):
+        return len(self.statements)
+
+    def __iter__(self):
+        return iter(self.statements)
+
+    def __setitem__(self, index, value):
+        self.statements[index] = value
+
+    def __getitem__(self, index):
+        return self.statements[index]
+
+    def __eq__(self, other):
+        return (isinstance(other, Statements) and
+            (self.statements, self.time_type) == (other.statements, other.time_type))
+
+    def __repr__(self):
+        return 'Statements(%r)' % self.statements
+
+
 class StatementsField(models.CharField):
     RELATIONS = ('=', '<=', '>=')
 
@@ -38,7 +63,7 @@ class StatementsField(models.CharField):
     def to_python(self, value):
         assert value is not None
 
-        if isinstance(value, list):
+        if isinstance(value, Statements):
             return value
 
         statements = [s for s in (s.strip() for s in value.split(',')) if s]
