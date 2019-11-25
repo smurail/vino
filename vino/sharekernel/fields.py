@@ -20,12 +20,16 @@ class StatementsField(models.CharField):
     RELATIONS = ('=', '<=', '>=')
 
     def __init__(self, types=None, max_length=200, blank=True, **kwargs):
-        self.types = types or (None, None)
-        self._relation = re.compile('(%s)' % '|'.join(self.RELATIONS))
         if kwargs.get('null'):
             raise NotImplementedError("StatementsField can't be null.")
-        kwargs['null'] = False
         super().__init__(max_length=max_length, blank=blank, **kwargs)
+        self.types = types or (None, None)
+        # Compile regex used to split relations (ie. "x=y", "a>=b"...)
+        self._relation = re.compile(
+            r'\s*(%s)\s*' % '|'.join(self.RELATIONS))
+
+    def split(self, statement):
+        return tuple(filter(None, map(str.strip, self._relation.split(statement))))
 
     @staticmethod
     def get_prep_value(value):
@@ -38,7 +42,7 @@ class StatementsField(models.CharField):
             return value
 
         statements = [s for s in (s.strip() for s in value.split(',')) if s]
-        splitted_statements = map(self._relation.split, statements)
+        splitted_statements = (self.split(stmt) for stmt in statements)
         valid_statements = [s for s in splitted_statements if len(s) == 3]
 
         if len(statements) != len(valid_statements):
