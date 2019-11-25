@@ -1,6 +1,7 @@
 import re
 
 from Equation import Expression as _Expression
+from functools import lru_cache
 
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -60,6 +61,8 @@ class StatementsField(models.CharField):
     def get_prep_value(value):
         return ','.join((''.join(map(str, statement)) for statement in value))
 
+    # XXX See https://stackoverflow.com/questions/14756790/why-are-uncompiled-repeatedly-used-regexes-so-much-slower-in-python-3
+    @lru_cache(maxsize=500, typed=True)
     def to_python(self, value):
         assert value is not None
 
@@ -114,6 +117,8 @@ class EquationsField(StatementsField):
             params={'name': name},
             code='invalid')
 
+    # XXX See StatementsField.to_python
+    @lru_cache(maxsize=500, typed=True)
     def to_python(self, value):
         assert value is not None
 
