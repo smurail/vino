@@ -112,9 +112,8 @@ class Equations(Statements):
     RELATIONS = ('=')
 
     @classmethod
-    def from_string(cls, value):
-        statements = super().from_string(value)
-        time_type = statements.time_type
+    def parse(cls, value):
+        statements, time_type = super().parse(value)
 
         for i, (left, op, right) in enumerate(statements):
             left, new_time_type = Statements.dynamics_variable(left)
@@ -124,7 +123,7 @@ class Equations(Statements):
             elif time_type != new_time_type:
                 raise StatementsError("Can't mix different dynamics types.")
 
-        return Statements(statements, time_type)
+        return statements, time_type
 
 
 class Inequations(Statements):
