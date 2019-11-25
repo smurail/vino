@@ -47,7 +47,7 @@ class Symbol(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['vp', 'type', 'name'],
+                fields=['vp', 'name'],
                 name='variable_unique'
             )
         ]
