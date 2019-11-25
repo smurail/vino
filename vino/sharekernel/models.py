@@ -121,6 +121,19 @@ class ViabilityProblem(Entity, Metadata):
                         symbols[name] = (symbols_order[ptype], ptype)
                         symbols_order[ptype] += 1
 
+        # Sort symbols by type
+        symbols_by_type = defaultdict(list)
+        sorted_symbols = sorted(symbols.items(), key=lambda x: x[1][0])
+        for name, (order, typ) in sorted_symbols:
+            symbols_by_type[typ].append(name)
+
+        # Normalize symbols order
+        symbols = {
+            n: (o, t)
+            for t in symbols_by_type
+            for o, n in enumerate(symbols_by_type[t])
+        }
+
         # Update database
         self.symbol_set.all().delete()
         Symbol.objects.bulk_create([
