@@ -156,6 +156,11 @@ class ParameterSet(Entity):
     constraints = models.CharField(max_length=200, blank=True)
     target = models.CharField(max_length=200, blank=True)
 
+    def __str__(self):
+        fields = filter(None, (self.dynamics, self.constraints, self.target))
+        return '%s: %s' % (
+            self.vp, ','.join(fields))
+
 
 class Software(EntityWithMetadata):
     version = models.CharField(max_length=30, default='', blank=True)
