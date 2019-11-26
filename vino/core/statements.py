@@ -93,8 +93,11 @@ class Statements:
         return self.statements[index]
 
     def __eq__(self, other):
-        return (isinstance(other, Statements) and
-            (self.statements, self.time_type) == (other.statements, other.time_type))
+        if isinstance(other, Statements):
+            a = (self.statements, self.time_type)
+            b = (other.statements, other.time_type)
+            return a == b
+        return False
 
     def __hash__(self):
         return hash(str(self))

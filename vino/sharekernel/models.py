@@ -1,7 +1,8 @@
 from collections import OrderedDict, defaultdict
 
 from django.db import models
-from django.conf import settings
+
+from django_currentuser.db.models import CurrentUserField
 
 from .fields import StatementsField, EquationsField, InequationsField
 
@@ -17,7 +18,7 @@ class Entity(models.Model):
         (DELETED, 'Deleted'),
     )
 
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
+    owner = CurrentUserField()
     state = models.IntegerField(choices=STATES, default=ACTIVE)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
