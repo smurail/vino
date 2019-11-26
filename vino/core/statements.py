@@ -1,6 +1,11 @@
+# XXX PEP 563 -- Postponed Evaluation of Annotations
+from __future__ import annotations
+
 import re
 
 from Equation import Expression as _Expression
+
+from typing import Iterable, Tuple, Union, Optional, Pattern
 
 
 __all__ = ['Statements', 'Equations', 'Inequations', 'StatementsError']
@@ -19,18 +24,26 @@ class StatementsError(Exception):
     pass
 
 
+StatementsLiteral = Iterable[Tuple[Union[str, Expression], ...]]
+
+
 class Statements:
     DISCRETE = 1
     CONTINUOUS = 2
 
-    RELATIONS = ('=', '<=', '>=')
+    RELATIONS: Tuple[str, ...] = ('=', '<=', '>=')
     NAME = {
         None: '%s',
         DISCRETE: 'next_%s',
         CONTINUOUS: "%s'"
     }
 
-    def __init__(self, statements, time_type=None):
+    _relation: Optional[Pattern] = None
+
+    def __init__(
+            self,
+            statements: Union[str, StatementsLiteral],
+            time_type: Optional[int] = None):
         if isinstance(statements, str):
             self.statements, self.time_type = self.parse(statements)
         else:
@@ -38,7 +51,7 @@ class Statements:
             self.time_type = time_type
 
     @classmethod
-    def dynamics_variable(cls, name):
+    def dynamics_variable(cls, name: str) -> Tuple[str, int]:
         if name.endswith("'"):
             return name[:-1], cls.CONTINUOUS
         if name.startswith('next_'):
@@ -48,15 +61,15 @@ class Statements:
             {'name': name})
 
     @classmethod
-    def split(cls, statement):
+    def split(cls, statement: str) -> Tuple[str, ...]:
         # Compile regex used to split relations (ie. "x=y", "a>=b"...)
-        if not hasattr(cls, '_relation'):
+        if cls._relation is None:
             cls._relation = re.compile(
                 r'\s*(%s)\s*' % '|'.join(cls.RELATIONS))
         return tuple(filter(None, map(str.strip, cls._relation.split(statement))))
 
     @classmethod
-    def parse(cls, value):
+    def parse(cls, value: str) -> Tuple[StatementsLiteral, Optional[int]]:
         statements = [s for s in (s.strip() for s in value.split(',')) if s]
         splitted_statements = (cls.split(stmt) for stmt in statements)
         valid_statements = [s for s in splitted_statements if len(s) == 3]
@@ -77,7 +90,7 @@ class Statements:
         return valid_statements, None
 
     @classmethod
-    def from_string(cls, value):
+    def from_string(cls, value: str) -> Statements:
         return Statements(*cls.parse(value))
 
     def __len__(self):
