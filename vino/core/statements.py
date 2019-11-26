@@ -125,7 +125,7 @@ class Statements:
 
 
 class Equations(Statements):
-    RELATIONS = ('=')
+    RELATIONS = ('=',)
 
     @classmethod
     def parse(cls, value):

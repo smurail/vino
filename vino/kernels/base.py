@@ -1,5 +1,6 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod
+from typing import Dict
 from vino import METADATA
 from .hdf5common import HDF5Manager
 
@@ -16,7 +17,7 @@ class KernelMeta(ABCMeta):
 
 
 class Kernel(metaclass=KernelMeta):
-    KERNELS = {}
+    KERNELS: Dict[str, type] = {}
 
     def __init__(self, metadata={}):
         self.__metadata = metadata

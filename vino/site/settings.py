@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 from pathlib import Path
 from dynaconf import LazySettings
+from typing import List
 
 settings = LazySettings(
     DEBUG_LEVEL_FOR_DYNACONF='DEBUG',
@@ -32,7 +33,7 @@ SECRET_KEY = settings.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = settings.get('DEBUG', True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: List[str] = []
 
 
 # Application definition
