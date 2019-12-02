@@ -3,7 +3,38 @@
 This project is mainly hosted at [SourceSup](https://sourcesup.renater.fr/projects/vino/).
 Please, consult the [Wiki](https://sourcesup.renater.fr/wiki/vino/index) for more information.
 
+## Setup development environment
+
+As of december 2019, ViNO is using `pipenv` to manage dependencies and virtual
+environment. To install required modules, generate default config files, and
+create local database, simply run:
+
+    make init
+
+You should then create a Django super user:
+
+    pipenv run ./manage.py createsuperuser
+
+You are now all setup to launch the debug server:
+
+    pipenv run ./manage.py runserver
+    # Go to <http://localhost:8000/admin> to work with ViNO!
+
+To run a command inside the virtual environment you can either enter pipenv
+shell, either run it with `pipenv run`. For example, to launch Django shell:
+
+    pipenv shell
+    # You are now in your local virtual environment
+    ./manage.py shell
+    # To quit use <ctrl-D>, once for the Django shell, once for the pipenv one
+
+    # Alternatively you can do
+    pipenv run ./manage.py shell
+
+
 ## Working with Docker
+
+**WARNING: This section must be updated!**
 
 A "Dockerfile" is provided for easily building your development environment. It is achieved in 3 steps:
 
