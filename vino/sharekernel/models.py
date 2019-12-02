@@ -93,9 +93,9 @@ class ViabilityProblem(Entity, Metadata):
     controls = InequationsField((Symbol.CONTROL, Symbol.DYNAMICS))
     constraints = InequationsField((Symbol.STATE, Symbol.CONSTRAINT))
     domain = InequationsField()
-    target = StatementsField()
+    target = InequationsField((Symbol.STATE, Symbol.TARGET))
 
-    STATEMENTS = [dynamics, constraints, controls]
+    STATEMENTS = [dynamics, constraints, controls, target]
     STATEMENTS_SET = set(STATEMENTS)
 
     def update_symbols(self):
