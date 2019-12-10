@@ -10,3 +10,6 @@ init:
 	mkdir -p data
 	# Create or upgrade database
 	pipenv run ./manage.py migrate
+
+check:
+	pipenv run ./tools/check.sh
