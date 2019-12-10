@@ -4,7 +4,7 @@ from django.db import models
 
 from django_currentuser.db.models import CurrentUserField
 
-from .fields import StatementsField, EquationsField, InequationsField
+from .fields import EquationsField, InequationsField
 
 
 class Entity(models.Model):
