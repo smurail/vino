@@ -19,9 +19,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.utils.translation import ugettext_lazy as _
 
+from vino.sharekernel import views
+
 admin.site.site_header = _("ViNO administration")
 admin.site.site_title = _("ViNO site admin")
 
 urlpatterns = [
+    path('', views.home),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,15 @@
+{% load staticfiles %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% block metatitle %}Vino{% endblock %}</title>
+    <style>
+html { font: 0.8em sans-serif }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% block body %}{% endblock %}
+</body>
+</html>
