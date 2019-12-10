@@ -80,7 +80,7 @@ class Symbol(models.Model):
         return '%s: %s%s' % (typ, self.name, longname)
 
 
-class ViabilityProblem(Entity, Metadata):
+class ViabilityProblem(EntityWithMetadata):
     class Meta:
         constraints = [
             models.UniqueConstraint(
