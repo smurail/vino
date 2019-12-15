@@ -51,11 +51,11 @@ METADATA = {
 }
 
 
-def parse(io: Iterable[str]):
+def parse(inp: Iterable[str]):
     section = 'meta'
     csv_reader = None
 
-    for line in io:
+    for line in inp:
         token = None
 
         if section == 'meta':
@@ -78,7 +78,7 @@ def parse(io: Iterable[str]):
 
             else:
                 section = 'data'
-                csv_reader = csv.DictReader(io, delimiter=' ')
+                csv_reader = csv.DictReader(inp, delimiter=' ')
                 break
 
         elif section == 'data':
