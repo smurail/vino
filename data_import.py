@@ -9,6 +9,7 @@ import csv
 
 from io import StringIO
 from functools import partial
+from typing import Iterable, Match
 
 from vino.sharekernel.models import ViabilityProblem as VP, Data
 
@@ -33,13 +34,12 @@ def Tuple(typ, sep=','):
 
 SPACES = re.compile(r' +')
 TOKENS = {
-    'BLANK_LINE': r'^\s*$',
-    'COMMENT_LINE': r'^//.*$',
-    'METADATA_LINE': r'^#\s*([^:]+?)\s*:\s*?(.+?)\s*?$',
-    'HASH_LINE': r'^#.*$',
-    'PSP_START_LINE': r'^Initxx',
+    'BLANK_LINE':     re.compile(r'^\s*$'),
+    'COMMENT_LINE':   re.compile(r'^//.*$'),
+    'METADATA_LINE':  re.compile(r'^#\s*([^:]+?)\s*:\s*?(.+?)\s*?$'),
+    'HASH_LINE':      re.compile(r'^#.*$'),
+    'PSP_START_LINE': re.compile(r'^Initxx'),
 }
-TOKENS = {k: re.compile(v) for k, v in TOKENS.items()}
 
 
 METADATA = {
@@ -51,30 +51,32 @@ METADATA = {
 }
 
 
-def parse(io):
+def parse(io: Iterable[str]):
     section = 'meta'
     csv_reader = None
 
     for line in io:
-        token, match = None, None
+        token = None
 
         if section == 'meta':
             for token, pattern in TOKENS.items():
                 match = pattern.match(line)
                 if match:
                     break
-            if not match:
-                token = None
 
-            if token in ('BLANK_LINE', 'COMMENT_LINE', 'HASH_LINE'):
-                continue
+            if match:
+                if token in ('BLANK_LINE', 'COMMENT_LINE', 'HASH_LINE'):
+                    continue
 
-            if token == 'METADATA_LINE':
-                key, value = match.group(1), match.group(2)
-                yield (section, (key, METADATA.get(key, str)(value)))
-            elif token == 'PSP_START_LINE':
-                section = 'data'
-            elif token is None:
+                elif token == 'METADATA_LINE':
+                    key, value = match.group(1), match.group(2)
+                    parse_value = METADATA.get(key) or str
+                    yield (section, (key, parse_value(value)))
+
+                elif token == 'PSP_START_LINE':
+                    section = 'data'
+
+            else:
                 section = 'data'
                 csv_reader = csv.DictReader(io, delimiter=' ')
                 break
