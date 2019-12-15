@@ -7,10 +7,11 @@ django.setup()
 import re
 import csv
 
+from dataclasses import dataclass
 from io import StringIO
 from functools import partial
 from itertools import chain
-from typing import Iterable, Match
+from typing import Tuple, Iterable
 
 from vino.sharekernel.models import ViabilityProblem as VP, Data
 
@@ -33,6 +34,15 @@ def TupleField(typ, sep=','):
     return parser
 
 
+@dataclass(frozen=True)
+class Datum:
+    DATA = 'data'
+    META = 'meta'
+
+    section: str = DATA
+    data: Tuple = ()
+
+
 SPACES = re.compile(r' +')
 TOKENS = {
     'BLANK_LINE':     re.compile(r'^\s*$'),
@@ -52,14 +62,14 @@ METADATA = {
 }
 
 
-def parse(inp: Iterable[str]):
-    section = 'meta'
+def parse(inp: Iterable[str]) -> Iterable[Datum]:
+    section = Datum.META
     csv_reader = None
 
     for line in inp:
         token = None
 
-        if section == 'meta':
+        if section == Datum.META:
             for token, pattern in TOKENS.items():
                 match = pattern.match(line)
                 if match:
@@ -72,23 +82,25 @@ def parse(inp: Iterable[str]):
                 elif token == 'METADATA_LINE':
                     key, value = match.group(1), match.group(2)
                     parse_value = METADATA.get(key) or str
-                    yield (section, (key, parse_value(value)))
+                    yield Datum(section, (key, parse_value(value)))
 
                 elif token == 'PSP_START_LINE':
-                    section = 'data'
+                    section = Datum.DATA
 
             else:
-                section = 'data'
+                section = Datum.DATA
                 csv_reader = csv.DictReader(chain([line], inp), delimiter=' ')
                 break
 
-        elif section == 'data':
+        elif section == Datum.DATA:
             values = SPACES.split(line.strip())
-            yield (section, tuple(map(partial(cast, to_type=int), values)))
+            typed_values = tuple(cast(x, int) for x in values)
+            yield Datum(section, typed_values)
 
     if csv_reader:
         for row in csv_reader:
-            yield (section, row)
+            typed_values = tuple((k, cast(v, float)) for k, v in row.items())
+            yield Datum(section, typed_values)
 
 
 if __name__ == '__main__':
