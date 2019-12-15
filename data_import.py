@@ -9,10 +9,11 @@ import csv
 from dataclasses import dataclass
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable, Dict, Any, Optional, NewType
+from typing import Tuple, Iterable, Optional
 
 
-Metadata = NewType('Metadata', Dict[str, Any])
+class Metadata(dict):
+    pass
 
 
 NO_DEFAULT = object()
@@ -121,7 +122,7 @@ def feed_metadata(data: Iterable[Datum], metadata: Optional[Metadata] = None) ->
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            if metadata:
+            if isinstance(metadata, Metadata):
                 metadata[key] = value
         yield datum
 
