@@ -11,9 +11,11 @@ from dataclasses import dataclass
 from io import StringIO
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable, Dict
+from typing import Tuple, Iterable, Dict, Any, Optional, NewType
 
 from vino.sharekernel.models import ViabilityProblem as VP, Data
+
+Metadata = NewType('Metadata', Dict[str, Any])
 
 
 NO_DEFAULT = object()
@@ -118,18 +120,19 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
             yield datum
 
 
-def feed_metadata(data: Iterable[Datum], metadata: Dict = None) -> Iterable[Datum]:
+def feed_metadata(data: Iterable[Datum], metadata: Optional[Metadata] = None) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            metadata[key] = value
+            if metadata:
+                metadata[key] = value
         yield datum
 
 
-def parse_data(data: Iterable[Datum], metadata: Dict = None) -> Iterable[Datum]:
+def parse_data(data: Iterable[Datum], metadata: Optional[Metadata] = None) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.DATA:
-            columns = metadata.get('ColumnDescription')
+            columns = metadata and metadata.get('ColumnDescription')
             if columns:
                 values = ((k, v) for k, v in zip(columns, datum.data) if k != 'empty')
                 yield Datum(datum.section, tuple(values))
@@ -138,7 +141,7 @@ def parse_data(data: Iterable[Datum], metadata: Dict = None) -> Iterable[Datum]:
 
 
 def parse(inp: Iterable[str]) -> Iterable[Datum]:
-    metadata = {}
+    metadata = Metadata({})
     pipeline = compose(
         parse_datafile,
         parse_metadata,
