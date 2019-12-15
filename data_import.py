@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from io import StringIO
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable
+from typing import Tuple, Iterable, Dict
 
 from vino.sharekernel.models import ViabilityProblem as VP, Data
 
@@ -118,8 +118,33 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
             yield datum
 
 
+def feed_metadata(data: Iterable[Datum], metadata: Dict = None) -> Iterable[Datum]:
+    for datum in data:
+        if datum.section == Datum.META:
+            key, value = datum.data
+            metadata[key] = value
+        yield datum
+
+
+def parse_data(data: Iterable[Datum], metadata: Dict = None) -> Iterable[Datum]:
+    for datum in data:
+        if datum.section == Datum.DATA:
+            columns = metadata.get('ColumnDescription')
+            if columns:
+                values = ((k, v) for k, v in zip(columns, datum.data) if k != 'empty')
+                yield Datum(datum.section, tuple(values))
+                continue
+        yield datum
+
+
 def parse(inp: Iterable[str]) -> Iterable[Datum]:
-    pipeline = compose(parse_datafile, parse_metadata)
+    metadata = {}
+    pipeline = compose(
+        parse_datafile,
+        parse_metadata,
+        partial(feed_metadata, metadata=metadata),
+        partial(parse_data, metadata=metadata))
+
     return pipeline(inp)
 
 
