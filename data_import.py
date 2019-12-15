@@ -9,7 +9,7 @@ import csv
 
 from dataclasses import dataclass
 from io import StringIO
-from functools import partial
+from functools import partial, reduce
 from itertools import chain
 from typing import Tuple, Iterable
 
@@ -26,6 +26,12 @@ def cast(value, to_type, default=NO_DEFAULT):
         return to_type(value)
     except ValueError:
         return to_type() if default is NO_DEFAULT else default
+
+
+def compose(*functions):
+    def inner(arg):
+        return reduce(lambda arg, func: func(arg), functions, arg)
+    return inner
 
 
 def TupleField(typ, sep=','):
@@ -62,7 +68,7 @@ METADATA = {
 }
 
 
-def parse(inp: Iterable[str]) -> Iterable[Datum]:
+def parse_datafile(inp: Iterable[str]) -> Iterable[Datum]:
     section = Datum.META
     csv_reader = None
 
@@ -81,8 +87,7 @@ def parse(inp: Iterable[str]) -> Iterable[Datum]:
 
                 elif token == 'METADATA_LINE':
                     key, value = match.group(1), match.group(2)
-                    parse_value = METADATA.get(key) or str
-                    yield Datum(section, (key, parse_value(value)))
+                    yield Datum(section, (key, value))
 
                 elif token == 'PSP_START_LINE':
                     section = Datum.DATA
@@ -101,6 +106,21 @@ def parse(inp: Iterable[str]) -> Iterable[Datum]:
         for row in csv_reader:
             typed_values = tuple((k, cast(v, float)) for k, v in row.items())
             yield Datum(section, typed_values)
+
+
+def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
+    for datum in data:
+        if datum.section == Datum.META:
+            key, value = datum.data
+            parse_value = METADATA.get(key) or str
+            yield Datum(datum.section, (key, parse_value(value)))
+        else:
+            yield datum
+
+
+def parse(inp: Iterable[str]) -> Iterable[Datum]:
+    pipeline = compose(parse_datafile, parse_metadata)
+    return pipeline(inp)
 
 
 if __name__ == '__main__':
