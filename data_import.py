@@ -9,6 +9,7 @@ import csv
 
 from io import StringIO
 from functools import partial
+from itertools import chain
 from typing import Iterable, Match
 
 from vino.sharekernel.models import ViabilityProblem as VP, Data
@@ -78,7 +79,7 @@ def parse(inp: Iterable[str]):
 
             else:
                 section = 'data'
-                csv_reader = csv.DictReader(inp, delimiter=' ')
+                csv_reader = csv.DictReader(chain([line], inp), delimiter=' ')
                 break
 
         elif section == 'data':
