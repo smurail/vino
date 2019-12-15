@@ -27,7 +27,7 @@ def cast(value, to_type, default=NO_DEFAULT):
         return to_type() if default is NO_DEFAULT else default
 
 
-def Tuple(typ, sep=','):
+def TupleField(typ, sep=','):
     def parser(inp):
         return [cast(item.strip(), typ) for item in inp.split(sep)]
     return parser
@@ -44,11 +44,11 @@ TOKENS = {
 
 
 METADATA = {
-    'MinimalValues': Tuple(float, sep=' '),
-    'MaximalValues': Tuple(float, sep=' '),
-    'PointNumberPerAxis': Tuple(int),
+    'MinimalValues': TupleField(float, sep=' '),
+    'MaximalValues': TupleField(float, sep=' '),
+    'PointNumberPerAxis': TupleField(int),
     'PointSize': int,
-    'ColumnDescription': Tuple(str),
+    'ColumnDescription': TupleField(str),
 }
 
 
