@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import django
-from django.conf import settings
 
 django.setup()
 
@@ -8,12 +7,10 @@ import re
 import csv
 
 from dataclasses import dataclass
-from io import StringIO
 from functools import partial, reduce
 from itertools import chain
 from typing import Tuple, Iterable, Dict, Any, Optional, NewType
 
-from vino.sharekernel.models import ViabilityProblem as VP, Data
 
 Metadata = NewType('Metadata', Dict[str, Any])
 
