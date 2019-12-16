@@ -9,9 +9,9 @@ import csv
 from dataclasses import dataclass
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable, TextIO
+from typing import Tuple, Iterable, Optional, Type, Dict, Any
 from collections import OrderedDict
-from array import array
+from abc import ABC, abstractmethod
 
 
 class Metadata(dict):
@@ -36,7 +36,17 @@ def compose(*functions):
     return inner
 
 
-class TupleField:
+class Field(ABC):
+    @abstractmethod
+    def parse(self, inp: str) -> Any:
+        raise NotImplementedError
+
+    @abstractmethod
+    def unparse(self, value: Any) -> str:
+        raise NotImplementedError
+
+
+class TupleField(Field):
     def __init__(self, typ, sep=','):
         self.type = typ
         self.separator = sep
@@ -49,8 +59,8 @@ class TupleField:
         return self.separator.join((str(x) for x in value))
 
 
-class BuiltinTypeField:
-    TYPE = None
+class BuiltinTypeField(Field):
+    TYPE: Optional[Type] = None
 
     @classmethod
     def parse(cls, inp):
@@ -84,11 +94,11 @@ TOKENS = {
 }
 
 
-METADATA = {
+METADATA: Dict[str, Field] = {
     'MinimalValues': TupleField(float, sep=' '),
     'MaximalValues': TupleField(float, sep=' '),
     'PointNumberPerAxis': TupleField(int),
-    'PointSize': IntField,
+    'PointSize': IntField(),
     'ColumnDescription': TupleField(str),
 }
 
@@ -137,7 +147,7 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            parse = METADATA.get(key).parse or str
+            parse = METADATA[key].parse or str
             yield Datum(datum.section, (key, parse(value)))
         else:
             yield datum
@@ -169,7 +179,7 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
         for datum in data:
             if datum.section == Datum.META:
                 key, value = datum.data
-                unparse = METADATA.get(key).unparse or str
+                unparse = METADATA[key].unparse or str
                 out.write(f'#{key}: {unparse(value)}\n')
             elif datum.section == Datum.DATA:
                 if not writer:
