@@ -9,7 +9,9 @@ import csv
 from dataclasses import dataclass
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable, Optional
+from typing import Tuple, Iterable, Optional, TextIO
+from collections import OrderedDict
+from array import array
 
 
 class Metadata(dict):
@@ -34,10 +36,33 @@ def compose(*functions):
     return inner
 
 
-def TupleField(typ, sep=','):
-    def parser(inp):
+class TupleField:
+    def __init__(self, typ, sep=','):
+        self.type = typ
+        self.separator = sep
+
+    def parse(self, inp):
+        typ, sep = self.type, self.separator
         return [cast(item.strip(), typ) for item in inp.split(sep)]
-    return parser
+
+    def unparse(self, value):
+        return self.separator.join((str(x) for x in value))
+
+
+class BuiltinTypeField:
+    TYPE = None
+
+    @classmethod
+    def parse(cls, inp):
+        return cast(inp, cls.TYPE)
+
+    @classmethod
+    def unparse(cls, value):
+        return str(value)
+
+
+class IntField(BuiltinTypeField):
+    TYPE = int
 
 
 @dataclass(frozen=True)
@@ -63,7 +88,7 @@ METADATA = {
     'MinimalValues': TupleField(float, sep=' '),
     'MaximalValues': TupleField(float, sep=' '),
     'PointNumberPerAxis': TupleField(int),
-    'PointSize': int,
+    'PointSize': IntField,
     'ColumnDescription': TupleField(str),
 }
 
@@ -112,8 +137,8 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            parse_value = METADATA.get(key) or str
-            yield Datum(datum.section, (key, parse_value(value)))
+            parse = METADATA.get(key).parse or str
+            yield Datum(datum.section, (key, parse(value)))
         else:
             yield datum
 
@@ -138,13 +163,33 @@ def parse_data(data: Iterable[Datum], metadata: Optional[Metadata] = None) -> It
         yield datum
 
 
+def write_csv(data: Iterable[Datum], target: str, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+    with open(target, 'w') as out:
+        writer = None
+
+        for datum in data:
+            if datum.section == Datum.META:
+                key, value = datum.data
+                unparse = METADATA.get(key).unparse or str
+                out.write(f'#{key}: {unparse(value)}\n')
+            elif datum.section == Datum.DATA:
+                if not writer:
+                    fields = OrderedDict(datum.data).keys()
+                    writer = csv.DictWriter(out, fieldnames=fields, delimiter=' ')
+                    writer.writeheader()
+                writer.writerow(OrderedDict(datum.data))
+
+            yield datum
+
+
 def parse(inp: Iterable[str]) -> Iterable[Datum]:
     metadata = Metadata({})
     pipeline = compose(
         parse_datafile,
         parse_metadata,
         partial(feed_metadata, metadata=metadata),
-        partial(parse_data, metadata=metadata))
+        partial(parse_data, metadata=metadata),
+        partial(write_csv, target='data/data.csv', metadata=metadata))
 
     return pipeline(inp)
 
