@@ -9,7 +9,7 @@ import csv
 from dataclasses import dataclass
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable, Optional, TextIO
+from typing import Tuple, Iterable, TextIO
 from collections import OrderedDict
 from array import array
 
@@ -143,16 +143,15 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
             yield datum
 
 
-def feed_metadata(data: Iterable[Datum], metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+def feed_metadata(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            if isinstance(metadata, Metadata):
-                metadata[key] = value
+            metadata[key] = value
         yield datum
 
 
-def parse_data(data: Iterable[Datum], metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+def parse_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.DATA:
             columns = metadata and metadata.get('ColumnDescription')
@@ -163,7 +162,7 @@ def parse_data(data: Iterable[Datum], metadata: Optional[Metadata] = None) -> It
         yield datum
 
 
-def write_csv(data: Iterable[Datum], target: str, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterable[Datum]:
     with open(target, 'w') as out:
         writer = None
 
