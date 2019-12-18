@@ -32,6 +32,7 @@ class Metadata(models.Model):
     description = models.TextField(default='', blank=True)
     publication = models.TextField(default='', blank=True)
     author = models.CharField(max_length=200, default='', blank=True)
+    email = models.CharField(max_length=200, default='', blank=True)
     url = models.URLField(default='', blank=True)
     image = models.ImageField(upload_to='images/%Y/%m/%d', blank=True)
 
