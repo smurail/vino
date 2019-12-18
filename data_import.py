@@ -53,7 +53,8 @@ class TupleField(Field):
 
     def parse(self, inp):
         typ, sep = self.type, self.separator
-        return [cast(item.strip(), typ) for item in inp.split(sep)]
+        tokens = inp.strip().split(self.separator)
+        return [cast(item.strip(), typ) for item in tokens if item.strip()]
 
     def unparse(self, value):
         return self.separator.join((str(x) for x in value))
