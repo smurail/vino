@@ -1,6 +1,5 @@
 import re
 import numpy as np
-from overrides import overrides
 
 from .base import FileFormatException, FileFormatLoader
 from ..kernels import BarGridKernel
@@ -13,7 +12,6 @@ class PspModifiedLoader(FileFormatLoader):
     modified for give easy access to metadata at the begin of the file.
     '''
 
-    @overrides
     def readFile(self, f):
         '''
         Returns an object of class BarGridKernel loaded from an output file

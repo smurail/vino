@@ -1,8 +1,6 @@
 import re
 import os
 
-from overrides import overrides
-
 from vino import METADATA
 from .base import FileFormatLoader
 from ..kernels import KdTreeKernel
@@ -17,7 +15,6 @@ class ViabilitreeLoader(FileFormatLoader):
     The metadata 'viabilityproblem.statedimension' is mandatory for loading the file.
     '''
 
-    @overrides
     def read(self, filename):
         metadata = {}
 #        myre = re.compile('^#(.*):(.*)$')

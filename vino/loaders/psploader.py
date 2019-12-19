@@ -1,5 +1,4 @@
 import re
-from overrides import overrides
 
 from vino import METADATA
 from .base import FileFormatLoader
@@ -10,7 +9,6 @@ class PspLoader(FileFormatLoader):
     '''
     Reader for the raw output format of the software of Patrick Saint-Pierre.
     '''
-    @overrides
     def readFile(self, f):
         metadata={}
         bgk = None

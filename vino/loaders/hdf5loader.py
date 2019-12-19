@@ -1,5 +1,3 @@
-from overrides import overrides
-
 from .base import FileFormatLoader
 from ..kernels import BarGridKernel, KdTreeKernel
 from ..kernels.hdf5common import HDF5Manager
@@ -13,6 +11,5 @@ class Hdf5Loader(FileFormatLoader):
     def __init__(self, strategies=[BarGridKernel, KdTreeKernel]):
         self.hdf5manager = HDF5Manager(strategies)
 
-    @overrides
     def read(self, filename):
         return self.hdf5manager.readKernel(filename)
