@@ -131,10 +131,13 @@ class BarGridKernel(Kernel):
         permutIntervalNumberperaxis = np.dot(self.permutation, self.intervalNumberperaxis)
 
         for i in range(len(self.bars)):
-           data.append(list(permutOriginCoords+(permutOppositeCoords-permutOriginCoords)*np.array(self.bars[i][:-1])/permutIntervalNumberperaxis)+[permutOriginCoords[-1]+(permutOppositeCoords[-1]-permutOriginCoords[-1])*self.bars[i][-1]/permutIntervalNumberperaxis[-1]])
+           data.append([
+               permutOriginCoords+(permutOppositeCoords-permutOriginCoords)*np.array(self.bars[i][:-1])/permutIntervalNumberperaxis,
+               permutOriginCoords[-1]+(permutOppositeCoords[-1]-permutOriginCoords[-1])*self.bars[i][-1]/permutIntervalNumberperaxis[-1]
+           ])
 
         perm = np.dot(self.permutation,np.arange(len(self.originCoords)))
-        data = [self.getMinFrameworkBounds()+self.getMaxFrameworkBounds()+self.getIntervalSizes()+list(perm)]+list(data)
+        data = [self.getMinFrameworkBounds()+self.getMaxFrameworkBounds()+self.getIntervalSizes()+[perm], data]
 
         return data
 
