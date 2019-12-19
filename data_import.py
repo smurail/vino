@@ -26,7 +26,7 @@ def cast(value, to_type, default=NO_DEFAULT):
         if type(value) is to_type:
             return value
         return to_type(value)
-    except ValueError:
+    except (ValueError, TypeError):
         return to_type() if default is NO_DEFAULT else default
 
 
