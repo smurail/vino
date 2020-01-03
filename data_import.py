@@ -148,8 +148,9 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            parse = METADATA[key].parse or str
-            yield Datum(datum.section, (key, parse(value)))
+            if key in METADATA:
+                parse = METADATA[key].parse
+                yield Datum(datum.section, (key, parse(value)))
         else:
             yield datum
 
