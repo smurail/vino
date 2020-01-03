@@ -208,7 +208,6 @@ def parse(inp: Iterable[str]) -> Iterable[Datum]:
 if __name__ == '__main__':
     import sys
     from pathlib import Path
-    from pprint import pprint
 
     if len(sys.argv) < 2:
         print(f"{sys.argv[0]} <file>", file=sys.stderr)
@@ -221,4 +220,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(f, newline='') as fp:
-        pprint(list(parse(fp)))
+        for r in parse(fp):
+            print(r)
