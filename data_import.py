@@ -183,15 +183,49 @@ def feed_metadata(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
         yield datum
 
 
-def parse_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+def to_vectors(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+    columns: Tuple[Any, ...] = ()
+
     for datum in data:
         if datum.section == Datum.DATA:
-            columns = metadata and metadata.get('ColumnDescription')
-            if columns:
-                values = ((k, v) for k, v in zip(columns, datum.data) if k != 'empty')
-                yield Datum(datum.section, tuple(values))
-                continue
-        yield datum
+            dataformat = metadata['dataformat.name']
+            values: Iterable[Any]
+
+            if dataformat == 'bars':
+                original_columns = metadata['ColumnDescription']
+                if not columns:
+                    columns = tuple(c for c in original_columns if c != 'empty')
+                    metadata['dataformat.columns'] = columns
+                data_items = zip(original_columns, datum.data)
+                values = (v for k, v in data_items if k != 'empty')
+
+            else:
+                data_dict = OrderedDict(datum.data)
+                values = data_dict.values()
+                if not columns:
+                    columns = tuple(data_dict.keys())
+                    metadata['dataformat.columns'] = columns
+
+            yield Datum(datum.section, values)
+
+        else:
+            yield datum
+
+
+def to_dicts(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+    yielded_metadata = False
+
+    for datum in data:
+        if datum.section == Datum.DATA:
+            if not yielded_metadata:
+                for item in metadata.items():
+                    yield Datum(Datum.META, item)
+                yielded_metadata = True
+
+            columns = metadata['dataformat.columns']
+            assert len(columns) == len(datum.data)
+            values = ((k, v) for k, v in zip(columns, datum.data))
+            yield Datum(datum.section, values)
 
 
 def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterable[Datum]:
@@ -220,8 +254,10 @@ def parse(inp: Iterable[str]) -> Iterable[Datum]:
         parse_datafile,
         parse_metadata,
         partial(feed_metadata, metadata=metadata),
-        partial(parse_data, metadata=metadata),
-        partial(write_csv, target='data/data.csv', metadata=metadata))
+        partial(to_vectors, metadata=metadata),
+        partial(to_dicts, metadata=metadata),
+        partial(write_csv, target='data/data.csv', metadata=metadata),
+    )
 
     return pipeline(inp)
 
