@@ -26,6 +26,15 @@ def cast(value, to_type, default=NO_DEFAULT):
         return to_type() if default is NO_DEFAULT else default
 
 
+DIGITS = re.compile(r'\d+|$')
+
+
+def to_int(value: str):
+    # XXX DIGITS regex match digits or empty string (because of |$ part)
+    match = DIGITS.search(value).group() # type: ignore
+    return cast(match, int)
+
+
 def compose(*functions):
     def inner(arg):
         return reduce(lambda arg, func: func(arg), functions, arg)
