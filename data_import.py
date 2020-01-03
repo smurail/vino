@@ -32,7 +32,7 @@ DIGITS = re.compile(r'\d+|$')
 
 def to_int(value: str):
     # XXX DIGITS regex match digits or empty string (because of |$ part)
-    match = DIGITS.search(value).group() # type: ignore
+    match = DIGITS.search(value).group()  # type: ignore
     return cast(match, int)
 
 
