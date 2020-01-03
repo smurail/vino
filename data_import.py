@@ -23,7 +23,7 @@ NO_DEFAULT = object()
 
 def cast(value, to_type, default=NO_DEFAULT):
     try:
-        if type(value) is to_type:
+        if isinstance(value, to_type):
             return value
         return to_type(value)
     except (ValueError, TypeError):
@@ -53,7 +53,7 @@ class TupleField(Field):
 
     def parse(self, inp):
         typ, sep = self.type, self.separator
-        tokens = inp.strip().split(self.separator)
+        tokens = inp.strip().split(sep)
         return [cast(item.strip(), typ) for item in tokens if item.strip()]
 
     def unparse(self, value):
@@ -182,6 +182,7 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
                 key, value = datum.data
                 unparse = METADATA[key].unparse or str
                 out.write(f'#{key}: {unparse(value)}\n')
+
             elif datum.section == Datum.DATA:
                 if not writer:
                     fields = OrderedDict(datum.data).keys()
