@@ -140,9 +140,11 @@ def parse_datafile(inp: Iterable[str]) -> Iterable[Datum]:
                     yield Datum(section, (key, value))
 
                 elif token == 'PSP_START_LINE':
+                    yield Datum(Datum.META, ('dataformat.name', 'bars'))
                     section = Datum.DATA
 
             else:
+                yield Datum(Datum.META, ('dataformat.name', 'kdtree'))
                 section = Datum.DATA
                 csv_reader = csv.DictReader(chain([line], inp), delimiter=' ')
                 break
