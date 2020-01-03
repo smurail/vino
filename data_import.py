@@ -14,10 +14,6 @@ from collections import OrderedDict
 from abc import ABC, abstractmethod
 
 
-class Metadata(dict):
-    pass
-
-
 NO_DEFAULT = object()
 
 
@@ -72,8 +68,12 @@ class BuiltinTypeField(Field):
         return str(value)
 
 
-class IntField(BuiltinTypeField):
+class IntegerField(BuiltinTypeField):
     TYPE = int
+
+
+class StringField(BuiltinTypeField):
+    TYPE = str
 
 
 @dataclass(frozen=True)
@@ -95,12 +95,26 @@ TOKENS = {
 }
 
 
+class Metadata(dict):
+    """
+    MinimalValues = TupleField(float, sep=' ')
+    MaximalValues = TupleField(float, sep=' ')
+    PointNumberPerAxis = TupleField(int)
+    PointSize = IntegerField()
+    ColumnDescription = TupleField(str)
+    dataformat__name = StringField()
+    dataformat__columns = TupleField(str)
+    """
+
+
 METADATA: Dict[str, Field] = {
     'MinimalValues': TupleField(float, sep=' '),
     'MaximalValues': TupleField(float, sep=' '),
     'PointNumberPerAxis': TupleField(int),
-    'PointSize': IntField(),
+    'PointSize': IntegerField(),
     'ColumnDescription': TupleField(str),
+    'dataformat.name': StringField(),
+    'dataformat.columns': TupleField(str),
 }
 
 
