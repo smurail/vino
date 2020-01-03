@@ -12,7 +12,7 @@ from functools import partial, reduce
 from itertools import chain
 from typing import Tuple, Iterable, Optional, Type, Dict, Any, List, Callable
 from collections import OrderedDict
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 
 NO_DEFAULT = object()
@@ -42,7 +42,18 @@ def compose(*functions):
     return inner
 
 
-class Field(ABC):
+class FieldMeta(ABCMeta):
+    _instances: Dict[Tuple[type, Tuple[Any, ...], Tuple[Tuple[str, Any], ...]], 'Field'] = {}
+
+    # Inspired by https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python#6798042
+    def __call__(cls, *args, **kwargs):
+        key = (cls, args, tuple(kwargs.items()))
+        if key not in cls._instances:
+            cls._instances[key] = super().__call__(*args, **kwargs)
+        return cls._instances[key]
+
+
+class Field(metaclass=FieldMeta):
     @abstractmethod
     def parse(self, inp: str) -> Any:
         raise NotImplementedError
