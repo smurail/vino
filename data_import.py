@@ -208,6 +208,9 @@ def parse(inp: Iterable[str]) -> Iterable[Datum]:
 if __name__ == '__main__':
     import sys
     from pathlib import Path
+    # XXX https://stackoverflow.com/questions/14207708/ioerror-errno-32-broken-pipe-python/30091579#30091579
+    from signal import signal, SIGPIPE, SIG_DFL
+    signal(SIGPIPE, SIG_DFL)
 
     if len(sys.argv) < 2:
         print(f"{sys.argv[0]} <file>", file=sys.stderr)
