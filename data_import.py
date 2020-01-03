@@ -5,11 +5,12 @@ django.setup()
 
 import re
 import csv
+import numpy as np
 
 from dataclasses import dataclass
 from functools import partial, reduce
 from itertools import chain
-from typing import Tuple, Iterable, Optional, Type, Dict, Any
+from typing import Tuple, Iterable, Optional, Type, Dict, Any, List, Callable
 from collections import OrderedDict
 from abc import ABC, abstractmethod
 
@@ -221,6 +222,61 @@ def to_vectors(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
             yield datum
 
 
+def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+    permut_cols = None
+    column_indices: List[int] = []
+    resample: List[Callable] = []
+
+    for datum in data:
+        if datum.section == Datum.DATA and metadata['dataformat.name'] == 'bars':
+            # Make permutation matrices
+            if permut_cols is None:
+                columns = metadata['dataformat.columns']
+                assert columns
+                count = len(columns)
+                # Initialize permutation matrix with zeros
+                permut_cols = np.zeros((count, count), int)
+                permut_axes = np.zeros((count-1, count-1), int)
+                # Find column indices out of column labels (x1, x2...)
+                column_indices = [to_int(c)-1 for c in columns]
+                # Two last columns are bounds of a bar
+                assert column_indices[-1] == column_indices[-2]
+                bar_axis = column_indices[-1]
+                permut_fields_vector = column_indices[:-1]
+                # Shift all columns after max bound (ie. xNmax)
+                permut_vector = [x+1 if x > bar_axis else x for x in column_indices]
+                permut_vector[-1] += 1
+                # Make permutation matrices out of permutation vector
+                for i in range(len(permut_vector)):
+                    permut_cols[permut_vector[i]][i] = 1
+                for i in range(len(permut_fields_vector)):
+                    permut_axes[permut_fields_vector[i]][i] = 1
+                # Permute column labels by permuting column indices
+                columns = [columns[i] for i in np.dot(permut_cols, range(count))]
+                metadata['dataformat.columns'] = columns
+
+            # Make resampling functions
+            if not resample:
+                min_values = np.dot(permut_axes, metadata['MinimalValues'])
+                max_values = np.dot(permut_axes, metadata['MaximalValues'])
+                ppa_values = np.dot(permut_axes, metadata['PointNumberPerAxis'])
+                assert len(min_values) == len(max_values) == len(ppa_values)
+                resampling_values = list(zip(min_values, max_values, ppa_values))
+                for i in column_indices:
+                    vmin, vmax, ppa = resampling_values[i]
+                    resample.append(lambda x: vmin + x/ppa * (vmax-vmin))
+
+            # Compute results
+            resampled = [resample[i](x) for i, x in enumerate(datum.data)]
+            permuted = np.dot(permut_cols, resampled)
+            normalized = permuted
+
+            yield Datum(datum.section, normalized)
+
+        else:
+            yield datum
+
+
 def to_dicts(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
     yielded_metadata = False
 
@@ -264,6 +320,7 @@ def parse(inp: Iterable[str]) -> Iterable[Datum]:
         parse_metadata,
         partial(feed_metadata, metadata=metadata),
         partial(to_vectors, metadata=metadata),
+        partial(normalize_data, metadata=metadata),
         partial(to_dicts, metadata=metadata),
         partial(write_csv, target='data/data.csv', metadata=metadata),
     )
