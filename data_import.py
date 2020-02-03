@@ -279,8 +279,7 @@ def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]
 
             # Compute results
             resampled = [resample[i](x) for i, x in enumerate(datum.data)]
-            permuted = np.dot(permut_cols, resampled)
-            normalized = permuted
+            normalized = np.dot(permut_cols, resampled)
 
             yield Datum(datum.section, normalized)
 
