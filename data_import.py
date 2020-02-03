@@ -305,7 +305,7 @@ def to_dicts(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
 
 
 def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterable[Datum]:
-    with open(target, 'w') as out:
+    with open(target, 'w', newline='\r\n') as out:
         writer = None
 
         for datum in data:
@@ -318,7 +318,8 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
             elif datum.section == Datum.DATA:
                 if not writer:
                     fields = OrderedDict(datum.data).keys()
-                    writer = csv.DictWriter(out, fieldnames=fields, delimiter=' ')
+                    writer = csv.DictWriter(out, fieldnames=fields, delimiter=' ',
+                                            lineterminator='\n')
                     writer.writeheader()
                 writer.writerow(OrderedDict(datum.data))
 
