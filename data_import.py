@@ -275,7 +275,7 @@ def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]
                 resampling_values = list(zip(min_values, max_values, ppa_values))
                 for i in column_indices:
                     vmin, vmax, ppa = resampling_values[i]
-                    resample.append(lambda x: vmin + x/ppa * (vmax-vmin))
+                    resample.append(lambda x: vmin + float(x)/ppa * (vmax-vmin))
 
             # Compute results
             resampled = [resample[i](x) for i, x in enumerate(datum.data)]
