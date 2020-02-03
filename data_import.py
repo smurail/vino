@@ -311,8 +311,9 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
         for datum in data:
             if datum.section == Datum.META:
                 key, value = datum.data
-                unparse = METADATA[key].unparse or str
-                out.write(f'#{key}: {unparse(value)}\n')
+                if key in METADATA:
+                    unparse = METADATA[key].unparse
+                    out.write(f'#{key}: {unparse(value)}\n')
 
             elif datum.section == Datum.DATA:
                 if not writer:
