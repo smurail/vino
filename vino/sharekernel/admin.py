@@ -20,7 +20,7 @@ class SymbolInline(admin.TabularInline):
 
 
 @admin.register(ViabilityProblem)
-class ViabilityProblemAdin(admin.ModelAdmin):
+class ViabilityProblemAdmin(admin.ModelAdmin):
     list_display = ('title', 'owner', 'state', 'date_created', 'date_updated')
     readonly_fields = ('date_created', 'date_updated')
     fields = (
