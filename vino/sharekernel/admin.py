@@ -24,6 +24,7 @@ class ViabilityProblemAdmin(admin.ModelAdmin):
     list_display = ('title', 'owner', 'state', 'date_created', 'date_updated')
     readonly_fields = ('date_created', 'date_updated')
     fields = (
-        'owner', 'state', 'date_created', 'date_updated', 'title', 'description', 'publication',
-        'author', 'url', 'image', 'dynamics', 'controls', 'constraints', 'domain', 'target')
+        'owner', 'state', 'title', 'date_created', 'date_updated',
+        'description', 'publication', 'author', 'email', 'url', 'image',
+        'dynamics', 'controls', 'constraints', 'domain', 'target')
     inlines = (SymbolInline,)
