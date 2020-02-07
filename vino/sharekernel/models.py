@@ -68,6 +68,7 @@ class Symbol(models.Model):
     ])
 
     vp = models.ForeignKey('ViabilityProblem', models.CASCADE,
+                           related_name="symbols",
                            verbose_name="Viability problem")
     type = models.CharField(max_length=2, choices=TYPES.items())
     order = models.IntegerField()
@@ -137,7 +138,7 @@ class ViabilityProblem(EntityWithMetadata):
         }
 
         # Update database
-        self.symbol_set.all().delete()
+        self.symbols.all().delete()
         Symbol.objects.bulk_create([
             Symbol(vp=self, type=typ, order=order, name=name)
             for name, (order, typ) in symbols.items()
