@@ -171,9 +171,8 @@ class ParameterSet(Entity):
         return OrderedDict(zip(names, values))
 
     def __str__(self):
-        fields = filter(None, (self.dynamics, self.constraints, self.target))
-        return '%s: %s' % (
-            self.vp, ','.join(fields))
+        fields = ('='.join(item) for item in self.to_dict().items())
+        return f'{self.vp}: {", ".join(fields)}'
 
 
 class Software(EntityWithMetadata):
