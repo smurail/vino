@@ -5,7 +5,6 @@ from .models import Symbol, ViabilityProblem, ParameterSet, Software, Kernel
 
 admin.site.register(ParameterSet)
 admin.site.register(Software)
-admin.site.register(Kernel)
 
 
 @admin.register(Symbol)
@@ -28,3 +27,13 @@ class ViabilityProblemAdmin(admin.ModelAdmin):
         'description', 'publication', 'author', 'email', 'url', 'image',
         'dynamics', 'controls', 'constraints', 'domain', 'target')
     inlines = (SymbolInline,)
+
+
+@admin.register(Kernel)
+class KernelAdmin(admin.ModelAdmin):
+    list_display = ('title', 'owner', 'state', 'date_created', 'date_updated')
+    readonly_fields = ('date_created', 'date_updated')
+    fields = (
+        'owner', 'state', 'params', 'file', 'format', 'software', 'title',
+        'date_created', 'date_updated', 'description', 'publication', 'author',
+        'email', 'url', 'image')
