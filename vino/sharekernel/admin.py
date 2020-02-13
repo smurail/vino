@@ -34,6 +34,6 @@ class KernelAdmin(admin.ModelAdmin):
     list_display = ('title', 'owner', 'state', 'date_created', 'date_updated')
     readonly_fields = ('date_created', 'date_updated')
     fields = (
-        'owner', 'state', 'params', 'file', 'format', 'software', 'title',
+        'owner', 'state', 'params', 'datafile', 'format', 'software', 'title',
         'date_created', 'date_updated', 'description', 'publication', 'author',
         'email', 'url', 'image')
