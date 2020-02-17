@@ -114,7 +114,7 @@ SPACES = re.compile(r' +')
 TOKENS = {
     'BLANK_LINE':     re.compile(r'^\s*$'),
     'COMMENT_LINE':   re.compile(r'^//.*$'),
-    'METADATA_LINE':  re.compile(r'^#\s*([^:]+?)\s*:\s*?(.+?)\s*?$'),
+    'METADATA_LINE':  re.compile(r'^#\s*([^:]+?)\s*:\s*(.+?)\s*?$'),
     'HASH_LINE':      re.compile(r'^#.*$'),
     'PSP_START_LINE': re.compile(r'^Initxx'),
 }
