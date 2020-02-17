@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .importable import ImportableMixin
 from .models import Symbol, ViabilityProblem, ParameterSet, Software, Kernel
 
 # Register your models here.
@@ -30,7 +31,7 @@ class ViabilityProblemAdmin(admin.ModelAdmin):
 
 
 @admin.register(Kernel)
-class KernelAdmin(admin.ModelAdmin):
+class KernelAdmin(ImportableMixin, admin.ModelAdmin):
     list_display = ('title', 'owner', 'state', 'date_created', 'date_updated')
     readonly_fields = ('date_created', 'date_updated')
     fields = (
