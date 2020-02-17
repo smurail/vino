@@ -325,8 +325,8 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
             yield datum
 
 
-def parse(inp: Iterable[str]) -> Iterable[Datum]:
-    metadata = Metadata({})
+def parse(inp: Iterable[str], metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+    metadata = metadata if isinstance(metadata, Metadata) else Metadata({})
     pipeline = compose(
         parse_datafile,
         parse_metadata,
