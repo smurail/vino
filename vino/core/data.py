@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-import django
-
-django.setup()
-
 import re
 import csv
 import numpy as np
@@ -341,6 +337,10 @@ def parse(inp: Iterable[str], metadata: Optional[Metadata] = None) -> Iterable[D
 
 
 if __name__ == '__main__':
+    import django
+
+    django.setup()
+
     import sys
     from pathlib import Path
     # XXX https://stackoverflow.com/questions/14207708/ioerror-errno-32-broken-pipe-python/30091579#30091579
