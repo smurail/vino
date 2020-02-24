@@ -190,9 +190,7 @@ class Kernel(EntityWithMetadata):
         ('kdtree', 'KdTree format'),
     )
 
-    params = models.ForeignKey(ParameterSet, models.CASCADE,
-                               verbose_name="Parameters")
-    datafile = models.FileField(upload_to='kernels/%Y/%m/%d',
-                                verbose_name="Data file")
+    params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE)
     software = models.ForeignKey(Software, models.CASCADE)
+    datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
