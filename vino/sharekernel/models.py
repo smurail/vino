@@ -25,7 +25,7 @@ class Entity(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
 
-class Metadata(models.Model):
+class EntityWithMetadata(Entity):
     class Meta:
         abstract = True
 
@@ -39,11 +39,6 @@ class Metadata(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class EntityWithMetadata(Entity, Metadata):
-    class Meta:
-        abstract = True
 
 
 class Symbol(models.Model):
