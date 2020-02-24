@@ -4,93 +4,13 @@ import csv
 import numpy as np
 
 from dataclasses import dataclass
-from functools import partial, reduce
+from functools import partial
 from itertools import chain
-from typing import Tuple, Iterable, Optional, Type, Dict, Any, List, Callable
+from typing import Tuple, Iterable, Optional, Any, List, Callable
 from collections import OrderedDict
-from abc import ABCMeta, abstractmethod
 
-
-NO_DEFAULT = object()
-
-
-def cast(value, to_type, default=NO_DEFAULT):
-    try:
-        if isinstance(value, to_type):
-            return value
-        return to_type(value)
-    except (ValueError, TypeError):
-        return to_type() if default is NO_DEFAULT else default
-
-
-DIGITS = re.compile(r'\d+|$')
-
-
-def to_int(value: str):
-    # XXX DIGITS regex match digits or empty string (because of |$ part)
-    match = DIGITS.search(value).group()  # type: ignore
-    return cast(match, int)
-
-
-def compose(*functions):
-    def inner(arg):
-        return reduce(lambda arg, func: func(arg), functions, arg)
-    return inner
-
-
-class FieldMeta(ABCMeta):
-    _instances: Dict[Tuple[type, Tuple[Any, ...], Tuple[Tuple[str, Any], ...]], 'Field'] = {}
-
-    # Inspired by https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python#6798042
-    def __call__(cls, *args, **kwargs):
-        key = (cls, args, tuple(kwargs.items()))
-        if key not in cls._instances:
-            cls._instances[key] = super().__call__(*args, **kwargs)
-        return cls._instances[key]
-
-
-class Field(metaclass=FieldMeta):
-    @abstractmethod
-    def parse(self, inp: str) -> Any:
-        raise NotImplementedError
-
-    @abstractmethod
-    def unparse(self, value: Any) -> str:
-        raise NotImplementedError
-
-
-class TupleField(Field):
-    def __init__(self, typ, sep=','):
-        self.type = typ
-        self.separator = sep
-
-    def parse(self, inp):
-        typ, sep = self.type, self.separator
-        tokens = inp.strip().split(sep)
-        return [cast(item.strip(), typ) for item in tokens if item.strip()]
-
-    def unparse(self, value):
-        return self.separator.join((str(x) for x in value))
-
-
-class BuiltinTypeField(Field):
-    TYPE: Optional[Type] = None
-
-    @classmethod
-    def parse(cls, inp):
-        return cast(inp, cls.TYPE)
-
-    @classmethod
-    def unparse(cls, value):
-        return str(value)
-
-
-class IntegerField(BuiltinTypeField):
-    TYPE = int
-
-
-class StringField(BuiltinTypeField):
-    TYPE = str
+from .utils import cast, to_int, compose
+from .metadata import Metadata
 
 
 @dataclass(frozen=True)
@@ -113,29 +33,6 @@ TOKENS = {
     'METADATA_LINE':  re.compile(r'^#\s*([^:]+?)\s*:\s*(.+?)\s*?$'),
     'HASH_LINE':      re.compile(r'^#.*$'),
     'PSP_START_LINE': re.compile(r'^Initxx'),
-}
-
-
-class Metadata(dict):
-    """
-    MinimalValues = TupleField(float, sep=' ')
-    MaximalValues = TupleField(float, sep=' ')
-    PointNumberPerAxis = TupleField(int)
-    PointSize = IntegerField()
-    ColumnDescription = TupleField(str)
-    dataformat__name = StringField()
-    dataformat__columns = TupleField(str)
-    """
-
-
-METADATA: Dict[str, Field] = {
-    'MinimalValues': TupleField(float, sep=' '),
-    'MaximalValues': TupleField(float, sep=' '),
-    'PointNumberPerAxis': TupleField(int),
-    'PointSize': IntegerField(),
-    'ColumnDescription': TupleField(str),
-    'dataformat.name': StringField(),
-    'dataformat.columns': TupleField(str),
 }
 
 
@@ -185,8 +82,8 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            if key in METADATA:
-                parse = METADATA[key].parse
+            if key in Metadata.FIELDS:
+                parse = Metadata.FIELDS[key].parse
                 yield Datum(datum.section, (key, parse(value)))
         else:
             yield datum
@@ -306,8 +203,8 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
         for datum in data:
             if datum.section == Datum.META:
                 key, value = datum.data
-                if key in METADATA:
-                    unparse = METADATA[key].unparse
+                if key in Metadata.FIELDS:
+                    unparse = Metadata.FIELDS[key].unparse
                     out.write(f'#{key}: {unparse(value)}\n')
 
             elif datum.section == Datum.DATA:
