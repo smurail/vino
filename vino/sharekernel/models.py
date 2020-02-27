@@ -175,12 +175,12 @@ class Software(EntityWithMetadata):
     parameters = models.CharField(max_length=200, default='', blank=True)
 
 
-class DataFormat(Entity):
+class DataFormat(EntityWithMetadata):
     parameters = models.CharField(max_length=200, default='', blank=True)
 
 
 class Kernel(EntityWithMetadata):
     params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
-    format = models.ForeignKey(DataFormat, models.CASCADE)
+    format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
