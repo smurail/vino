@@ -2,7 +2,6 @@ import inspect
 
 from abc import ABCMeta, abstractmethod
 from typing import Type, Dict, Tuple, Any, Optional
-from datetime import datetime
 from ast import literal_eval
 
 from django.utils.dateparse import parse_datetime
