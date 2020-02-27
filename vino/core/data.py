@@ -218,7 +218,7 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
             yield datum
 
 
-def parse(inp: Iterable[str], metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+def parse(inp: Iterable[str], target: str, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata({})
     pipeline = compose(
         parse_datafile,
@@ -227,7 +227,7 @@ def parse(inp: Iterable[str], metadata: Optional[Metadata] = None) -> Iterable[D
         partial(to_vectors, metadata=metadata),
         partial(normalize_data, metadata=metadata),
         partial(to_dicts, metadata=metadata),
-        partial(write_csv, target='data/data.csv', metadata=metadata),
+        partial(write_csv, target=target, metadata=metadata),
     )
 
     return pipeline(inp)
@@ -240,6 +240,7 @@ if __name__ == '__main__':
 
     import sys
     from pathlib import Path
+    from tempfile import mktemp
     # XXX https://stackoverflow.com/questions/14207708/ioerror-errno-32-broken-pipe-python/30091579#30091579
     from signal import signal, SIGPIPE, SIG_DFL
     signal(SIGPIPE, SIG_DFL)
@@ -255,5 +256,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(f, newline='') as fp:
-        for r in parse(fp):
+        tmpfile = mktemp(prefix='vino-')
+        for r in parse(fp, target=tmpfile):
             print(r)
+        Path(tmpfile).unlink()
