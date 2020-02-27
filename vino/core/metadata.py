@@ -3,6 +3,7 @@ import inspect
 from abc import ABCMeta, abstractmethod
 from typing import Type, Dict, Tuple, Any, Optional
 from datetime import datetime
+from ast import literal_eval
 
 from django.utils.dateparse import parse_datetime
 
@@ -69,6 +70,14 @@ class TupleField(Field):
 
     def do_unparse(self, value):
         return self.separator.join((str(x) for x in value))
+
+
+class LiteralField(Field):
+    def do_parse(self, inp):
+        return literal_eval(inp)
+
+    def do_unparse(self, value):
+        return repr(value)
 
 
 class DateTimeField(Field):
