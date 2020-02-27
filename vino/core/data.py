@@ -197,7 +197,7 @@ def to_dicts(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
 
 
 def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterable[Datum]:
-    with open(target, 'w', newline='\r\n') as out:
+    with open(target, 'a', newline='\r\n') as out:
         writer = None
 
         for datum in data:
