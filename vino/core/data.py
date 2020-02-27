@@ -36,7 +36,7 @@ TOKENS = {
 }
 
 
-def parse_datafile(inp: Iterable[str]) -> Iterable[Datum]:
+def parse_lines(inp: Iterable[str]) -> Iterable[Datum]:
     section = Datum.META
     csv_reader = None
 
@@ -83,8 +83,9 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
         if datum.section == Datum.META:
             key, value = datum.data
             if key in Metadata.FIELDS:
-                parse = Metadata.FIELDS[key].parse
-                yield Datum(datum.section, (key, parse(value)))
+                parsed = Metadata.FIELDS[key].parse(value)
+                if parsed is not None:
+                    yield Datum(datum.section, (key, parsed))
         else:
             yield datum
 
@@ -218,19 +219,31 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
             yield datum
 
 
-def parse(inp: Iterable[str], target: str, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
-    metadata = metadata if isinstance(metadata, Metadata) else Metadata({})
+def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+    metadata = metadata if isinstance(metadata, Metadata) else Metadata()
     pipeline = compose(
-        parse_datafile,
+        parse_lines,
         parse_metadata,
         partial(feed_metadata, metadata=metadata),
         partial(to_vectors, metadata=metadata),
         partial(normalize_data, metadata=metadata),
         partial(to_dicts, metadata=metadata),
-        partial(write_csv, target=target, metadata=metadata),
     )
 
+    if target is not None:
+        pipeline = compose(pipeline, partial(write_csv, target=target, metadata=metadata))
+
     return pipeline(inp)
+
+
+def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Optional[Metadata] = None) -> Metadata:
+    metadata = metadata if isinstance(metadata, Metadata) else Metadata()
+
+    with open(filepath) as fp:
+        for r in parse(fp, target=target, metadata=metadata):
+            pass
+
+    return metadata
 
 
 if __name__ == '__main__':
