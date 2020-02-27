@@ -1,3 +1,5 @@
+import inspect
+
 from abc import ABCMeta, abstractmethod
 from typing import Type, Dict, Tuple, Any, Optional
 
@@ -9,6 +11,19 @@ class FieldMeta(ABCMeta):
 
     # Inspired by https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python#6798042
     def __call__(cls, *args, **kwargs):
+        # Build a dict of all default values of constructor parameters for
+        # this class and its ancestors
+        defaults = {}
+        for subcls in cls.mro():
+            parameters = inspect.signature(subcls.__init__).parameters.items()
+            defaults.update(**{
+                k: v.default for k, v in parameters
+                if v.default is not inspect.Parameter.empty
+            })
+        # Add default parameters to current parameters
+        defaults.update(**kwargs)
+        kwargs = defaults
+        # We can now build the complete signature of this field
         key = (cls, args, tuple(kwargs.items()))
         if key not in cls._instances:
             cls._instances[key] = super().__call__(*args, **kwargs)
