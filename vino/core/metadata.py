@@ -16,26 +16,40 @@ class FieldMeta(ABCMeta):
 
 
 class Field(metaclass=FieldMeta):
-    @abstractmethod
+    def __init__(self, *args, optional=True, **kwargs):
+        self.optional = optional
+
     def parse(self, inp: str) -> Any:
+        if self.optional and inp.lower() == 'none':
+            return None
+        return self.do_parse(inp)
+
+    def unparse(self, value: Any) -> str:
+        if self.optional and value is None:
+            return 'none'
+        return self.do_unparse(value)
+
+    @abstractmethod
+    def do_parse(self, inp: str) -> Any:
         raise NotImplementedError
 
     @abstractmethod
-    def unparse(self, value: Any) -> str:
+    def do_unparse(self, value: Any) -> str:
         raise NotImplementedError
 
 
 class TupleField(Field):
-    def __init__(self, typ, sep=','):
+    def __init__(self, typ, sep=',', **kwargs):
         self.type = typ
         self.separator = sep
+        super().__init__(**kwargs)
 
-    def parse(self, inp):
+    def do_parse(self, inp):
         typ, sep = self.type, self.separator
         tokens = inp.strip().split(sep)
         return [cast(item.strip(), typ) for item in tokens if item.strip()]
 
-    def unparse(self, value):
+    def do_unparse(self, value):
         return self.separator.join((str(x) for x in value))
 
 
@@ -43,11 +57,11 @@ class BuiltinTypeField(Field):
     TYPE: Optional[Type] = None
 
     @classmethod
-    def parse(cls, inp):
+    def do_parse(cls, inp):
         return cast(inp, cls.TYPE)
 
     @classmethod
-    def unparse(cls, value):
+    def do_unparse(cls, value):
         return str(value)
 
 
