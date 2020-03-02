@@ -225,13 +225,16 @@ def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[M
         parse_lines,
         parse_metadata,
         partial(feed_metadata, metadata=metadata),
-        partial(to_vectors, metadata=metadata),
-        partial(normalize_data, metadata=metadata),
-        partial(to_dicts, metadata=metadata),
     )
 
-    if target is not None:
-        pipeline = compose(pipeline, partial(write_csv, target=target, metadata=metadata))
+    if target:
+        pipeline = compose(
+            pipeline,
+            partial(to_vectors, metadata=metadata),
+            partial(normalize_data, metadata=metadata),
+            partial(to_dicts, metadata=metadata),
+            partial(write_csv, target=target, metadata=metadata)
+        )
 
     return pipeline(inp)
 
