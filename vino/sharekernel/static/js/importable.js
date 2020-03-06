@@ -24,11 +24,14 @@ function humanFileSize(bytes, si) {
                         fieldset = $('<fieldset class="module"/>').appendTo(feedback),
                         table = $('<table/>').appendTo(fieldset),
                         previous = $(this).closest('fieldset'),
+                        files = Array.prototype.slice.call(this.files),
                         cls, row, file, caption;
-                    for (var i = 0; i < this.files.length; i++) {
+
+                    files.sort((a, b) => a.size > b.size);
+                    for (var i = 0; i < files.length; i++) {
                         cls = i % 2 == 0 ? 'row1' : 'row2';
                         row = $('<tr/>').addClass(cls).appendTo(table);
-                        file = this.files[i];
+                        file = files[i];
                         caption = file.name+' ('+humanFileSize(file.size)+')';
                         $('<td/>').text(caption).appendTo(row);
                     }
