@@ -7,6 +7,9 @@ from .importable import ImportableMixin
 from .models import Symbol, ViabilityProblem, ParameterSet, Software, Kernel
 
 
+admin.site.index_template = 'admin/sharekernel_index.html'
+
+
 @admin.register(Symbol)
 class SymbolAdmin(admin.ModelAdmin):
     list_display = ('name', 'order', 'vp', 'type', 'longname', 'unit')
