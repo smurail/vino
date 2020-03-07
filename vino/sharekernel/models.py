@@ -313,8 +313,12 @@ class Kernel(EntityWithMetadata):
         tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
         metadata = Metadata()
 
-        for filepath in saved_files:
-            parse_datafile(filepath, target=tmpfile, metadata=metadata)
+        try:
+            for filepath in saved_files:
+                parse_datafile(filepath, target=tmpfile, metadata=metadata)
+        except:
+            tmpfile.unlink()
+            raise
 
         # Generate datafile name from metadata
         fields = ('viabilityproblem.title', 'results.title')
