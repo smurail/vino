@@ -4,7 +4,8 @@ from django.utils.safestring import mark_safe
 from django.utils.html import escape
 
 from .importable import ImportableMixin
-from .models import Symbol, ViabilityProblem, ParameterSet, Software, Kernel
+from .models import (Symbol, ViabilityProblem, ParameterSet, Software, Kernel,
+                     DataFormat)
 
 
 admin.site.index_template = 'admin/sharekernel_index.html'
@@ -29,6 +30,11 @@ class ParameterSetAdmin(admin.ModelAdmin):
 @admin.register(Software)
 class SoftwareAdmin(admin.ModelAdmin):
     list_display = ('title', 'version', 'owner', 'state', 'date_created', 'date_updated')
+
+
+@admin.register(DataFormat)
+class SoftwareAdmin(admin.ModelAdmin):
+    list_display = ('title', 'parameters', 'owner', 'state', 'date_created', 'date_updated')
 
 
 @admin.register(ViabilityProblem)
