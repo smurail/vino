@@ -69,3 +69,8 @@ class ImportableMixin(object):
             ),
         ]
         return importable_urls + urls
+
+    def get_model_perms(self, request):
+        perms = super().get_model_perms(request)
+        perms['import'] = True
+        return perms
