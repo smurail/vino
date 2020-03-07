@@ -65,7 +65,8 @@ class Entity(models.Model):
     def from_metadata(cls, metadata, **kwargs):
         values = cls.prepare_metadata(metadata, **kwargs)
         kwargs = {k: values.get(k) for k in cls.IDENTITY if values.get(k)}
-        obj, _ = cls.objects.get_or_create(defaults=values, **kwargs)
+        obj, created = cls.objects.get_or_create(defaults=values, **kwargs)
+        obj._created = created
         return obj
 
     @classmethod
@@ -230,21 +231,22 @@ class ViabilityProblem(EntityWithMetadata):
 
     @classmethod
     def from_metadata(cls, metadata, **kwargs):
-        # Build a variable dict from metadata
-        var_fields = ('statevariables', 'controlvariables')
-        var_definitions = sum(
-            [(metadata.get(f'{cls.PREFIX}{v}') or []) for v in var_fields],
-            []
-        )
-        variables = {
-            v[0]: Symbol(name=v[0], longname=v[1], unit=v[2])
-            for v in var_definitions
-        }
         # Generate model instance from metadata
         instance = super().from_metadata(metadata, **kwargs)
-        # Apply symbols informations from aforementioned dict
-        instance._symbols_details = variables
-        instance.update_symbols()
+        if instance._created:
+            # Build a variable dict from metadata
+            var_fields = ('statevariables', 'controlvariables')
+            var_definitions = sum(
+                [(metadata.get(f'{cls.PREFIX}{v}') or []) for v in var_fields],
+                []
+            )
+            variables = {
+                v[0]: Symbol(name=v[0], longname=v[1], unit=v[2])
+                for v in var_definitions
+            }
+            # Apply symbols informations from aforementioned dict
+            instance._symbols_details = variables
+            instance.update_symbols()
         return instance
 
 
