@@ -154,6 +154,7 @@ class Metadata(dict):
         'viabilityproblem.stateconstraintdescription': StringField(),
         'viabilityproblem.stateconstraintparameters': LiteralField(),
         'viabilityproblem.statedefinitiondomain': StringField(),
+        'viabilityproblem.statedimension': IntegerField(),
         'viabilityproblem.statevariables': LiteralField(),
         'viabilityproblem.targetdescription': StringField(),
         'viabilityproblem.targetparameters': LiteralField(),
