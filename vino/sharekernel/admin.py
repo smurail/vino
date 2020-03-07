@@ -6,11 +6,6 @@ from django.utils.html import escape
 from .importable import ImportableMixin
 from .models import Symbol, ViabilityProblem, ParameterSet, Software, Kernel
 
-# Register your models here.
-
-admin.site.register(ParameterSet)
-admin.site.register(Software)
-
 
 @admin.register(Symbol)
 class SymbolAdmin(admin.ModelAdmin):
@@ -21,6 +16,16 @@ class SymbolInline(admin.TabularInline):
     model = Symbol
     extra = 0
     ordering = ('type', 'order')
+
+
+@admin.register(ParameterSet)
+class ParameterSetAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'owner', 'state', 'date_created', 'date_updated')
+
+
+@admin.register(Software)
+class SoftwareAdmin(admin.ModelAdmin):
+    list_display = ('title', 'version', 'owner', 'state', 'date_created', 'date_updated')
 
 
 @admin.register(ViabilityProblem)
