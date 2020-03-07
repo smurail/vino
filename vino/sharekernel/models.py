@@ -1,11 +1,20 @@
 from collections import OrderedDict, defaultdict
 from itertools import chain
+from pathlib import Path
+from tempfile import mktemp
+from typing import Tuple, Dict
 
 from django.db import models
+from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist
+from django.utils.text import slugify
 
 from django_currentuser.db.models import CurrentUserField
 
+from vino.core.data import parse_datafile, Metadata
+
 from .fields import EquationsField, InequationsField
+from .utils import generate_media_path, store_files
 
 
 class Entity(models.Model):
@@ -24,10 +33,59 @@ class Entity(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    @classmethod
+    def field_exists(cls, field):
+        try:
+            cls._meta.get_field(field)
+            return True
+        except FieldDoesNotExist:
+            return False
+
+    @classmethod
+    def prepare_metadata(cls, metadata, **kwargs):
+        def field_name(mk):
+            k = mk[len(cls.PREFIX):] if '.' in mk else mk
+            return cls.METADATA_TO_FIELD.get(k, k)
+
+        metadata = {
+            k: metadata.FIELDS[k].unparse(v) for k, v in metadata.items()
+        }
+
+        filtered_metadata = {
+            k: v for k, v in dict(metadata, **kwargs).items()
+            if '.' not in k or k.startswith(cls.PREFIX)
+        }
+
+        return {
+            field_name(k): v for k, v in filtered_metadata.items()
+            if v is not None and cls.field_exists(field_name(k))
+        }
+
+    @classmethod
+    def from_metadata(cls, metadata, **kwargs):
+        values = cls.prepare_metadata(metadata, **kwargs)
+        kwargs = {k: values.get(k) for k in cls.IDENTITY if values.get(k)}
+        obj, _ = cls.objects.get_or_create(defaults=values, **kwargs)
+        return obj
+
+    @classmethod
+    def from_files(cls, *files):
+        metadata = Metadata()
+        for filepath in files:
+            parse_datafile(filepath, metadata=metadata)
+        return cls.from_metadata(metadata)
+
 
 class EntityWithMetadata(Entity):
     class Meta:
         abstract = True
+
+    PREFIX = 'entity.'
+    IDENTITY: Tuple[str, ...] = ('title',)
+    METADATA_TO_FIELD = {
+        'contact': 'email',
+        'website': 'url',
+    }
 
     title = models.CharField(max_length=200)
     description = models.TextField(default='', blank=True)
@@ -87,6 +145,18 @@ class ViabilityProblem(EntityWithMetadata):
             )
         ]
 
+    PREFIX = 'viabilityproblem.'
+    IDENTITY = ('dynamics', 'controls', 'constraints', 'domain', 'target')
+    METADATA_TO_FIELD = {
+        'dynamicsdescription': 'dynamics',
+        'admissiblecontroldescription': 'controls',
+        'stateconstraintdescription': 'constraints',
+        'statedefinitiondomain': 'domain',
+        'targetdescription': 'target',
+    }
+
+    _symbols_details: Dict[str, Tuple[str, ...]] = {}
+
     dynamics = EquationsField((Symbol.STATE, Symbol.DYNAMICS))
     controls = InequationsField((Symbol.CONTROL, Symbol.DYNAMICS))
     constraints = InequationsField((Symbol.STATE, Symbol.CONSTRAINT))
@@ -106,6 +176,8 @@ class ViabilityProblem(EntityWithMetadata):
 
         # Extract variables and parameters
         for field, statements in statements_items:
+            if isinstance(statements, str):
+                statements = field.to_python(statements)
             for left, _, right in statements:
                 # Variable and parameter types
                 vtype, ptype = field.types
@@ -134,9 +206,13 @@ class ViabilityProblem(EntityWithMetadata):
         }
 
         # Update database
+        details = self._symbols_details
         self.symbols.all().delete()
         Symbol.objects.bulk_create([
-            Symbol(vp=self, type=typ, order=order, name=name)
+            Symbol(
+                vp=self, type=typ, order=order, name=name,
+                longname=details[name].longname if name in details else '',
+                unit=details[name].unit if name in details else '')
             for name, (order, typ) in symbols.items()
         ])
 
@@ -146,10 +222,42 @@ class ViabilityProblem(EntityWithMetadata):
         if fields & instance.STATEMENTS_SET:
             instance.update_symbols()
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._symbols_details = {s.name: s for s in instance.symbols.all()}
+        return instance
+
+    @classmethod
+    def from_metadata(cls, metadata, **kwargs):
+        # Build a variable dict from metadata
+        var_fields = ('statevariables', 'controlvariables')
+        var_definitions = sum(
+            [(metadata.get(f'{cls.PREFIX}{v}') or []) for v in var_fields],
+            []
+        )
+        variables = {
+            v[0]: Symbol(name=v[0], longname=v[1], unit=v[2])
+            for v in var_definitions
+        }
+        # Generate model instance from metadata
+        instance = super().from_metadata(metadata, **kwargs)
+        # Apply symbols informations from aforementioned dict
+        instance._symbols_details = variables
+        instance.update_symbols()
+        return instance
+
 
 class ParameterSet(Entity):
-    vp = models.ForeignKey(ViabilityProblem, models.CASCADE,
-                           verbose_name="Viability problem")
+    PREFIX = 'parameters.'
+    IDENTITY = ('vp', 'dynamics', 'constraints', 'target')
+    METADATA_TO_FIELD = {
+        'dynamicsparametervalues': 'dynamics',
+        'stateconstraintparametervalues': 'constraints',
+        'targetparametervalues': 'target',
+    }
+
+    vp = models.ForeignKey(ViabilityProblem, models.CASCADE, verbose_name="Viability problem")
     dynamics = models.CharField(max_length=200, blank=True)
     constraints = models.CharField(max_length=200, blank=True)
     target = models.CharField(max_length=200, blank=True)
@@ -171,16 +279,62 @@ class ParameterSet(Entity):
 
 
 class Software(EntityWithMetadata):
+    PREFIX = 'software.'
+    IDENTITY = ('title', 'version')
+
     version = models.CharField(max_length=30, default='', blank=True)
     parameters = models.CharField(max_length=200, default='', blank=True)
 
 
 class DataFormat(EntityWithMetadata):
+    PREFIX = 'resultformat.'
+    IDENTITY = ('title',)
+    METADATA_TO_FIELD = {
+        'parameterlist': 'parameters'
+    }
+
     parameters = models.CharField(max_length=200, default='', blank=True)
 
 
 class Kernel(EntityWithMetadata):
+    PREFIX = 'results.'
+    IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
+    UPLOAD_TO = 'import/%Y/%m/%d'
+
     params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
+
+    @classmethod
+    def from_files(cls, *files):
+        # Parse data and metadata from files
+        saved_files = store_files(generate_media_path(cls.UPLOAD_TO), *files)
+        tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
+        metadata = Metadata()
+
+        for filepath in saved_files:
+            parse_datafile(filepath, target=tmpfile, metadata=metadata)
+
+        # Generate datafile name from metadata
+        fields = ('viabilityproblem.title', 'results.title')
+        parts = (slugify(metadata.get(x)) for x in fields)
+        filename = '_'.join(parts) + '.csv'
+        datafile = generate_media_path(cls.datafile.field.upload_to) / filename
+
+        # Create new directories if needed
+        datafile.parent.mkdir(parents=True, exist_ok=True)
+
+        # Rename temporary datafile to generated filename
+        tmpfile.rename(datafile)
+
+        # Generate models instances from metadata
+        vp = ViabilityProblem.from_metadata(metadata)
+        related = {
+            'params': ParameterSet.from_metadata(metadata, vp=vp),
+            'software': Software.from_metadata(metadata),
+            'format': DataFormat.from_metadata(metadata),
+            'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix()
+        }
+
+        return Kernel.from_metadata(metadata, **related)

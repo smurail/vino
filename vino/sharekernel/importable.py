@@ -3,15 +3,8 @@ from django.contrib import admin
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
-from .models import ViabilityProblem
-
 
 class ImportForm(forms.Form):
-    vp = forms.ModelChoiceField(
-        queryset=ViabilityProblem.objects.all(),
-        empty_label=None,
-        label=_('Viability problem'),
-    )
     files = forms.FileField(
         widget=forms.ClearableFileInput(attrs={'multiple': True}),
         label=_('Files'),
@@ -29,7 +22,7 @@ class ImportAdmin(admin.ModelAdmin):
 
     import_view = admin.ModelAdmin.add_view
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, request, obj=None, change=False, **kwargs):
         return self.form
 
     def get_changeform_initial_data(self, request):
@@ -48,7 +41,7 @@ class ImportAdmin(admin.ModelAdmin):
 
     def save_form(self, request, form, change):
         files = request.FILES.getlist('files')
-        return self.model.from_files(files)
+        return self.model.from_files(*files)
 
     def save_related(self, request, form, formsets, change):
         # Override this method to avoid errors
