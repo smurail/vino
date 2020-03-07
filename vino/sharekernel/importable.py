@@ -47,6 +47,10 @@ class ImportAdmin(admin.ModelAdmin):
         # Override this method to avoid errors
         pass
 
+    def save_model(self, request, obj, form, change):
+        # Imported model is already saved at this point, don't do anything
+        pass
+
 
 class ImportableMixin(object):
     def __init__(self, *args, **kwargs):
