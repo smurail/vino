@@ -337,4 +337,18 @@ class Kernel(EntityWithMetadata):
             'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix()
         }
 
-        return Kernel.from_metadata(metadata, **related)
+        kernel = Kernel.from_metadata(metadata, **related)
+
+        # Check if declared format match detected one
+        detected = metadata.get('dataformat.name')
+        declared = metadata.get('resultformat.title')
+        msg = f'Declared format ({declared}) differs from detected one ({detected})'
+        assert detected == declared, msg
+
+        # Check if column count is valid
+        column_count = len(metadata.get('dataformat.columns', []))
+        dimensions = metadata.get('viabilityproblem.statedimension', 0)
+        msg = f'Column count ({column_count}) must be greater or equal than state dimensions ({dimensions})'
+        assert column_count >= dimensions, msg
+
+        return kernel
