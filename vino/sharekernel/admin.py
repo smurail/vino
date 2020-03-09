@@ -33,7 +33,7 @@ class SoftwareAdmin(admin.ModelAdmin):
 
 
 @admin.register(DataFormat)
-class SoftwareAdmin(admin.ModelAdmin):
+class DataFormatAdmin(admin.ModelAdmin):
     list_display = ('title', 'parameters', 'owner', 'state', 'date_created', 'date_updated')
 
 
