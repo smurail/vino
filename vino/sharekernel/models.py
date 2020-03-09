@@ -307,6 +307,7 @@ class Kernel(EntityWithMetadata):
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
+    size = models.IntegerField(default=0)
 
     @classmethod
     def from_files(cls, *files):
@@ -314,10 +315,11 @@ class Kernel(EntityWithMetadata):
         saved_files = store_files(generate_media_path(cls.UPLOAD_TO), *files)
         tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
         metadata = Metadata()
+        size = 0
 
         try:
             for filepath in saved_files:
-                parse_datafile(filepath, target=tmpfile, metadata=metadata)
+                size += parse_datafile(filepath, target=tmpfile, metadata=metadata)
         except:
             tmpfile.unlink()
             raise
@@ -336,14 +338,15 @@ class Kernel(EntityWithMetadata):
 
         # Generate models instances from metadata
         vp = ViabilityProblem.from_metadata(metadata)
-        related = {
+        fields = {
             'params': ParameterSet.from_metadata(metadata, vp=vp),
             'software': Software.from_metadata(metadata),
             'format': DataFormat.from_metadata(metadata),
-            'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix()
+            'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix(),
+            'size': size,
         }
 
-        kernel = Kernel.from_metadata(metadata, **related)
+        kernel = Kernel.from_metadata(metadata, **fields)
 
         # Check if declared format match detected one
         detected = metadata.get('dataformat.name')
