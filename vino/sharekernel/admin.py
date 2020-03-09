@@ -51,7 +51,7 @@ class ViabilityProblemAdmin(admin.ModelAdmin):
 @admin.register(Kernel)
 class KernelAdmin(ImportableMixin, admin.ModelAdmin):
     list_display = (
-        'vp', 'title', 'format', 'software', 'owner', 'state',
+        'vp', 'title', 'size', 'format', 'software', 'owner', 'state',
         'date_created', 'date_updated')
     list_display_links = ('title',)
     readonly_fields = ('date_created', 'date_updated', 'vp')
