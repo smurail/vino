@@ -239,14 +239,16 @@ def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[M
     return pipeline(inp)
 
 
-def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Optional[Metadata] = None) -> Metadata:
+def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Optional[Metadata] = None) -> int:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata()
+    size = 0
 
     with open(filepath) as fp:
-        for r in parse(fp, target=target, metadata=metadata):
-            pass
+        for datum in parse(fp, target=target, metadata=metadata):
+            if datum.section == Datum.DATA:
+                size += 1
 
-    return metadata
+    return size
 
 
 if __name__ == '__main__':
