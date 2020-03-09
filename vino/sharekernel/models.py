@@ -14,7 +14,7 @@ from django_currentuser.db.models import CurrentUserField
 from vino.core.data import parse_datafile, Metadata
 
 from .fields import EquationsField, InequationsField
-from .utils import generate_media_path, store_files
+from .utils import generate_media_path, store_files, sorted_by_size
 
 
 class Entity(models.Model):
@@ -318,7 +318,7 @@ class Kernel(EntityWithMetadata):
         size = 0
 
         try:
-            for filepath in saved_files:
+            for filepath in sorted_by_size(saved_files):
                 size += parse_datafile(filepath, target=tmpfile, metadata=metadata)
         except Exception:
             tmpfile.unlink()
