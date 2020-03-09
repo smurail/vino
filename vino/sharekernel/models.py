@@ -320,7 +320,7 @@ class Kernel(EntityWithMetadata):
         try:
             for filepath in saved_files:
                 size += parse_datafile(filepath, target=tmpfile, metadata=metadata)
-        except:
+        except Exception:
             tmpfile.unlink()
             raise
 
