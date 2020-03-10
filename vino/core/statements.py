@@ -51,16 +51,6 @@ class Statements:
             self.time_type = time_type
 
     @classmethod
-    def dynamics_variable(cls, name: str) -> Tuple[str, int]:
-        if name.endswith("'"):
-            return name[:-1], cls.CONTINUOUS
-        if name.startswith('next_'):
-            return name[5:], cls.DISCRETE
-        raise StatementsError(
-            "Invalid dynamics left side: %(name)s.",
-            {'name': name})
-
-    @classmethod
     def split(cls, statement: str) -> Tuple[str, ...]:
         # Compile regex used to split relations (ie. "x=y", "a>=b"...)
         if cls._relation is None:
@@ -128,11 +118,21 @@ class Equations(Statements):
     RELATIONS = ('=',)
 
     @classmethod
+    def dynamics_variable(cls, name: str) -> Tuple[str, int]:
+        if name.endswith("'"):
+            return name[:-1], cls.CONTINUOUS
+        if name.startswith('next_'):
+            return name[5:], cls.DISCRETE
+        raise StatementsError(
+            "Invalid dynamics left side: %(name)s.",
+            {'name': name})
+
+    @classmethod
     def parse(cls, value):
         statements, time_type = super().parse(value)
 
         for i, (left, op, right) in enumerate(statements):
-            left, new_time_type = Statements.dynamics_variable(left)
+            left, new_time_type = cls.dynamics_variable(left)
             statements[i] = (left, op, right)
             if time_type is None:
                 time_type = new_time_type
