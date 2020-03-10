@@ -92,14 +92,30 @@ class Statements:
                 "Each statement must contain one of: %(relations)s.",
                 {'relations': ', '.join(self.RELATIONS)})
 
-        try:
-            for i, (left, op, right) in enumerate(valid_statements):
-                stmt = (self.LEFT(left), op, Expression(right))
-                typed_statements.append(stmt)
-        except Exception:
-            raise StatementsError(
-                "Invalid syntax: %(value)s",
-                {'value': right})
+        for i, (left, op, right) in enumerate(valid_statements):
+            # Process left expression
+            try:
+                left_expr = self.LEFT(left)
+                # XXX Hack to trigger all potential errors...
+                repr(left_expr)
+            except StatementsError:
+                raise
+            except Exception:
+                raise StatementsError(
+                    "Invalid syntax: %(value)s",
+                    {'value': left})
+
+            # Process right expression
+            try:
+                right_expr = Expression(right)
+                # XXX Hack to trigger all potential errors...
+                repr(right_expr)
+            except Exception:
+                raise StatementsError(
+                    "Invalid syntax: %(value)s",
+                    {'value': right})
+
+            typed_statements.append((left_expr, op, right_expr))
 
         return typed_statements
 
