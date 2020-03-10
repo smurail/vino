@@ -260,6 +260,10 @@ class ViabilityProblem(EntityWithMetadata):
     def control_dimension(self):
         return self.get_dimension(Symbol.CONTROL)
 
+    @property
+    def dynamics_type(self):
+        return self.dynamics.dynamics_type_name.capitalize()
+
 
 class ParameterSet(Entity):
     PREFIX = 'parameters.'
