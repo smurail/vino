@@ -14,7 +14,8 @@ from django_currentuser.db.models import CurrentUserField
 from vino.core.data import parse_datafile, Metadata
 
 from .fields import EquationsField, InequationsField
-from .utils import generate_media_path, store_files, sorted_by_size
+from .utils import (generate_media_path, store_files, store_one_file,
+                    sorted_by_size)
 
 
 class Entity(models.Model):
@@ -330,11 +331,9 @@ class Kernel(EntityWithMetadata):
         filename = '_'.join(parts) + '.csv'
         datafile = generate_media_path(cls.datafile.field.upload_to) / filename
 
-        # Create new directories if needed
-        datafile.parent.mkdir(parents=True, exist_ok=True)
-
-        # Rename temporary datafile to generated filename
-        tmpfile.rename(datafile)
+        # Store datafile and remove temporary file
+        datafile = store_one_file(datafile, tmpfile.open())
+        tmpfile.unlink()
 
         # Generate models instances from metadata
         vp = ViabilityProblem.from_metadata(metadata)
@@ -345,7 +344,6 @@ class Kernel(EntityWithMetadata):
             'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix(),
             'size': size,
         }
-
         kernel = Kernel.from_metadata(metadata, **fields)
 
         # Check if declared format match detected one

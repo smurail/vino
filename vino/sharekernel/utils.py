@@ -13,7 +13,16 @@ def generate_media_path(path):
 
 def store_files(path, *files):
     fs = FileSystemStorage(path)
-    return [fs.path(fs.save(f.name, f)) for f in files]
+    return [
+        Path(fs.path(fs.save(fs.generate_filename(f.name), f)))
+        for f in files
+    ]
+
+
+def store_one_file(filepath, content):
+    filepath = Path(filepath)
+    fs = FileSystemStorage(filepath.parent)
+    return Path(fs.path(fs.save(fs.generate_filename(filepath.name), content)))
 
 
 def sorted_by_size(files):
