@@ -22,9 +22,27 @@ class SymbolInline(admin.TabularInline):
     ordering = ('type', 'order')
 
 
+class KernelInline(admin.TabularInline):
+    model = Kernel
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    readonly_fields = (
+        'title', 'size', 'format', 'software', 'date_created', 'date_updated')
+    fields = ('owner', 'state') + readonly_fields
+
+
 @admin.register(ParameterSet)
 class ParameterSetAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'owner', 'state', 'date_created', 'date_updated')
+    inlines = (KernelInline,)
+
+
+class ParameterSetInline(admin.TabularInline):
+    model = ParameterSet
+    extra = 0
+    show_change_link = True
+    can_delete = False
 
 
 @admin.register(Software)
@@ -49,7 +67,7 @@ class ViabilityProblemAdmin(admin.ModelAdmin):
         'description', 'publication', 'author', 'email', 'url', 'image',
         'state_dimension', 'control_dimension', 'dynamics_type',
         'dynamics', 'controls', 'constraints', 'domain', 'target')
-    inlines = (SymbolInline,)
+    inlines = (ParameterSetInline, SymbolInline)
 
 
 @admin.register(Kernel)
