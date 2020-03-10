@@ -35,6 +35,9 @@ class StatementsField(models.CharField):
             message, params = e.args
             raise ValidationError(_(message), params=params, code='invalid')
 
+    def from_db_value(self, value, expression, connection):
+        return self.to_python(value)
+
 
 class EquationsField(StatementsField):
     STATEMENTS_CLS = Equations

@@ -178,8 +178,6 @@ class ViabilityProblem(EntityWithMetadata):
 
         # Extract variables and parameters
         for field, statements in statements_items:
-            if isinstance(statements, str):
-                statements = field.to_python(statements)
             for left, _, right in statements:
                 # Variable and parameter types
                 vtype, ptype = field.types
