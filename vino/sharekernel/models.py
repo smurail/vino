@@ -251,6 +251,17 @@ class ViabilityProblem(EntityWithMetadata):
             instance.update_symbols()
         return instance
 
+    def get_dimension(self, type):
+        return self.symbols.filter(type=type).count()
+
+    @property
+    def state_dimension(self):
+        return self.get_dimension(Symbol.STATE)
+
+    @property
+    def control_dimension(self):
+        return self.get_dimension(Symbol.CONTROL)
+
 
 class ParameterSet(Entity):
     PREFIX = 'parameters.'
