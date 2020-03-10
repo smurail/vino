@@ -40,14 +40,14 @@ class DataFormatAdmin(admin.ModelAdmin):
 @admin.register(ViabilityProblem)
 class ViabilityProblemAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'state_dimension', 'control_dimension', 'owner', 'state',
-        'date_created', 'date_updated')
+        'title', 'state_dimension', 'control_dimension', 'dynamics_type',
+        'owner', 'state', 'date_created', 'date_updated')
     readonly_fields = (
-        'date_created', 'date_updated', 'state_dimension', 'control_dimension')
+        'date_created', 'date_updated', 'state_dimension', 'control_dimension', 'dynamics_type')
     fields = (
         'owner', 'state', 'title', 'date_created', 'date_updated',
         'description', 'publication', 'author', 'email', 'url', 'image',
-        'state_dimension', 'control_dimension',
+        'state_dimension', 'control_dimension', 'dynamics_type',
         'dynamics', 'controls', 'constraints', 'domain', 'target')
     inlines = (SymbolInline,)
 
