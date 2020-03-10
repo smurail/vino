@@ -3,15 +3,19 @@ from __future__ import annotations
 
 import re
 
-from Equation import Expression as _Expression
+import Equation
 
-from typing import Iterable, Tuple, Union, Optional, Pattern
+from typing import Iterable, List, Tuple, Union, Optional, Pattern
 
 
 __all__ = ['Statements', 'Equations', 'Inequations', 'StatementsError']
 
 
-class Expression(_Expression):
+# XXX Monkey patching to allow "'" in variable names, don't do this at home!
+Equation.core.nmatch = re.compile("\\s*([a-zA-Z_][a-zA-Z0-9_']*)")
+
+
+class Expression(Equation.Expression):
     def __init__(self, expression, argorder=[], *args, **kwargs):
         self.value = expression
         super().__init__(expression, argorder, *args, **kwargs)
@@ -20,35 +24,54 @@ class Expression(_Expression):
         return self.value
 
 
+class DynamicsLeftExpression(Expression):
+    DISCRETE = 1
+    CONTINUOUS = 2
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.dynamics_type = None
+        self.variables = []
+
+        for name in super().__iter__():
+            if name.endswith("'"):
+                self.variables.append(name[:-1])
+                new_dynamics_type = self.CONTINUOUS
+            elif name.startswith('next_'):
+                self.variables.append(name[5:])
+                new_dynamics_type = self.DISCRETE
+            else:
+                raise StatementsError(
+                    "Invalid dynamics left expression: %(name)s.",
+                    {'name': name})
+            if self.dynamics_type is not None and self.dynamics_type != new_dynamics_type:
+                raise StatementsError("Can't mix different dynamics types.")
+            self.dynamics_type = new_dynamics_type
+
+    def __iter__(self):
+        return iter(self.variables)
+
+
 class StatementsError(Exception):
     pass
 
 
-StatementsLiteral = Iterable[Tuple[Union[str, Expression], ...]]
+StatementLiteral = Tuple[Expression, str, Expression]
+ManyStatementLiterals = Iterable[StatementLiteral]
 
 
 class Statements:
-    DISCRETE = 1
-    CONTINUOUS = 2
-
     RELATIONS: Tuple[str, ...] = ('=', '<=', '>=')
-    NAME = {
-        None: '%s',
-        DISCRETE: 'next_%s',
-        CONTINUOUS: "%s'"
-    }
+    LEFT = Expression
 
     _relation: Optional[Pattern] = None
 
-    def __init__(
-            self,
-            statements: Union[str, StatementsLiteral],
-            time_type: Optional[int] = None):
+    def __init__(self, statements: Union[str, ManyStatementLiterals]):
         if isinstance(statements, str):
-            self.statements, self.time_type = self.parse(statements)
+            self.statements = self.parse(statements)
         else:
             self.statements = statements
-            self.time_type = time_type
 
     @classmethod
     def split(cls, statement: str) -> Tuple[str, ...]:
@@ -58,30 +81,27 @@ class Statements:
                 r'\s*(%s)\s*' % '|'.join(cls.RELATIONS))
         return tuple(filter(None, map(str.strip, cls._relation.split(statement))))
 
-    @classmethod
-    def parse(cls, value: str) -> Tuple[StatementsLiteral, Optional[int]]:
+    def parse(self, value: str) -> ManyStatementLiterals:
         statements = [s for s in (s.strip() for s in value.split(',')) if s]
-        splitted_statements = (cls.split(stmt) for stmt in statements)
+        splitted_statements = (self.split(stmt) for stmt in statements)
         valid_statements = [s for s in splitted_statements if len(s) == 3]
+        typed_statements: List[StatementLiteral] = []
 
         if len(statements) != len(valid_statements):
             raise StatementsError(
                 "Each statement must contain one of: %(relations)s.",
-                {'relations': ', '.join(cls.RELATIONS)})
+                {'relations': ', '.join(self.RELATIONS)})
 
         try:
             for i, (left, op, right) in enumerate(valid_statements):
-                valid_statements[i] = (left, op, Expression(right))
-        except: # noqa
+                stmt = (self.LEFT(left), op, Expression(right))
+                typed_statements.append(stmt)
+        except Exception:
             raise StatementsError(
                 "Invalid syntax: %(value)s",
                 {'value': right})
 
-        return valid_statements, None
-
-    @classmethod
-    def from_string(cls, value: str) -> Statements:
-        return Statements(*cls.parse(value))
+        return typed_statements
 
     def __len__(self):
         return len(self.statements)
@@ -97,9 +117,7 @@ class Statements:
 
     def __eq__(self, other):
         if isinstance(other, Statements):
-            a = (self.statements, self.time_type)
-            b = (other.statements, other.time_type)
-            return a == b
+            return self.statements == other.statements
         return False
 
     def __hash__(self):
@@ -107,7 +125,7 @@ class Statements:
 
     def __str__(self):
         return ','.join(
-            ''.join((self.NAME[self.time_type] % left, op, str(right)))
+            ''.join((str(left), op, str(right)))
             for left, op, right in self.statements)
 
     def __repr__(self):
@@ -116,30 +134,34 @@ class Statements:
 
 class Equations(Statements):
     RELATIONS = ('=',)
+    LEFT = DynamicsLeftExpression
+    DYNAMICS_TYPE_NAME = {
+        DynamicsLeftExpression.DISCRETE: 'discrete',
+        DynamicsLeftExpression.CONTINUOUS: 'continuous',
+    }
 
-    @classmethod
-    def dynamics_variable(cls, name: str) -> Tuple[str, int]:
-        if name.endswith("'"):
-            return name[:-1], cls.CONTINUOUS
-        if name.startswith('next_'):
-            return name[5:], cls.DISCRETE
-        raise StatementsError(
-            "Invalid dynamics left side: %(name)s.",
-            {'name': name})
+    def __init__(
+            self,
+            statements: Union[str, ManyStatementLiterals],
+            dynamics_type: Optional[int] = None):
+        self.dynamics_type = dynamics_type
+        super().__init__(statements)
 
-    @classmethod
-    def parse(cls, value):
-        statements, time_type = super().parse(value)
+    @property
+    def dynamics_type_name(self):
+        return self.DYNAMICS_TYPE_NAME.get(self.dynamics_type, '')
+
+    def parse(self, value: str) -> ManyStatementLiterals:
+        statements = super().parse(value)
+        self.dynamics_type = None
 
         for i, (left, op, right) in enumerate(statements):
-            left, new_time_type = cls.dynamics_variable(left)
-            statements[i] = (left, op, right)
-            if time_type is None:
-                time_type = new_time_type
-            elif time_type != new_time_type:
+            if self.dynamics_type is None:
+                self.dynamics_type = left.dynamics_type
+            elif self.dynamics_type != left.dynamics_type:
                 raise StatementsError("Can't mix different dynamics types.")
 
-        return statements, time_type
+        return statements
 
 
 class Inequations(Statements):

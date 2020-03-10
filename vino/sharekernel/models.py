@@ -184,9 +184,10 @@ class ViabilityProblem(EntityWithMetadata):
                 # Variable and parameter types
                 vtype, ptype = field.types
 
-                # Add variable
-                symbols[left] = (symbols_order[vtype], vtype)
-                symbols_order[vtype] += 1
+                # Add variables
+                for name in left:
+                    symbols[name] = (symbols_order[vtype], vtype)
+                    symbols_order[vtype] += 1
 
                 # Add parameters
                 for name in right:
