@@ -234,6 +234,9 @@ class ViabilityProblem(EntityWithMetadata):
         # Generate model instance from metadata
         instance = super().from_metadata(metadata, **kwargs)
         if instance._created:
+            # Make sure to_python method is called for each field so we get
+            # Statements objects for dynamics, constraints, controls, etc...
+            instance.full_clean()
             # Build a variable dict from metadata
             var_fields = ('statevariables', 'controlvariables')
             var_definitions = sum(
