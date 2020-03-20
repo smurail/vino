@@ -20,6 +20,7 @@ class SymbolInline(admin.TabularInline):
     model = Symbol
     extra = 0
     ordering = ('type', 'order')
+    readonly_fields = ('type', 'order', 'name', 'longname', 'unit')
 
 
 class KernelInline(admin.TabularInline):
