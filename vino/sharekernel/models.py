@@ -326,24 +326,26 @@ class SourceFile(Entity):
 class Kernel(EntityWithMetadata):
     PREFIX = 'results.'
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
-    UPLOAD_TO = 'import/%Y/%m/%d'
 
     params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
+    sourcefiles = models.ManyToManyField(SourceFile, verbose_name="Source files")
     size = models.IntegerField(default=0)
 
     @classmethod
     def from_files(cls, *files, owner=None):
         # Parse data and metadata from files
-        saved_files = store_files(generate_media_path(cls.UPLOAD_TO), *files)
+        path = generate_media_path(SourceFile._meta.get_field('file').path)
+        saved_files = store_files(path, *files)
+        sorted_files = sorted_by_size(saved_files)
         tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
         metadata = Metadata()
         size = 0
 
         try:
-            for filepath in sorted_by_size(saved_files):
+            for filepath in sorted_files:
                 size += parse_datafile(filepath, target=tmpfile, metadata=metadata)
         except Exception:
             tmpfile.unlink()
@@ -370,6 +372,13 @@ class Kernel(EntityWithMetadata):
             'owner': owner,
         }
         kernel = Kernel.from_metadata(metadata, **fields)
+
+        # Bind to source files
+        sourcefiles = []
+        for f in sorted_files:
+            obj, _ = SourceFile.objects.get_or_create(file=f)
+            sourcefiles.append(obj)
+        kernel.sourcefiles.add(*sourcefiles)
 
         # Check if declared format match detected one
         detected = metadata.get('dataformat.name')
