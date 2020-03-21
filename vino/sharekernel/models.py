@@ -319,6 +319,15 @@ class DataFormat(EntityWithMetadata):
 class SourceFile(Entity):
     file = models.FilePathField(path='import/%Y/%m/%d', verbose_name="Source file")
 
+    @classmethod
+    def from_files(cls, *files):
+        path = generate_media_path(cls._meta.get_field('file').path)
+        saved_files = store_files(path, *files)
+        return [
+            cls.objects.get_or_create(file=f)[0]
+            for f in sorted_by_size(saved_files)
+        ]
+
     def __str__(self):
         return Path(self.file).relative_to(settings.MEDIA_ROOT).as_posix()
 
@@ -337,16 +346,14 @@ class Kernel(EntityWithMetadata):
     @classmethod
     def from_files(cls, *files, owner=None):
         # Parse data and metadata from files
-        path = generate_media_path(SourceFile._meta.get_field('file').path)
-        saved_files = store_files(path, *files)
-        sorted_files = sorted_by_size(saved_files)
+        sourcefiles = SourceFile.from_files(*files)
         tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
         metadata = Metadata()
         size = 0
 
         try:
-            for filepath in sorted_files:
-                size += parse_datafile(filepath, target=tmpfile, metadata=metadata)
+            for sf in sourcefiles:
+                size += parse_datafile(sf.file, target=tmpfile, metadata=metadata)
         except Exception:
             tmpfile.unlink()
             raise
@@ -374,10 +381,6 @@ class Kernel(EntityWithMetadata):
         kernel = Kernel.from_metadata(metadata, **fields)
 
         # Bind to source files
-        sourcefiles = []
-        for f in sorted_files:
-            obj, _ = SourceFile.objects.get_or_create(file=f)
-            sourcefiles.append(obj)
         kernel.sourcefiles.add(*sourcefiles)
 
         # Check if declared format match detected one
