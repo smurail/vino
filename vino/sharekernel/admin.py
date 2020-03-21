@@ -77,11 +77,11 @@ class KernelAdmin(ImportableMixin, admin.ModelAdmin):
         'vp', 'title', 'size', 'format', 'software', 'owner', 'state',
         'date_created', 'date_updated')
     list_display_links = ('title',)
-    readonly_fields = ('date_created', 'date_updated', 'vp')
+    readonly_fields = ('date_created', 'date_updated', 'vp', 'sourcefiles')
     ordering = ('params__vp__title', 'title')
     fields = (
         'owner', 'state', 'title', 'date_created', 'date_updated',
-        'vp', 'params', 'format', 'software', 'datafile',
+        'vp', 'params', 'format', 'software', 'datafile', 'sourcefiles',
         'description', 'publication', 'author', 'email', 'url', 'image')
 
     def vp(self, obj):
