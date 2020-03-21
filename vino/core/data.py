@@ -6,7 +6,7 @@ import numpy as np
 from dataclasses import dataclass
 from functools import partial
 from itertools import chain
-from typing import Tuple, Iterable, Optional, Any, List, Callable
+from typing import Tuple, Iterable, Optional, Any, List
 from collections import OrderedDict
 
 from vino.core.utils import cast, to_int, compose
@@ -130,7 +130,11 @@ def to_vectors(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
 def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
     permut_cols = None
     column_indices: List[int] = []
-    resample: List[Callable] = []
+    resampling_params: List[Tuple[float, float, int]] = []
+
+    def resample(value: float, parameters: Tuple[float, float, int]):
+        vmin, vmax, ppa = parameters
+        return vmin + float(value) / ppa * (vmax - vmin)
 
     for datum in data:
         if datum.section == Datum.DATA and metadata['dataformat.name'] == 'bars':
@@ -156,23 +160,25 @@ def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]
                     permut_cols[permut_vector[i]][i] = 1
                 for i in range(len(permut_fields_vector)):
                     permut_axes[permut_fields_vector[i]][i] = 1
-                # Permute column labels by permuting column indices
+                # Permute column labels
                 columns = [columns[i] for i in np.dot(permut_cols, range(count))]
                 metadata['dataformat.columns'] = columns
+                # Permute column indices
+                column_indices = np.dot(permut_cols, column_indices)
 
-            # Make resampling functions
-            if not resample:
+            # Build resampling parameters
+            if not resampling_params:
                 min_values = np.dot(permut_axes, metadata['MinimalValues'])
                 max_values = np.dot(permut_axes, metadata['MaximalValues'])
                 ppa_values = np.dot(permut_axes, metadata['PointNumberPerAxis'])
                 assert len(min_values) == len(max_values) == len(ppa_values)
-                resampling_values = list(zip(min_values, max_values, ppa_values))
-                for i in column_indices:
-                    vmin, vmax, ppa = resampling_values[i]
-                    resample.append(lambda x: vmin + float(x)/ppa * (vmax-vmin))
+                resampling_params = list(zip(min_values, max_values, ppa_values))
 
             # Compute results
-            resampled = [resample[i](x) for i, x in enumerate(datum.data)]
+            resampled = [
+                resample(x, resampling_params[column_indices[i]])
+                for i, x in enumerate(datum.data)
+            ]
             normalized = np.dot(permut_cols, resampled)
 
             yield Datum(datum.section, normalized)
