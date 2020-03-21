@@ -316,6 +316,13 @@ class DataFormat(EntityWithMetadata):
     parameters = models.CharField(max_length=200, default='', blank=True)
 
 
+class SourceFile(Entity):
+    file = models.FilePathField(path='import/%Y/%m/%d', verbose_name="Source file")
+
+    def __str__(self):
+        return Path(self.file).relative_to(settings.MEDIA_ROOT).as_posix()
+
+
 class Kernel(EntityWithMetadata):
     PREFIX = 'results.'
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
