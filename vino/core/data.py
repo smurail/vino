@@ -9,8 +9,8 @@ from itertools import chain
 from typing import Tuple, Iterable, Optional, Any, List, Callable
 from collections import OrderedDict
 
-from .utils import cast, to_int, compose
-from .metadata import Metadata
+from vino.core.utils import cast, to_int, compose
+from vino.core.metadata import Metadata
 
 
 @dataclass(frozen=True)
