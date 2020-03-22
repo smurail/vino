@@ -157,7 +157,7 @@ class ViabilityProblem(EntityWithMetadata):
         'targetdescription': 'target',
     }
 
-    _symbols_details: Dict[str, Tuple[str, ...]] = {}
+    _symbols_details: Dict[str, Symbol] = {}
 
     dynamics = EquationsField((Symbol.STATE, Symbol.DYNAMICS))
     controls = InequationsField((Symbol.CONTROL, Symbol.DYNAMICS))
