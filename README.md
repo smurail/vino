@@ -32,6 +32,21 @@ shell, either run it with `pipenv run`. For example, to launch Django shell:
     pipenv run ./manage.py shell
 
 
+## Database maintenance
+
+Don't forget to migrate database when pulling last commits:
+
+    pipenv run ./manage.py migrate
+
+You want to completely reset whole ViNO database without messing with Django
+users and groups? Just do:
+
+    # This will unapply each migration one by one
+    pipenv run ./manage.py migrate sharekernel zero
+    # As usual, to update database to latest migration
+    pipenv run ./manage.py migrate
+
+
 ## Working with Docker
 
 **WARNING: This section must be updated!**
