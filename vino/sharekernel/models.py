@@ -71,7 +71,7 @@ class Entity(models.Model):
         return obj
 
     @classmethod
-    def from_files(cls, *files):
+    def from_files(cls, *files, owner=None):
         metadata = Metadata()
         for filepath in files:
             parse_datafile(filepath, metadata=metadata)
@@ -328,7 +328,7 @@ class Kernel(EntityWithMetadata):
     size = models.IntegerField(default=0)
 
     @classmethod
-    def from_files(cls, *files):
+    def from_files(cls, *files, owner=None):
         # Parse data and metadata from files
         saved_files = store_files(generate_media_path(cls.UPLOAD_TO), *files)
         tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
@@ -353,13 +353,14 @@ class Kernel(EntityWithMetadata):
         tmpfile.unlink()
 
         # Generate models instances from metadata
-        vp = ViabilityProblem.from_metadata(metadata)
+        vp = ViabilityProblem.from_metadata(metadata, owner=owner)
         fields = {
-            'params': ParameterSet.from_metadata(metadata, vp=vp),
-            'software': Software.from_metadata(metadata),
-            'format': DataFormat.from_metadata(metadata),
+            'params': ParameterSet.from_metadata(metadata, vp=vp, owner=owner),
+            'software': Software.from_metadata(metadata, owner=owner),
+            'format': DataFormat.from_metadata(metadata, owner=owner),
             'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix(),
             'size': size,
+            'owner': owner,
         }
         kernel = Kernel.from_metadata(metadata, **fields)
 
