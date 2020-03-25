@@ -70,6 +70,20 @@ class ViabilityProblemAdmin(admin.ModelAdmin):
         'dynamics', 'controls', 'constraints', 'domain', 'target')
     inlines = (ParameterSetInline, SymbolInline)
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.with_dimensions()
+
+    def state_dimension(self, obj):
+        return obj.state_dimension
+    state_dimension.short_description = 'State dimension'  # type: ignore
+    state_dimension.admin_order_field = 'state_dimension'  # type: ignore
+
+    def control_dimension(self, obj):
+        return obj.control_dimension
+    control_dimension.short_description = 'Control dimension'  # type: ignore
+    control_dimension.admin_order_field = 'control_dimension'  # type: ignore
+
 
 @admin.register(Kernel)
 class KernelAdmin(ImportableMixin, admin.ModelAdmin):

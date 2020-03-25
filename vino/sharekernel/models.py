@@ -5,6 +5,7 @@ from tempfile import mktemp
 from typing import Tuple, Dict
 
 from django.db import models
+from django.db.models import Count, Q
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import slugify
@@ -138,6 +139,21 @@ class Symbol(models.Model):
         return '%s: %s%s' % (typ, self.name, longname)
 
 
+class ViabilityProblemQuerySet(models.QuerySet):
+    def with_dimension_of(self, type, name):
+        opts = {name: Count('symbols', filter=Q(symbols__type=type))}
+        return self.annotate(**opts)
+
+    def with_state_dimension(self):
+        return self.with_dimension_of(Symbol.STATE, 'state_dimension')
+
+    def with_control_dimension(self):
+        return self.with_dimension_of(Symbol.CONTROL, 'control_dimension')
+
+    def with_dimensions(self):
+        return self.with_state_dimension().with_control_dimension()
+
+
 class ViabilityProblem(EntityWithMetadata):
     class Meta:
         constraints = [
@@ -164,6 +180,8 @@ class ViabilityProblem(EntityWithMetadata):
     constraints = InequationsField((Symbol.STATE, Symbol.CONSTRAINT))
     domain = InequationsField()
     target = InequationsField((Symbol.STATE, Symbol.TARGET))
+
+    objects = ViabilityProblemQuerySet.as_manager()
 
     STATEMENTS = [dynamics, constraints, controls, target]
     STATEMENTS_SET = set(STATEMENTS)
@@ -251,17 +269,6 @@ class ViabilityProblem(EntityWithMetadata):
             instance._symbols_details = variables
             instance.update_symbols()
         return instance
-
-    def get_dimension(self, type):
-        return self.symbols.filter(type=type).count()
-
-    @property
-    def state_dimension(self):
-        return self.get_dimension(Symbol.STATE)
-
-    @property
-    def control_dimension(self):
-        return self.get_dimension(Symbol.CONTROL)
 
     @property
     def dynamics_type(self):
