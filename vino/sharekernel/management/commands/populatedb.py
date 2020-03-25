@@ -37,7 +37,7 @@ class Command(BaseCommand):
             raise CommandError(f"User {user} does not exist.")
 
         for datafile in map(Path, samples):
-            # Deduce metadata filename from date filename
+            # Deduce metadata filename from data filename
             df = Path(self.SAMPLES_PATH) / datafile
             mf = (
                 df.with_suffix('.txt') if df.suffix == '.dat' else
