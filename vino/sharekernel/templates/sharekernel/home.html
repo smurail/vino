@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block body %}
-    <p><strong>Work in progress...</strong></p>
-    <p>Core features implemented in <a href="admin">administration</a></p>
+    <div class="jumbotron mt-4 py-5">
+        <h1 class="jumbotron-head text-primary">ViNO</h1>
+        <p class="lead">
+            <span class="text-primary">Vi</span>able <span class="text-primary">N</span>umericable <span class="text-primary">O</span>bject repository
+        </p>
+        <hr class="mr-4">
+        <p>Viability problems arise in several scientific fields (robotics, economics, environmental sciences). Once the set of constraints to be satisfied is specified and the dynamics described, the viability problem is the study of the compatibility between these constraints and these dynamics; Control strategies governing viable evolutions if any can then be deduced.</p>
+        <p>Analytical solutions to sustainability problems are very rare. Approximations can then be calculated, we call them Viable Numerical Objects.</p>
+        <a class="btn btn-primary" href="{% url 'visualize' %}" role="button">Visualization demo</a>
+        <a class="btn btn-dark" href="{% url 'admin:index' %}" role="button">Administration</a>
+    </div>
 {% endblock %}
