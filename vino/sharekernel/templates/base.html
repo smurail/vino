@@ -4,12 +4,30 @@
 <head>
     <meta charset="utf-8">
     <title>{% block metatitle %}Vino{% endblock %}</title>
-    <style>
-html { font: 0.8em sans-serif }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/vendor/bootstrap.min.css' %}">
+    <script src="{% static 'js/vendor/jquery-3.4.1.slim.min.js' %}"></script>
+    <script src="{% static 'js/vendor/popper-1.16.0.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap-4.4.1.min.js' %}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="{% url 'home' %}">Vino</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'visualize' %}">Visualization demo</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main class="container" role="main">
     {% block body %}{% endblock %}
+    </main>
 </body>
 </html>
