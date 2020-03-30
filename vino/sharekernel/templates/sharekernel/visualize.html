@@ -28,12 +28,12 @@
 var viz;
 
 document.addEventListener('DOMContentLoaded', () => {
-    viz = new Visualization('.card')
-});
-
-document.getElementById('action').addEventListener('submit', e => {
-    viz.update();
-    e.preventDefault();
+    viz = new Visualization('.card');
+    var form = viz.element.querySelector('form');
+    form.addEventListener('submit', e => {
+        viz.load();
+        e.preventDefault();
+    });
 });
 
     </script>
