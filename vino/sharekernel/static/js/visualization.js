@@ -31,10 +31,15 @@ class Visualization {
                 yaxis: { title: data.ytitle }
             },
             trace = {
-                type: 'bar',
-                orientation: 'h'
+                type: data.type,
             };
 
+        if (data.ztitle)
+            layout.zaxis = { title: data.ztitle };
+        if (data.orientation)
+            trace.orientation = data.orientation;
+        if (data.mode)
+            trace.mode = data.mode;
 
         for (const p in data)
             trace[p] = data[p];
