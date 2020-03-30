@@ -257,6 +257,22 @@ def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Option
     return size
 
 
+def iter_datafile(filepath: str, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+    metadata = metadata if isinstance(metadata, Metadata) else Metadata()
+    pipeline = compose(
+        parse_lines,
+        parse_metadata,
+        partial(feed_metadata, metadata=metadata),
+        partial(to_vectors, metadata=metadata),
+        partial(normalize_data, metadata=metadata),
+    )
+
+    with open(filepath) as fp:
+        for datum in pipeline(fp):
+            if datum.section == Datum.DATA:
+                yield datum
+
+
 if __name__ == '__main__':
     import django
 
