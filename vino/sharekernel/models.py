@@ -133,10 +133,12 @@ class Symbol(models.Model):
     longname = models.CharField(max_length=200, blank=True)
     unit = models.CharField(max_length=30, blank=True)
 
+    @property
+    def fullname(self):
+        return self.name + (f' ({self.longname})' if self.longname else '')
+
     def __str__(self):
-        typ = self.TYPES[self.type]
-        longname = (' (%s)' % self.longname if self.longname else '')
-        return '%s: %s%s' % (typ, self.name, longname)
+        return f'{self.TYPES[self.type]}: {self.fullname}'
 
 
 class ViabilityProblemQuerySet(models.QuerySet):
