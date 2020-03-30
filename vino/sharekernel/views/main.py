@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-from ..models import Kernel, Symbol
+from ..models import Kernel
 from .json import JsonDetailView
 
 
