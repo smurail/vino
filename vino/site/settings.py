@@ -45,10 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'vino.sharekernel',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -134,3 +137,10 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/files/'
 MEDIA_ROOT = DATA_DIR
+
+
+# Debug toolbar
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
