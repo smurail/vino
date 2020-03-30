@@ -33,7 +33,10 @@ class Visualization {
                 base: 0, // used when trace.type == 'bar'
                 orientation: 'h', // used when trace.type == 'bar'
                 type: 'z' in data ? 'scatter3d' : 'scattergl',
-                mode: 'markers'
+                mode: 'markers',
+                marker: {
+                    size: 2
+                }
             };
 
         if (data.ztitle)
