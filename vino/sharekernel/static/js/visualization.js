@@ -6,7 +6,6 @@ class Visualization {
                        element :
                        document.querySelector(element);
         this.loader = this.element.querySelector('.loader');
-        setTimeout(this.load.bind(this), 1);
     }
 
     dispatchEvent(name, details) {
@@ -26,7 +25,7 @@ class Visualization {
 
         var view = this.element.querySelector('.view'),
             layout = {
-                bargap: 0,
+                bargap: 0, // used when trace.type == 'bar'
                 xaxis: { title: data.xtitle },
                 yaxis: { title: data.ytitle }
             },
@@ -49,11 +48,10 @@ class Visualization {
         this.dispatchEvent('plotend');
     }
 
-    load() {
+    load(url) {
         this.dispatchEvent('load');
         this.loading(true);
-        var url = this.element.querySelector('input[name=url]');
-        fetch(url.value)
+        fetch(url)
             .then(r => r.json())
             .then(data => this.plot(data))
             .catch(error => console.log(error))
