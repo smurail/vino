@@ -8,12 +8,14 @@
 {% block body %}
     <div class="card mt-4">
         <div class="card-header py-2 d-flex align-items-center">
-            <form id="action" class="form-inline">
-                <label for="url">Visualize</label>
-                <div class="form-group mx-sm-2">
-                    <input type="text" id="url" name="url" class="form-control form-control-sm" size="50" value="/kernel/1/data">
-                </div>
-                <button type="submit" class="btn btn-sm btn-primary">Plot</button>
+            <form id="action">
+                <fieldset class="form-inline">
+                    <label for="url">Visualize</label>
+                    <div class="form-group mx-sm-2">
+                        <input type="text" id="url" name="url" class="form-control form-control-sm" size="50" value="/kernel/1/data">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Plot</button>
+                </fieldset>
             </form>
             <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
                 <span class="sr-only">Loading...</span>
@@ -30,13 +32,13 @@ var viz;
 document.addEventListener('DOMContentLoaded', () => {
     viz = new Visualization('.card');
     var form = viz.element.querySelector('form');
-    var submitButton = form.querySelector('button[type=submit]');
+    var fieldset = form.querySelector('fieldset');
     form.addEventListener('submit', e => {
         viz.load();
         e.preventDefault();
     });
-    viz.addEventListener('load', e => submitButton.disabled = true);
-    viz.addEventListener('plotend', e => submitButton.disabled = false);
+    viz.addEventListener('load', e => fieldset.disabled = true);
+    viz.addEventListener('plotend', e => fieldset.disabled = false);
 });
 
     </script>
