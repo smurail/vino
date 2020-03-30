@@ -22,6 +22,8 @@ class Visualization {
     }
 
     plot(data) {
+        this.dispatchEvent('plotstart', {data: data});
+
         var view = this.element.querySelector('.view'),
             layout = {
                 bargap: 0,
@@ -33,7 +35,6 @@ class Visualization {
                 orientation: 'h'
             };
 
-        this.dispatchEvent('plotstart', {data: data});
 
         for (const p in data)
             trace[p] = data[p];
