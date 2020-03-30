@@ -8,18 +8,14 @@
 {% block body %}
     <div class="card mt-4">
         <div class="card-header py-2 d-flex align-items-center">
-            <form id="action">
-                <fieldset class="form-inline">
-                    <label for="url">Visualize</label>
-                    <div class="form-group mx-sm-2">
-                        <select name="kernel" class="custom-select custom-select-sm mx-sm-2">
-                            {% for pk, title in kernels %}
-                            <option value="{{ pk }}">{{ title }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-primary">Plot</button>
-                </fieldset>
+            <form id="action" class="form-inline">
+                <label for="url">Visualize</label>
+                <select name="kernel" class="custom-select custom-select-sm mx-sm-2">
+                    {% for pk, title in kernels %}
+                    <option value="{{ pk }}">{{ title }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Plot</button>
             </form>
             <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
                 <span class="sr-only">Loading...</span>
@@ -35,10 +31,14 @@ class KernelVisualization extends Visualization {
     constructor(element) {
         super(element);
         this.form = this.element.querySelector('form');
-        this.fieldset = this.element.querySelector('fieldset');
         this.kernel = this.form.elements['kernel'];
-        this.addEventListener('load', e => this.fieldset.disabled = true);
-        this.addEventListener('plotend', e => this.fieldset.disabled = false);
+        this.button = this.form.querySelector('button');
+        this.addEventListener('load', e => {
+            this.kernel.disabled = this.button.disabled = true;
+        });
+        this.addEventListener('plotend', e => {
+            this.kernel.disabled = this.button.disabled = false;
+        });
         this.form.addEventListener('submit', e => {
             this.load();
             e.preventDefault();
