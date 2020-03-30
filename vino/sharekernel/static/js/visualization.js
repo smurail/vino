@@ -30,15 +30,14 @@ class Visualization {
                 yaxis: { title: data.ytitle }
             },
             trace = {
-                type: data.type,
+                base: 0, // used when trace.type == 'bar'
+                orientation: 'h', // used when trace.type == 'bar'
+                type: 'z' in data ? 'scatter3d' : 'scattergl',
+                mode: 'markers'
             };
 
         if (data.ztitle)
             layout.zaxis = { title: data.ztitle };
-        if (data.orientation)
-            trace.orientation = data.orientation;
-        if (data.mode)
-            trace.mode = data.mode;
 
         for (const p in data)
             trace[p] = data[p];
