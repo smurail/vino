@@ -12,7 +12,11 @@
                 <fieldset class="form-inline">
                     <label for="url">Visualize</label>
                     <div class="form-group mx-sm-2">
-                        <input type="text" id="url" name="url" class="form-control form-control-sm" size="50" value="/kernel/1/data">
+                        <select name="kernel" class="custom-select mx-sm-2">
+                            {% for pk, title in kernels %}
+                            <option value="{{ pk }}">{{ title }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-sm btn-primary">Plot</button>
                 </fieldset>
@@ -32,18 +36,23 @@ class KernelVisualization extends Visualization {
         super(element);
         this.form = this.element.querySelector('form');
         this.fieldset = this.element.querySelector('fieldset');
-        this.url = this.form.elements['url'];
+        this.kernel = this.form.elements['kernel'];
         this.addEventListener('load', e => this.fieldset.disabled = true);
         this.addEventListener('plotend', e => this.fieldset.disabled = false);
         this.form.addEventListener('submit', e => {
             this.load();
             e.preventDefault();
         });
+        this.kernel.addEventListener('change', e => this.load());
         setTimeout(this.load.bind(this), 1);
     }
 
+    url(pk) {
+        return "{% url 'kernel_data' 42 %}".replace('42', pk);
+    }
+
     load() {
-        super.load(this.url.value);
+        super.load(this.url(this.kernel.value));
     }
 }
 

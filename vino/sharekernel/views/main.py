@@ -11,6 +11,14 @@ class HomeView(TemplateView):
 class VisualizeView(TemplateView):
     template_name = 'sharekernel/visualize.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kernels = Kernel.objects.all()
+        context['kernels'] = [
+            (k.pk, f"{k.params.vp}: {k.title} ({k.size})") for k in kernels
+        ]
+        return context
+
 
 class KernelData(JsonDetailView):
     model = Kernel
