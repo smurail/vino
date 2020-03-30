@@ -26,13 +26,14 @@ class KernelData(JsonDetailView):
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
         variables = [v.fullname for v in kernel.vp.state_variables]
+        offset = 1 if kernel.format.title == 'bars' else 0
         data = {
-            'x': [values[1] for values in kernel.data],
-            'y': [values[2] for values in kernel.data],
+            'x': [values[offset] for values in kernel.data],
+            'y': [values[offset+1] for values in kernel.data],
             'xtitle': variables[0],
             'ytitle': variables[1],
         }
         if len(variables) > 2:
-            data['z'] = [values[3] for values in kernel.data]
+            data['z'] = [values[offset+2] for values in kernel.data]
             data['ztitle'] = variables[2]
         return data
