@@ -368,7 +368,7 @@ class Kernel(EntityWithMetadata):
     def vp(self):
         return self.params.vp
 
-    @property
+    @property  # type: ignore
     @lru_cache(maxsize=1, typed=True)
     def data(self):
         return [
