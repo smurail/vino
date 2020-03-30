@@ -3,6 +3,7 @@ from itertools import chain
 from pathlib import Path
 from tempfile import mktemp
 from typing import Tuple, Dict
+from functools import lru_cache
 
 from django.db import models
 from django.db.models import Count, Q
@@ -368,9 +369,11 @@ class Kernel(EntityWithMetadata):
         return self.params.vp
 
     @property
+    @lru_cache(maxsize=1, typed=True)
     def data(self):
-        for datum in iter_datafile(self.datafile.path):
-            yield list(datum.data)
+        return [
+            tuple(datum.data) for datum in iter_datafile(self.datafile.path)
+        ]
 
     @property
     def columns(self):
