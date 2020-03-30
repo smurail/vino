@@ -12,7 +12,7 @@ from django.utils.text import slugify
 
 from django_currentuser.db.models import CurrentUserField
 
-from vino.core.data import parse_datafile, Metadata
+from vino.core.data import parse_datafile, iter_datafile, Metadata
 
 from .fields import EquationsField, InequationsField
 from .utils import (generate_media_path, store_files, store_one_file,
@@ -355,6 +355,17 @@ class Kernel(EntityWithMetadata):
     @property
     def vp(self):
         return self.params.vp
+
+    @property
+    def data(self):
+        for datum in iter_datafile(self.datafile.path):
+            yield list(datum.data)
+
+    @property
+    def columns(self):
+        metadata = Metadata()
+        parse_datafile(self.datafile.path, metadata=metadata)
+        return metadata.get('dataformat.columns')
 
     @classmethod
     def from_files(cls, *files, owner=None):
