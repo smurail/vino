@@ -102,6 +102,11 @@ class EntityWithMetadata(Entity):
         return self.title
 
 
+class SymbolManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('order')
+
+
 class Symbol(models.Model):
     class Meta:
         constraints = [
@@ -132,6 +137,8 @@ class Symbol(models.Model):
     name = models.CharField(max_length=30)
     longname = models.CharField(max_length=200, blank=True)
     unit = models.CharField(max_length=30, blank=True)
+
+    objects = SymbolManager()
 
     @property
     def fullname(self):
@@ -275,6 +282,10 @@ class ViabilityProblem(EntityWithMetadata):
     @property
     def dynamics_type(self):
         return self.dynamics.dynamics_type_name.capitalize()
+
+    @property
+    def state_variables(self):
+        return self.symbols.filter(type=Symbol.STATE)
 
 
 class ParameterSet(Entity):

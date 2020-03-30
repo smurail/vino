@@ -17,8 +17,7 @@ class KernelData(JsonDetailView):
 
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
-        state_variables = kernel.vp.symbols.filter(type=Symbol.STATE).order_by('order')
-        variables = [v.fullname for v in state_variables]
+        variables = [v.fullname for v in kernel.vp.state_variables]
         return {
             'base': 0,
             'x': [values[1] for values in kernel.data],
