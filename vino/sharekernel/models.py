@@ -352,6 +352,10 @@ class Kernel(EntityWithMetadata):
     sourcefiles = models.ManyToManyField(SourceFile, verbose_name="Source files")
     size = models.IntegerField(default=0)
 
+    @property
+    def vp(self):
+        return self.params.vp
+
     @classmethod
     def from_files(cls, *files, owner=None):
         # Parse data and metadata from files
