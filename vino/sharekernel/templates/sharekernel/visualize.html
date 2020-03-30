@@ -30,10 +30,13 @@ var viz;
 document.addEventListener('DOMContentLoaded', () => {
     viz = new Visualization('.card');
     var form = viz.element.querySelector('form');
+    var submitButton = form.querySelector('button[type=submit]');
     form.addEventListener('submit', e => {
         viz.load();
         e.preventDefault();
     });
+    viz.addEventListener('load', e => submitButton.disabled = true);
+    viz.addEventListener('plotend', e => submitButton.disabled = false);
 });
 
     </script>
