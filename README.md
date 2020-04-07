@@ -38,6 +38,11 @@ Don't forget to migrate database when pulling last commits:
 
     pipenv run ./manage.py migrate
 
+To import all samples in `data/samples` directory run this command (don't
+forget to specify your username):
+
+    pipenv run ./manage.py populatedb <username>
+
 You want to completely reset whole ViNO database without messing with Django
 users and groups? Just do:
 
@@ -45,6 +50,11 @@ users and groups? Just do:
     pipenv run ./manage.py migrate sharekernel zero
     # As usual, to update database to latest migration
     pipenv run ./manage.py migrate
+
+Alternatively, you can empty vino data from database with this custom command:
+
+    # This will drop sharekernel data without resetting AUTOINCREMENT
+    pipenv run ./manage.py resetdb
 
 
 ## Working with Docker
