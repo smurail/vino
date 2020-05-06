@@ -1,19 +1,16 @@
 "use strict";
 
-class Visualization {
+class Visualization extends EventTarget {
     constructor(element) {
+        super();
         this.element = element instanceof HTMLElement ?
                        element :
                        document.querySelector(element);
         this.loader = this.element.querySelector('.loader');
     }
 
-    dispatchEvent(name, details) {
-        this.element.dispatchEvent(new CustomEvent(name, details));
-    }
-
-    addEventListener(name, callback) {
-        this.element.addEventListener(name, callback);
+    dispatchCustomEvent(name, details) {
+        this.dispatchEvent(new CustomEvent(name, details));
     }
 
     loading(isLoading) {
@@ -21,7 +18,7 @@ class Visualization {
     }
 
     plot(data) {
-        this.dispatchEvent('plotstart', {data: data});
+        this.dispatchCustomEvent('plotstart', {data: data});
 
         var view = this.element.querySelector('.view'),
             layout = {
@@ -47,11 +44,11 @@ class Visualization {
 
         Plotly.react(view, [trace], layout);
 
-        this.dispatchEvent('plotend');
+        this.dispatchCustomEvent('plotend');
     }
 
     load(url) {
-        this.dispatchEvent('load');
+        this.dispatchCustomEvent('load');
         this.loading(true);
         fetch(url)
             .then(r => r.json())
