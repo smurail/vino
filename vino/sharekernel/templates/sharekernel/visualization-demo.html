@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load sharekernel %}
+{% block body %}
+    {% kernel_visualize kernels %}
+    <script>
+        URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);
+    </script>
+    <script src="{% static 'js/vendor/plotly-1.52.3.min.js' %}"></script>
+    <script src="{% static 'js/visualization.js' %}"></script>
+{% endblock %}

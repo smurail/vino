@@ -8,8 +8,8 @@ class HomeView(TemplateView):
     template_name = 'sharekernel/home.html'
 
 
-class VisualizeView(TemplateView):
-    template_name = 'sharekernel/visualize.html'
+class VisualizationDemoView(TemplateView):
+    template_name = 'sharekernel/visualization-demo.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,4 +1,4 @@
-from .main import HomeView, VisualizeView, KernelData
+from .main import HomeView, VisualizationDemoView, KernelData
 
 
-__all__ = ['HomeView', 'VisualizeView', 'KernelData']
+__all__ = ['HomeView', 'VisualizationDemoView', 'KernelData']
