@@ -1,0 +1,19 @@
+<div class="kernel card mt-4">
+    <div class="card-header py-2 d-flex align-items-center">
+        <form id="action" class="form-inline">
+            <label for="url">Visualize</label>
+            <select name="kernel" class="custom-select custom-select-sm mx-sm-2">
+                {% for pk, title in kernels %}
+                <option value="{{ pk }}">{{ title }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">Plot</button>
+        </form>
+        <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="view"></div>
+    </div>
+</div>

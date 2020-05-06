@@ -57,3 +57,38 @@ class Visualization extends EventTarget {
             .finally(() => this.loading(false));
     }
 }
+
+class KernelVisualization extends Visualization {
+    constructor(element) {
+        super(element);
+        this.form = this.element.querySelector('form');
+        this.kernel = this.form.elements['kernel'];
+        this.button = this.form.querySelector('button');
+        this.addEventListener('load', e => {
+            this.kernel.disabled = this.button.disabled = true;
+        });
+        this.addEventListener('plotend', e => {
+            this.kernel.disabled = this.button.disabled = false;
+        });
+        this.form.addEventListener('submit', e => {
+            this.load();
+            e.preventDefault();
+        });
+        this.kernel.addEventListener('change', e => this.load());
+        setTimeout(this.load.bind(this), 1);
+    }
+
+    url(pk) {
+        return URL_KERNEL_DATA(pk);
+    }
+
+    load() {
+        super.load(this.url(this.kernel.value));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document
+        .querySelectorAll('.kernel')
+        .forEach((element) => new KernelVisualization(element));
+});
