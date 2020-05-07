@@ -25,7 +25,8 @@ class Visualization extends EventTarget {
                 margin: { t: 60, r: 20, b: 80, l: 80, pad: 0 },
                 bargap: 0, // used when trace.type == 'bar'
                 xaxis: { title: data.xtitle },
-                yaxis: { title: data.ytitle }
+                yaxis: { title: data.ytitle },
+                dragmode: 'pan'
             },
             trace = {
                 base: 0, // used when trace.type == 'bar'
@@ -35,6 +36,9 @@ class Visualization extends EventTarget {
                 marker: {
                     size: 2
                 }
+            },
+            config = {
+                scrollZoom: true
             };
 
         if (data.ztitle)
@@ -43,7 +47,7 @@ class Visualization extends EventTarget {
         for (const p in data)
             trace[p] = data[p];
 
-        Plotly.react(view, [trace], layout);
+        Plotly.react(view, [trace], layout, config);
 
         this.dispatchCustomEvent('plotend');
     }
@@ -87,6 +91,19 @@ class KernelVisualization extends Visualization {
         super.load(this.url(this.kernel.value));
     }
 }
+
+// https://github.com/plotly/plotly.js/issues/1085#issuecomment-564488236
+window.addEventListener('wheel', (event) => {
+    if (!event.isTrusted) return;
+    event.stopPropagation();
+    if (event.shiftKey) return false;
+    var newEv = new WheelEvent('wheel', {
+            clientX: event.clientX,
+            clientY: event.clientY,
+            deltaY:  event.deltaY*4
+        });
+    event.target.dispatchEvent(newEv);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     document
