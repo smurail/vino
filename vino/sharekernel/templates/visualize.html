@@ -1,19 +1,28 @@
-<div class="kernel card mt-4">
+<div class="kernel card mt-4" data-id="{{ id }}">
     <div class="card-header px-3 py-2">
         <form>
             <div class="form-inline">
-                <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
-                <div class="input-group">
-                    <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm ml-2">
-                        {% for pk, title in kernels %}
-                        <option value="{{ pk }}">{{ title }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+                <div class="form-group" title="Kernel">
+                    <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
+                    <div class="input-group mx-2">
+                        <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm">
+                            {% for pk, title in kernels %}
+                            <option value="{{ pk }}">{{ title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
                     </div>
+                </div>
+                <div class="custom-control custom-checkbox ml-2" title="Shapes">
+                    <input id="show-shapes-{{ id }}" type="checkbox" class="custom-control-input">
+                    <label class="custom-control-label" for="show-shapes-{{ id }}">
+                        <i class="fas fa-layer-group"></i>
+                        &nbsp;<!-- This non-breaking space fixes vertical align -->
+                    </label>
                 </div>
                 <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
                     <span class="sr-only">Loading...</span>
