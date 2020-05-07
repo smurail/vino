@@ -4,11 +4,12 @@
 <head>
     <meta charset="utf-8">
     <title>{% block metatitle %}Vino{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/css/fontawesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/vino.css' %}">
-    <script src="{% static 'js/vendor/jquery-3.4.1.slim.min.js' %}"></script>
-    <script src="{% static 'js/vendor/popper-1.16.0.min.js' %}"></script>
-    <script src="{% static 'js/vendor/bootstrap-4.4.1.min.js' %}"></script>
+    <script src="{% static 'vendor/js/jquery-3.4.1.slim.min.js' %}"></script>
+    <script src="{% static 'vendor/js/popper-1.16.0.min.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap-4.4.1.min.js' %}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>
