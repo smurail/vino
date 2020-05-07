@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-from ..models import Kernel, BarGridKernel
+from ..models import Kernel, BarGridKernel, KdTreeKernel
 from .json import JsonDetailView
 
 
@@ -26,6 +26,7 @@ class KernelData(JsonDetailView):
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
         variables = [v.fullname for v in kernel.vp.state_variables]
+        dim = len(variables)
         offset = 1 if isinstance(kernel, BarGridKernel) else 0
         data = {
             'x': [values[offset] for values in kernel.data],
@@ -33,7 +34,11 @@ class KernelData(JsonDetailView):
             'xtitle': variables[0],
             'ytitle': variables[1],
         }
-        if len(variables) > 2:
+        if isinstance(kernel, KdTreeKernel):
+            data['rectangles'] = [
+                values[dim:3*dim] for values in kernel.data
+            ]
+        if dim > 2:
             data['z'] = [values[offset+2] for values in kernel.data]
             data['ztitle'] = variables[2]
         return data

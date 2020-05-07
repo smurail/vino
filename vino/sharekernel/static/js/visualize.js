@@ -41,6 +41,16 @@ class Visualization extends EventTarget {
                 scrollZoom: true
             };
 
+        if (data.rectangles)
+            layout.shapes = data.rectangles.map(r => (
+                {
+                    type: 'rect',
+                    x0: r[0], y0: r[2],
+                    x1: r[1], y1: r[3],
+                    line: { width: 0.2 }
+                }
+            ))
+
         if (data.ztitle)
             layout.zaxis = { title: data.ztitle };
 
