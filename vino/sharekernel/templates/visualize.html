@@ -3,12 +3,18 @@
         <form>
             <div class="form-inline">
                 <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
-                <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm mx-sm-2">
-                    {% for pk, title in kernels %}
-                    <option value="{{ pk }}">{{ title }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-sm btn-primary">Plot</button>
+                <div class="input-group">
+                    <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm ml-2">
+                        {% for pk, title in kernels %}
+                        <option value="{{ pk }}">{{ title }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
