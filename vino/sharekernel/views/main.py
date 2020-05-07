@@ -9,7 +9,7 @@ class HomeView(TemplateView):
 
 
 class VisualizationDemoView(TemplateView):
-    template_name = 'sharekernel/visualization-demo.html'
+    template_name = 'sharekernel/visualization_demo.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
