@@ -1,17 +1,19 @@
 <div class="kernel card mt-4">
-    <div class="card-header py-2 d-flex align-items-center">
-        <form id="action" class="form-inline">
-            <label for="url">Visualize</label>
-            <select name="kernel" class="custom-select custom-select-sm mx-sm-2">
-                {% for pk, title in kernels %}
-                <option value="{{ pk }}">{{ title }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-sm btn-primary">Plot</button>
+    <div class="card-header px-3 py-2">
+        <form>
+            <div class="form-inline">
+                <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
+                <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm mx-sm-2">
+                    {% for pk, title in kernels %}
+                    <option value="{{ pk }}">{{ title }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Plot</button>
+                <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         </form>
-        <div class="loader spinner-grow spinner-grow-sm ml-auto" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
     </div>
     <div class="card-body p-0">
         <div class="view"></div>

@@ -1,9 +1,13 @@
 .view {
-    height: 450px;
+    height: 400px;
     max-width: 600px;
     margin: 0 auto;
 }
 
 .loader {
     visibility: hidden;
+}
+
+.col .kernel select[name=kernel] {
+    max-width: 25em;
 }

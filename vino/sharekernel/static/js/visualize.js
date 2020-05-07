@@ -22,6 +22,7 @@ class Visualization extends EventTarget {
 
         var view = this.element.querySelector('.view'),
             layout = {
+                margin: { t: 60, r: 20, b: 80, l: 80, pad: 0 },
                 bargap: 0, // used when trace.type == 'bar'
                 xaxis: { title: data.xtitle },
                 yaxis: { title: data.ytitle }
