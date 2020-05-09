@@ -11,3 +11,8 @@
 .col .kernel select[name=kernel] {
     max-width: 25em;
 }
+
+/* Workaround to fix bootstrap interference in plotly modebar */
+.plotly svg {
+    vertical-align: baseline;
+}
