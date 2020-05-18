@@ -45,13 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
     'vino.sharekernel',
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -145,11 +142,19 @@ MEDIA_ROOT = DATA_DIR
 
 # Debug toolbar
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+if settings.get('DEBUG_TOOLBAR'):
+    INSTALLED_APPS[-1:-1] = ['debug_toolbar']
 
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_COLLAPSED': True,
-    'SQL_WARNING_THRESHOLD': 100
-}
+    MIDDLEWARE[0:0] = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
+    ]
+
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_COLLAPSED': True,
+        'SQL_WARNING_THRESHOLD': 100
+    }

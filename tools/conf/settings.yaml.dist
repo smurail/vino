@@ -1,3 +1,4 @@
 default:
     DEBUG: true
+    DEBUG_TOOLBAR: false
     TIME_ZONE: Europe/Paris
