@@ -30,7 +30,14 @@ class Visualization extends EventTarget {
         var threeDimensional = data.variables.length > 2 ? true : false,
             view = this.element.querySelector('.view'),
             layout = {
-                margin: { t: 60, r: 20, b: 80, l: 80, pad: 0 },
+                margin:
+                    threeDimensional ?
+                    { t: 0, r: 0, b: 0, l: 0 } :
+                    { t: 20, r: 0, b: 70, l: 80 },
+                hovermode: false,
+                modebar: {
+                    bgcolor: 'rgba(255,255,255,0.9)'
+                },
                 bargap: 0, // used when trace.type == 'bar'
                 xaxis: { title: data.variables[0].fullname },
                 yaxis: { title: data.variables[1].fullname },
@@ -42,11 +49,10 @@ class Visualization extends EventTarget {
                 mode: 'markers',
                 marker: {
                     size: 2
-                },
-                hovermode: false,
-                autosize: false
+                }
             },
             config = {
+                responsive: true,
                 scrollZoom: true
             };
 
