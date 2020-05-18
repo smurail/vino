@@ -25,14 +25,19 @@ class KernelData(JsonDetailView):
 
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
-        variables = [v.fullname for v in kernel.vp.state_variables]
-        dim = len(variables)
+        state_variables = kernel.vp.state_variables
+        dim = len(state_variables)
         offset = 1 if isinstance(kernel, BarGridKernel) else 0
         data = {
             'x': [values[offset] for values in kernel.data],
             'y': [values[offset+1] for values in kernel.data],
-            'xtitle': variables[0],
-            'ytitle': variables[1],
+            'variables': [
+                {
+                    'name': v.name,
+                    'fullname': v.fullname
+                }
+                for v in state_variables
+            ]
         }
         if isinstance(kernel, KdTreeKernel):
             data['rectangles'] = [
@@ -40,5 +45,4 @@ class KernelData(JsonDetailView):
             ]
         if dim > 2:
             data['z'] = [values[offset+2] for values in kernel.data]
-            data['ztitle'] = variables[2]
         return data

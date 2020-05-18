@@ -27,12 +27,13 @@ class Visualization extends EventTarget {
         this.data = data = data || this.data;
         this.dispatchCustomEvent('plotstart', {data: data});
 
-        var view = this.element.querySelector('.view'),
+        var threeDimensional = data.variables.length > 2 ? true : false,
+            view = this.element.querySelector('.view'),
             layout = {
                 margin: { t: 60, r: 20, b: 80, l: 80, pad: 0 },
                 bargap: 0, // used when trace.type == 'bar'
-                xaxis: { title: data.xtitle },
-                yaxis: { title: data.ytitle }
+                xaxis: { title: data.variables[0].fullname },
+                yaxis: { title: data.variables[1].fullname },
             },
             trace = {
                 base: 0, // used when trace.type == 'bar'
@@ -62,8 +63,12 @@ class Visualization extends EventTarget {
         if (this.options.showShapes && this.shapes)
             layout.shapes = this.shapes;
 
-        if (data.ztitle) {
-            layout.zaxis = { title: data.ztitle };
+        if (threeDimensional) {
+            layout.scene = {
+                xaxis: { title: data.variables[0].name },
+                yaxis: { title: data.variables[1].name },
+                zaxis: { title: data.variables[2].name }
+            }
         } else {
             layout.dragmode = 'pan';
         }
