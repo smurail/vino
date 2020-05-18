@@ -82,6 +82,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'vino.site.wsgi.application'
 
+# This is merged with default logging configuration unless LOGGING_CONFIG = None
+# https://docs.djangoproject.com/fr/2.2/topics/logging/#configuring-logging
+LOGGING = settings.get('LOGGING', {})
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
