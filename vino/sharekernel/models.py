@@ -236,7 +236,7 @@ class ViabilityProblem(EntityWithMetadata):
         }
 
         # Update database
-        details = self._symbols_details
+        details = self._symbols_details or {s.name: s for s in self.symbols.all()}
         self.symbols.all().delete()
         Symbol.objects.bulk_create([
             Symbol(
@@ -255,7 +255,7 @@ class ViabilityProblem(EntityWithMetadata):
     @classmethod
     def from_db(cls, db, field_names, values):
         instance = super().from_db(db, field_names, values)
-        instance._symbols_details = {s.name: s for s in instance.symbols.all()}
+        instance._symbols_details = None
         return instance
 
     @classmethod
