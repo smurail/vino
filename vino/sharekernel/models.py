@@ -7,6 +7,7 @@ from functools import lru_cache
 
 from django.db import models
 from django.db.models import Count, Q
+from django.db.models.query import ModelIterable
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import slugify
@@ -353,9 +354,47 @@ class SourceFile(Entity):
         return Path(self.file).relative_to(settings.MEDIA_ROOT).as_posix()
 
 
+class KernelIterable(ModelIterable):
+    def __iter__(self):
+        for kernel in super().__iter__():
+            yield kernel.promote()
+
+
+class KernelQuerySet(models.QuerySet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._iterable_class = KernelIterable
+
+
+class KernelManager(models.Manager):
+    FORMAT = None
+
+    def get_queryset(self):
+        # Use custom queryset
+        qs = KernelQuerySet(self.model, using=self._db)
+        # Optimization: fetch related objects in the same sql query
+        qs = qs.select_related(
+            'params', 'format', 'software', 'params__vp'
+        )
+        # Filter by format if needed
+        if self.FORMAT is not None:
+            qs = qs.filter(format__title=self.FORMAT)
+        return qs
+
+    @classmethod
+    def create(cls, name, format_name):
+        return type(
+            f'{name}KernelManager',
+            (KernelManager,),
+            {'FORMAT': format_name}
+        )
+
+
 class Kernel(EntityWithMetadata):
     PREFIX = 'results.'
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
+
+    objects = KernelManager()
 
     params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
@@ -363,6 +402,14 @@ class Kernel(EntityWithMetadata):
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
     sourcefiles = models.ManyToManyField(SourceFile, verbose_name="Source files")
     size = models.IntegerField(default=0)
+
+    def promote(self):
+        # https://schinckel.net/2013/07/28/django-single-table-inheritance-on-the-cheap./
+        format_name = self.format.title
+        if format_name in _CUSTOM_KERNELS:
+            subclass = _CUSTOM_KERNELS[format_name]
+            self.__class__ = subclass
+        return self
 
     @property
     def vp(self):
@@ -434,3 +481,24 @@ class Kernel(EntityWithMetadata):
         assert column_count >= dimensions, msg
 
         return kernel
+
+
+class BarGridKernel(Kernel):
+    FORMAT = 'bars'
+
+    objects = KernelManager.create('BarGrid', 'bars')()
+
+    class Meta:
+        proxy = True
+
+
+class KdTreeKernel(Kernel):
+    FORMAT = 'kdtree'
+
+    objects = KernelManager.create('KdTree', 'kdtree')()
+
+    class Meta:
+        proxy = True
+
+
+_CUSTOM_KERNELS = {cls.FORMAT: cls for cls in Kernel.__subclasses__()}
