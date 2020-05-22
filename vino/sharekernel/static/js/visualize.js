@@ -38,13 +38,10 @@ class Visualization extends EventTarget {
                 modebar: {
                     bgcolor: 'rgba(255,255,255,0.9)'
                 },
-                bargap: 0, // used when trace.type == 'bar'
                 xaxis: { title: data.variables[0].fullname },
                 yaxis: { title: data.variables[1].fullname },
             },
             trace = {
-                base: 0, // used when trace.type == 'bar'
-                orientation: 'h', // used when trace.type == 'bar'
                 type: 'z' in data ? 'scatter3d' : 'scattergl',
                 mode: 'markers',
                 marker: {
