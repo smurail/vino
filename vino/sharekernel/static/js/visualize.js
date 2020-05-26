@@ -20,6 +20,9 @@ class Visualization extends EventTarget {
     }
 
     loading(isLoading) {
+        if (!this.defaultCursor)
+            this.defaultCursor = document.body.style.cursor || 'default';
+        document.body.style.cursor = isLoading ? 'wait' : this.defaultCursor;
         this.loader.classList.toggle('visible', isLoading);
     }
 
