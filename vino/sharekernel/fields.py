@@ -22,15 +22,16 @@ class StatementsField(models.CharField):
         return str(value)
 
     # XXX See https://stackoverflow.com/questions/14756790/why-are-uncompiled-repeatedly-used-regexes-so-much-slower-in-python-3
-    @lru_cache(maxsize=500, typed=True)
-    def to_python(self, value):
+    @classmethod
+    @lru_cache(typed=True)
+    def to_python(cls, value):
         assert value is not None
 
         if isinstance(value, Statements):
             return value
 
         try:
-            return self.STATEMENTS_CLS(value)
+            return cls.STATEMENTS_CLS(value)
         except StatementsError as e:
             message, params = e.args
             raise ValidationError(_(message), params=params, code='invalid')
