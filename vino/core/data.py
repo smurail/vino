@@ -168,20 +168,19 @@ def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]
 
             # Build resampling parameters
             if not resampling_params:
-                min_values = np.dot(permut_axes, metadata['MinimalValues'])
-                max_values = np.dot(permut_axes, metadata['MaximalValues'])
-                ppa_values = np.dot(permut_axes, metadata['PointNumberPerAxis'])
+                min_values = metadata['MinimalValues']
+                max_values = metadata['MaximalValues']
+                ppa_values = metadata['PointNumberPerAxis']
                 assert len(min_values) == len(max_values) == len(ppa_values)
                 resampling_params = list(zip(min_values, max_values, ppa_values))
 
             # Compute results
             resampled = [
                 resample(x, resampling_params[column_indices[i]])
-                for i, x in enumerate(datum.data)
+                for i, x in enumerate(np.dot(permut_cols, datum.data))
             ]
-            normalized = np.dot(permut_cols, resampled)
 
-            yield Datum(datum.section, normalized)
+            yield Datum(datum.section, resampled)
 
         else:
             yield datum
