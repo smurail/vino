@@ -1,11 +1,11 @@
 from pathlib import Path
 from tempfile import mktemp
-from functools import lru_cache
 
 from django.db import models
 from django.db.models.query import ModelIterable
 from django.conf import settings
 from django.utils.text import slugify
+from django.utils.functional import cached_property
 
 from vino.core.data import parse_datafile, iter_datafile, Metadata
 
@@ -80,8 +80,7 @@ class Kernel(EntityWithMetadata):
     def vp(self):
         return self.params.vp
 
-    @property  # type: ignore
-    @lru_cache(maxsize=1, typed=True)
+    @cached_property
     def data(self):
         return [
             tuple(datum.data) for datum in iter_datafile(self.datafile.path)
