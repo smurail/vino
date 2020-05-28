@@ -59,6 +59,8 @@ class Kernel(EntityWithMetadata):
     PREFIX = 'results.'
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
 
+    FORMAT = None
+
     objects = KernelManager()
 
     params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
@@ -67,6 +69,14 @@ class Kernel(EntityWithMetadata):
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
     sourcefiles = models.ManyToManyField(SourceFile, verbose_name="Source files")
     size = models.IntegerField(default=0)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Ensure Kernel subclasses instances always have the right format
+        if self.FORMAT and (not self.format_id or self.format.title != self.FORMAT):
+            self.format = DataFormat.objects.get(title=self.FORMAT)
+            assert self.format.title == self.FORMAT
 
     def promote(self):
         # https://schinckel.net/2013/07/28/django-single-table-inheritance-on-the-cheap./
