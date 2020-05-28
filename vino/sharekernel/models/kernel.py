@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from pathlib import Path
 from tempfile import mktemp
+from typing import List, Optional
 
 from django.db import models
 from django.db.models.query import ModelIterable
@@ -59,7 +62,7 @@ class Kernel(EntityWithMetadata):
     PREFIX = 'results.'
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
 
-    FORMAT = None
+    FORMAT: Optional[str] = None
 
     objects = KernelManager()
 
@@ -78,7 +81,7 @@ class Kernel(EntityWithMetadata):
             self.format = DataFormat.objects.get(title=self.FORMAT)
             assert self.format.title == self.FORMAT
 
-    def promote(self):
+    def promote(self) -> Kernel:
         # https://schinckel.net/2013/07/28/django-single-table-inheritance-on-the-cheap./
         format_name = self.format.title
         if format_name in _CUSTOM_KERNELS:
@@ -87,17 +90,17 @@ class Kernel(EntityWithMetadata):
         return self
 
     @property
-    def vp(self):
+    def vp(self) -> ViabilityProblem:
         return self.params.vp
 
     @cached_property
-    def data(self):
+    def data(self) -> List:
         return [
             tuple(datum.data) for datum in iter_datafile(self.datafile.path)
         ]
 
     @property
-    def columns(self):
+    def columns(self) -> Optional[List]:
         metadata = Metadata()
         parse_datafile(self.datafile.path, metadata=metadata)
         return metadata.get('dataformat.columns')
