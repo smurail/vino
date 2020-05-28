@@ -148,21 +148,21 @@ class Kernel(EntityWithMetadata):
 
 
 class BarGridKernel(Kernel):
-    FORMAT = 'bars'
-
-    objects = KernelManager.create('BarGrid', 'bars')()
-
     class Meta:
         proxy = True
+
+    FORMAT = 'bars'
+
+    objects = KernelManager.create('BarGrid', FORMAT)()
 
 
 class KdTreeKernel(Kernel):
-    FORMAT = 'kdtree'
-
-    objects = KernelManager.create('KdTree', 'kdtree')()
-
     class Meta:
         proxy = True
+
+    FORMAT = 'kdtree'
+
+    objects = KernelManager.create('KdTree', FORMAT)()
 
 
 _CUSTOM_KERNELS = {cls.FORMAT: cls for cls in Kernel.__subclasses__()}
