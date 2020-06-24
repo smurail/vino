@@ -2,10 +2,17 @@ from itertools import chain
 from collections import OrderedDict
 
 from django.db import models
+from django.db.models import Count, Q
 
 from .entity import Entity
-from .viabilityproblem import ViabilityProblem
+from .viabilityproblem import ViabilityProblem, ViabilityProblemQuerySet
 from .symbol import Symbol
+
+
+class ParameterSetQuerySet(ViabilityProblemQuerySet):
+    def with_dimension_of(self, type, name):
+        opts = {name: Count('vp__symbols', filter=Q(vp__symbols__type=type))}
+        return self.annotate(**opts)
 
 
 class ParameterSet(Entity):
@@ -21,6 +28,8 @@ class ParameterSet(Entity):
     dynamics = models.CharField(max_length=200, blank=True)
     constraints = models.CharField(max_length=200, blank=True)
     target = models.CharField(max_length=200, blank=True)
+
+    objects = ParameterSetQuerySet.as_manager()
 
     def to_dict(self):
         types = [Symbol.DYNAMICS, Symbol.CONSTRAINT, Symbol.TARGET]
