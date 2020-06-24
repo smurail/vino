@@ -23,6 +23,9 @@ class ViabilityProblemQuerySet(models.QuerySet):
     def with_dimensions(self):
         return self.with_state_dimension().with_control_dimension()
 
+    def of_dimension(self, value: int):
+        return self.with_state_dimension().filter(state_dimension=value)
+
 
 class ViabilityProblem(EntityWithMetadata):
     class Meta:
