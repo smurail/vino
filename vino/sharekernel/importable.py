@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ImportForm(forms.Form):
-    files = forms.FileField(
+    import_files = forms.FileField(
         widget=forms.ClearableFileInput(attrs={'multiple': True}),
         label=_('Files'),
         help_text=_('After clicking above button, you can then select several '
@@ -40,7 +40,7 @@ class ImportAdmin(admin.ModelAdmin):
         return super().render_change_form(request, context, *args, **kwargs)
 
     def save_form(self, request, form, change):
-        files = request.FILES.getlist('files')
+        files = request.FILES.getlist('import_files')
         return self.model.from_files(*files)
 
     def save_related(self, request, form, formsets, change):
