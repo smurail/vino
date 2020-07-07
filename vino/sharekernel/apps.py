@@ -5,7 +5,7 @@ class SharekernelConfig(AppConfig):
     name = 'vino.sharekernel'
 
     def ready(self):
-        from fieldsignals import pre_save_changed, post_save_changed
+        from fieldsignals import pre_save_changed, post_save_changed  # type: ignore
 
         for model in self.models.values():
             if hasattr(model, 'pre_save'):

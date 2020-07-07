@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import re
 import csv
-import numpy as np
+import numpy as np  # type: ignore
 
 from dataclasses import dataclass
 from functools import partial

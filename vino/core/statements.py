@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-import Equation
+import Equation  # type: ignore
 
 from typing import Iterable, List, Tuple, Union, Optional, Pattern
 

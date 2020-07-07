@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import slugify
 
-from django_currentuser.db.models import CurrentUserField
+from django_currentuser.db.models import CurrentUserField  # type: ignore
 
 from vino.core.data import parse_datafile, iter_datafile, Metadata
 
