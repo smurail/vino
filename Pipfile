@@ -8,6 +8,7 @@ flake8 = "*"
 mypy = "*"
 django-debug-toolbar = "*"
 django-debug-toolbar-force = "*"
+django-stubs = "*"
 
 [packages]
 numpy = "*"
