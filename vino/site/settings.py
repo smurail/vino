@@ -10,13 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+import dynaconf
 from pathlib import Path
-from dynaconf import LazySettings
 from typing import List
 
-settings = LazySettings(
-    DEBUG_LEVEL_FOR_DYNACONF='DEBUG',
-    ENVVAR_PREFIX_FOR_DYNACONF='VINO',
+# Use dynaconf explicit mode
+# See https://www.dynaconf.com/django/#explicit-mode
+settings = dynaconf.LazySettings(
+    warn_dynaconf_global_settings=True,
+    environments=True,
+    lowercase_read=False,
+    load_dotenv=True,
+    default_settings_paths=dynaconf.constants.DEFAULT_SETTINGS_FILES,
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
