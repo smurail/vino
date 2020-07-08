@@ -32,28 +32,30 @@ class Visualization extends EventTarget {
 
         var threeDimensional = data.variables.length > 2 ? true : false,
             view = this.element.querySelector('.view'),
-            layout = {
-                margin:
-                    threeDimensional ?
-                    { t: 0, r: 0, b: 0, l: 0 } :
-                    { t: 20, r: 0, b: 70, l: 80 },
-                hovermode: false,
-                modebar: {
-                    bgcolor: 'rgba(255,255,255,0.9)'
+            plot = {
+                layout: {
+                    margin:
+                        threeDimensional ?
+                        { t: 0, r: 0, b: 0, l: 0 } :
+                        { t: 20, r: 0, b: 70, l: 80 },
+                    hovermode: 'closest',
+                    modebar: {
+                        bgcolor: 'rgba(255,255,255,0.9)'
+                    },
+                    xaxis: { title: data.variables[0].fullname },
+                    yaxis: { title: data.variables[1].fullname },
                 },
-                xaxis: { title: data.variables[0].fullname },
-                yaxis: { title: data.variables[1].fullname },
-            },
-            trace = {
-                type: 'z' in data ? 'scatter3d' : 'scattergl',
-                mode: 'markers',
-                marker: {
-                    size: 2
+                data: [{
+                    type: threeDimensional ? 'scatter3d' : 'scattergl',
+                    mode: 'markers',
+                    marker: {
+                        size: 2
+                    }
+                }],
+                config: {
+                    responsive: true,
+                    scrollZoom: true
                 }
-            },
-            config = {
-                responsive: true,
-                scrollZoom: true
             };
 
         if (data.rectangles && !this.shapes)
@@ -67,22 +69,23 @@ class Visualization extends EventTarget {
             ));
 
         if (this.options.showShapes && this.shapes)
-            layout.shapes = this.shapes;
+            plot.layout.shapes = this.shapes;
 
         if (threeDimensional) {
-            layout.scene = {
+            plot.layout.scene = {
                 xaxis: { title: data.variables[0].name },
                 yaxis: { title: data.variables[1].name },
                 zaxis: { title: data.variables[2].name }
             }
         } else {
-            layout.dragmode = 'pan';
+            plot.layout.dragmode = 'pan';
         }
 
         for (const p in data)
-            trace[p] = data[p];
+            plot.data[0][p] = data[p];
 
-        Plotly.react(view, [trace], layout, config);
+        // See https://plotly.com/javascript/plotlyjs-function-reference/#plotlynewplot
+        Plotly.react(view, plot);
 
         this.dispatchCustomEvent('plotend');
     }
