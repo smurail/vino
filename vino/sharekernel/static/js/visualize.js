@@ -41,7 +41,7 @@ class Visualization extends EventTarget {
                     margin:
                         threeDimensional ?
                         { t: 0, r: 0, b: 0, l: 0 } :
-                        { t: 20, r: 0, b: 70, l: 80 },
+                        { t: 0, r: 0, b: 70, l: 80 },
                     hovermode: 'closest',
                     modebar: {
                         bgcolor: 'rgba(255,255,255,0.9)'
