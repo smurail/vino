@@ -27,6 +27,8 @@ class Visualization extends EventTarget {
     }
 
     plot(data) {
+        var sameVP = !data || (this.data && this.data.vp == data.vp);
+
         this.data = data = data || this.data;
         this.dispatchCustomEvent('plotstart', {data: data});
 
@@ -58,7 +60,8 @@ class Visualization extends EventTarget {
                     responsive: true,
                     scrollZoom: true
                 }
-            };
+            },
+            update = {};
 
         if (data.shapes && !this.shapes)
             this.shapes = data.shapes.map(r => (
@@ -90,10 +93,20 @@ class Visualization extends EventTarget {
 
         for (var i in data.variables) {
             plot.data[0][AXES[i]] = data.variables[i].data;
+
+            // Keep pan and zoom
+            if (sameVP && view.layout && !threeDimensional) {
+                var axis = AXES[i] + 'axis';
+                update[axis+'.range[0]'] = view.layout[axis].range[0];
+                update[axis+'.range[1]'] = view.layout[axis].range[1];
+            }
         }
 
         // See https://plotly.com/javascript/plotlyjs-function-reference/#plotlynewplot
         Plotly.react(view, plot);
+
+        if (update)
+            Plotly.relayout(view, update);
 
         this.dispatchCustomEvent('plotend');
     }
