@@ -196,10 +196,84 @@ class BarGridKernel(Kernel):
 
     objects = KernelManager.create('BarGrid', FORMAT)()
 
+    @cached_property
+    def baraxis(self):
+        return self._baraxis if hasattr(self, '_baraxis') else 0
+
+    @cached_property
+    def ppa(self):
+        ppa = self._ppa if hasattr(self, '_ppa') else self.size
+        return np.array(
+            [ppa or self.DEFAULT_PPA] * self.dimension
+            if ppa or 'PointNumberPerAxis' not in self.metadata else
+            self.metadata['PointNumberPerAxis']
+        )
+
+    @cached_property
+    def bounds(self):
+        if hasattr(self, '_bounds'):
+            return self._bounds
+        defv = [.0 for _ in range(self.dimension)]
+        minv = self.metadata.get('MinimalValues', defv)
+        maxv = self.metadata.get('MaximalValues', defv)
+        return tuple(
+            (np.array((minv[i], maxv[i])) for i in range(self.dimension))
+        )
+
+    @cached_property
+    def axis_order(self) -> List[int]:
+        return list(chain(
+            range(0, self.baraxis),
+            range(self.baraxis+2, self.dimension+1),
+            (self.baraxis, self.baraxis+1)
+        ))
+
+    @cached_property
+    def bars(self):
+        return SortedList(
+            [tuple(datum[a] for a in self.axis_order) for datum in self.data],
+        )
+
+    @property
+    def shapes(self):
+        if self.dimension == 2:
+            return list(self.get_bar_rect(i) for i in range(self.size))
+
     def data_for_axis(self, axis: int):
         assert 0 <= axis < self.dimension
         for i in range(self.size):
-            yield self.data[i][axis+1]
+            yield self.get_bar_lower(i, axis)
+            yield self.get_bar_upper(i, axis)
+
+    def get_axis_length(self, axis: int) -> int:
+        assert 0 <= axis < self.dimension
+        lower, upper = self.bounds[axis]
+        return upper - lower
+
+    def get_axis_unit(self, axis: int, ppa: int = None):
+        assert 0 <= axis < self.dimension
+        return self.get_axis_length(axis) / self.ppa[axis]
+
+    def get_bar_lower(self, i: int, axis: int) -> float:
+        assert 0 <= i < len(self.bars)
+        assert 0 <= axis < self.dimension
+        return self.bars[i][
+            -2 if axis == self.baraxis else
+            axis if axis < self.baraxis else axis-1]
+
+    def get_bar_upper(self, i: int, axis: int) -> float:
+        assert 0 <= i < len(self.bars)
+        assert 0 <= axis < self.dimension
+        offset = 0 if axis == self.baraxis else self.get_axis_unit(axis)
+        return offset + self.bars[i][
+            -1 if axis == self.baraxis else
+            axis if axis < self.baraxis else axis-1]
+
+    def get_bar_rect(self, i: int) -> Tuple[float, float, float, float]:
+        assert self.dimension == 2
+        x0, y0 = self.get_bar_lower(i, 0), self.get_bar_lower(i, 1)
+        x1, y1 = self.get_bar_upper(i, 0), self.get_bar_upper(i, 1)
+        return (x0, x1, y0, y1)
 
 
 class KdTreeKernel(Kernel):
