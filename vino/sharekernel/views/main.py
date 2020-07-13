@@ -36,5 +36,5 @@ class KernelData(JsonDetailView):
                 }
                 for i, v in enumerate(kernel.variables)
             ],
-            'shapes': kernel.shapes,
+            'rectangles': kernel.rectangles,
         }

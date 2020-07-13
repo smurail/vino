@@ -108,7 +108,7 @@ class Kernel(EntityWithMetadata):
         return len(self.variables)
 
     @property
-    def shapes(self) -> Optional[List[float]]:
+    def rectangles(self) -> Optional[List[float]]:
         return None
 
     @cached_property
@@ -235,7 +235,7 @@ class BarGridKernel(Kernel):
         )
 
     @property
-    def shapes(self):
+    def rectangles(self):
         if self.dimension == 2:
             return list(self.get_bar_rect(i) for i in range(self.size))
 
@@ -285,7 +285,7 @@ class KdTreeKernel(Kernel):
     objects = KernelManager.create('KdTree', FORMAT)()
 
     @property
-    def shapes(self):
+    def rectangles(self):
         if self.dimension == 2:
             return [list(cell[2:6]) for cell in self.data]
 

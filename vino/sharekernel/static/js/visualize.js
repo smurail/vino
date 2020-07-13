@@ -63,8 +63,8 @@ class Visualization extends EventTarget {
             },
             update = {};
 
-        if (data.shapes && !this.shapes)
-            this.shapes = data.shapes.map(r => (
+        if (data.rectangles && !this.shapes)
+            this.shapes = data.rectangles.map(r => (
                 {
                     type: 'rect',
                     layer: 'below',
