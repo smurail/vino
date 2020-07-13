@@ -30,6 +30,8 @@ class Visualization extends EventTarget {
         this.data = data = data || this.data;
         this.dispatchCustomEvent('plotstart', {data: data});
 
+        const AXES = ['x', 'y', 'z'];
+
         var threeDimensional = data.variables.length > 2 ? true : false,
             view = this.element.querySelector('.view'),
             plot = {
@@ -58,8 +60,8 @@ class Visualization extends EventTarget {
                 }
             };
 
-        if (data.rectangles && !this.shapes)
-            this.shapes = data.rectangles.map(r => (
+        if (data.shapes && !this.shapes)
+            this.shapes = data.shapes.map(r => (
                 {
                     type: 'rect',
                     x0: r[0], y0: r[2],
@@ -68,8 +70,9 @@ class Visualization extends EventTarget {
                 }
             ));
 
-        if (this.options.showShapes && this.shapes)
+        if (this.options.showShapes && this.shapes) {
             plot.layout.shapes = this.shapes;
+        }
 
         if (threeDimensional) {
             plot.layout.scene = {
@@ -81,8 +84,9 @@ class Visualization extends EventTarget {
             plot.layout.dragmode = 'pan';
         }
 
-        for (const p in data)
-            plot.data[0][p] = data[p];
+        for (var i in data.variables) {
+            plot.data[0][AXES[i]] = data.variables[i].data;
+        }
 
         // See https://plotly.com/javascript/plotlyjs-function-reference/#plotlynewplot
         Plotly.react(view, plot);

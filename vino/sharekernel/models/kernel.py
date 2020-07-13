@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import numpy as np  # type: ignore
+
 from pathlib import Path
 from tempfile import mktemp
-from typing import List, Optional
+from typing import List, Optional, Iterable, Tuple
+from sortedcontainers import SortedList  # type: ignore
+from itertools import chain
 
 from django.db import models
+from django.db.models import QuerySet
 from django.db.models.query import ModelIterable
 from django.conf import settings
 from django.utils.text import slugify
@@ -18,6 +23,7 @@ from .dataformat import DataFormat
 from .software import Software
 from .sourcefile import SourceFile
 from .viabilityproblem import ViabilityProblem
+from .symbol import Symbol
 
 from ..utils import generate_media_path, store_one_file
 
@@ -94,16 +100,38 @@ class Kernel(EntityWithMetadata):
         return self.params.vp
 
     @cached_property
-    def data(self) -> List:
-        return [
-            tuple(datum.data) for datum in iter_datafile(self.datafile.path)
-        ]
+    def variables(self) -> QuerySet[Symbol]:
+        return self.vp.state_variables
 
     @property
-    def columns(self) -> Optional[List]:
+    def dimension(self) -> int:
+        return len(self.variables)
+
+    @property
+    def shapes(self) -> Optional[List[float]]:
+        return None
+
+    @cached_property
+    def data(self):
+        return np.array(
+            [tuple(datum.data) for datum in iter_datafile(self.datafile.path)]
+            if self.datafile else []
+        )
+
+    @cached_property
+    def metadata(self) -> Metadata:
         metadata = Metadata()
-        parse_datafile(self.datafile.path, metadata=metadata)
-        return metadata.get('dataformat.columns')
+        if self.datafile:
+            parse_datafile(self.datafile.path, metadata=metadata)
+        return metadata
+
+    @property
+    def columns(self) -> Optional[List[str]]:
+        return self.metadata.get('dataformat.columns')
+
+    def data_for_axis(self, axis: int) -> Iterable[float]:
+        assert 0 <= axis < self.dimension
+        return self.data[:, axis].tolist()
 
     @classmethod
     def from_files(cls, *files, owner=None):
@@ -168,6 +196,11 @@ class BarGridKernel(Kernel):
 
     objects = KernelManager.create('BarGrid', FORMAT)()
 
+    def data_for_axis(self, axis: int):
+        assert 0 <= axis < self.dimension
+        for i in range(self.size):
+            yield self.data[i][axis+1]
+
 
 class KdTreeKernel(Kernel):
     class Meta:
@@ -176,6 +209,11 @@ class KdTreeKernel(Kernel):
     FORMAT = 'kdtree'
 
     objects = KernelManager.create('KdTree', FORMAT)()
+
+    @property
+    def shapes(self):
+        if self.dimension == 2:
+            return [list(cell[2:6]) for cell in self.data]
 
 
 _CUSTOM_KERNELS = {cls.FORMAT: cls for cls in Kernel.__subclasses__()}
