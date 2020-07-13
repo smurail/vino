@@ -52,8 +52,11 @@ class Visualization extends EventTarget {
                 data: [{
                     type: threeDimensional ? 'scatter3d' : 'scattergl',
                     mode: 'markers',
+                    hoverinfo: AXES.slice(0, data.variables.length).join('+'),
+                    showlegend: false,
                     marker: {
-                        size: 2
+                        size: 2,
+                        color: '#1f77b4' // muted blue
                     }
                 }],
                 config: {
@@ -61,24 +64,27 @@ class Visualization extends EventTarget {
                     scrollZoom: true
                 }
             },
+            trace = plot.data[0],
             update = {};
 
-        if (data.rectangles && !this.shapes)
-            this.shapes = data.rectangles.map(r => (
-                {
-                    type: 'rect',
-                    layer: 'below',
-                    x0: r[0], y0: r[2],
-                    x1: r[1], y1: r[3],
-                    line: {
-                        width: 1,
-                        color: 'PaleTurquoise'
-                    }
+        if (!threeDimensional && this.options.showShapes && data.rectangles) {
+            plot.data.unshift({
+                type: 'scattergl',
+                mode: 'lines',
+                hoverinfo: 'skip',
+                showlegend: false,
+                connectgaps: false,
+                x: data.rectangles.flatMap(r => [
+                    r[0], r[1], r[1], r[0], r[0], null
+                ]),
+                y: data.rectangles.flatMap(r => [
+                    r[3], r[3], r[2], r[2], r[3], null
+                ]),
+                line: {
+                    width: 1,
+                    color: '#afeeee' // pale turquoise
                 }
-            ));
-
-        if (this.options.showShapes && this.shapes) {
-            plot.layout.shapes = this.shapes;
+            });
         }
 
         if (threeDimensional) {
@@ -92,7 +98,7 @@ class Visualization extends EventTarget {
         }
 
         for (var i in data.variables) {
-            plot.data[0][AXES[i]] = data.variables[i].data;
+            trace[AXES[i]] = data.variables[i].data;
 
             // Keep pan and zoom
             if (sameVP && view.layout && !threeDimensional) {
@@ -114,7 +120,6 @@ class Visualization extends EventTarget {
     load(url) {
         this.dispatchCustomEvent('load');
         this.loading(true);
-        this.shapes = null;
         fetch(url)
             .then(r => r.json())
             .then(data => this.plot(data))
