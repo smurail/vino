@@ -64,9 +64,13 @@ class Visualization extends EventTarget {
             this.shapes = data.shapes.map(r => (
                 {
                     type: 'rect',
+                    layer: 'below',
                     x0: r[0], y0: r[2],
                     x1: r[1], y1: r[3],
-                    line: { width: 0.2 }
+                    line: {
+                        width: 1,
+                        color: 'PaleTurquoise'
+                    }
                 }
             ));
 
