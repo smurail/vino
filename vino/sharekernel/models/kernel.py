@@ -7,6 +7,7 @@ from tempfile import mktemp
 from typing import List, Optional, Iterable, Tuple
 from sortedcontainers import SortedList  # type: ignore
 from itertools import chain
+from operator import itemgetter
 
 from django.db import models
 from django.db.models import QuerySet
@@ -133,6 +134,34 @@ class Kernel(EntityWithMetadata):
         assert 0 <= axis < self.dimension
         return self.data[:, axis].tolist()
 
+    def add_bar(self, bar: List[float]):
+        pos, lower, upper = bar[:-2], bar[-2], bar[-1]
+
+        assert lower < upper
+
+        axes = range(self.dimension)
+        unit = self.get_axis_unit(self.baraxis)
+        pos_unit = np.fromiter((self.get_axis_unit(a) for a in axes if a != self.baraxis), float)
+        merge_bars = []
+
+        bars_at_pos = self.bars.irange((pos - pos_unit / 2).tolist(), (pos + pos_unit / 2).tolist())
+        for cur_bar in bars_at_pos:
+            cur_pos, cur_lower, cur_upper = cur_bar[:-2], cur_bar[-2], cur_bar[-1]
+
+            if round(upper/unit) >= round(cur_lower/unit) and round(lower/unit) <= round(cur_upper/unit):
+                # our new bar intersects this bar, merge them
+                merge_bars.append(cur_bar)
+                lower = min(lower, cur_lower)
+                upper = max(upper, cur_upper)
+
+        for bar in merge_bars:
+            self.bars.remove(bar)
+
+        # Insert the new bar
+        new_bar = pos + [lower, upper]
+        self.bars.add(new_bar)
+        self.size = len(self.bars)
+
     @classmethod
     def from_files(cls, *files, owner=None):
         # Parse data and metadata from files
@@ -195,6 +224,13 @@ class BarGridKernel(Kernel):
     FORMAT = 'bars'
 
     objects = KernelManager.create('BarGrid', FORMAT)()
+
+    def __init__(self, *args, ppa: Optional[int] = None, baraxis: int = 0, bounds=None, **kwargs):
+        assert ppa is None or ppa > 1
+        super().__init__(*args, **kwargs)
+        self._ppa = ppa
+        self._baraxis = baraxis
+        self._bounds = bounds
 
     @cached_property
     def baraxis(self):
@@ -289,6 +325,103 @@ class KdTreeKernel(Kernel):
     def rectangles(self):
         if self.dimension == 2:
             return [list(cell[2:6]) for cell in self.data]
+
+    def get_cell_lower(self, i: int, axis: int) -> float:
+        assert 0 <= i < self.size
+        assert 0 <= axis < self.dimension
+        return self.data[i][self.dimension + axis*2]
+
+    def get_cell_upper(self, i: int, axis: int) -> float:
+        assert 0 <= i < self.size
+        assert 0 <= axis < self.dimension
+        return self.data[i][self.dimension + axis*2 + 1]
+
+    def to_bargrid(self, ppa: int, debug: bool = False) -> BarGridKernel:
+        assert ppa > 1
+
+        # Alias for state space dimension
+        dim = self.dimension
+        axes = range(dim)
+        # Lower bounds for each axis
+        minima = np.array([
+            min(self.get_cell_lower(i, a) for i in range(self.size))
+            for a in axes
+        ])
+        # Upper bounds for each axis
+        maxima = np.array([
+            max(self.get_cell_upper(i, a) for i in range(self.size))
+            for a in axes
+        ])
+        # Size
+        length = maxima - minima
+        # Brand new BarGridKernel
+        bgk = BarGridKernel(
+            owner=self.owner,
+            title=self.title,
+            description=self.description,
+            publication=self.publication,
+            author=self.author,
+            email=self.email,
+            url=self.url,
+            image=self.image,
+            params=self.params,
+            ppa=ppa,
+            baraxis=0,
+            bounds=tuple(np.array((minima[a], maxima[a])) for a in axes),
+        )
+        # Grid unit vector
+        unit = length / bgk.ppa
+
+        if debug:
+            cells = {}
+
+        seen = set()
+
+        for i in range(self.size):
+
+            lower_point = np.fromiter((self.get_cell_lower(i, a) for a in axes), float)
+            lower = minima + np.floor((lower_point - minima) / unit) * unit
+
+            upper_point = np.fromiter((self.get_cell_upper(i, a) for a in axes), float)
+            upper = minima + np.ceil((upper_point - minima) / unit) * unit
+
+            assert lower[bgk.baraxis] < upper[bgk.baraxis]
+
+            if debug:
+                new_cell = tuple(lower) + sum(((lower[a], upper[a]) for a in axes), ())
+                if new_cell not in cells:
+                    cells[new_cell] = len(cells)
+
+            pos = np.delete(lower, bgk.baraxis)
+            pos_start = np.copy(pos)
+            pos_limit = np.delete(upper, bgk.baraxis)
+            pos_unit = np.delete(unit, bgk.baraxis)
+
+            while np.all(np.round(pos/pos_unit) < np.round(pos_limit/pos_unit)):
+                bar = pos.tolist() + [lower[bgk.baraxis], upper[bgk.baraxis]]
+
+                bar_id = tuple(bar)
+                if bar_id not in seen:
+                    bgk.add_bar(bar)
+                    seen.add(bar_id)
+
+                for k in range(len(pos)):
+                    if round(pos[k]/pos_unit[k]) < round(pos_limit[k]/pos_unit[k]):
+                        pos[k] += pos_unit[k]
+                        break
+                    else:
+                        pos[k] = pos_start[k]
+
+        if debug:
+            sorted_cells = list(it[0] for it in sorted(cells.items(), key=itemgetter(1)))
+            for cell in sorted_cells:
+                print(cell)
+            print('Cell count:', len(cells))
+            self.data = np.array(sorted_cells)
+
+        print('Bar count:', len(bgk.bars))
+
+        return bgk
 
 
 _CUSTOM_KERNELS = {cls.FORMAT: cls for cls in Kernel.__subclasses__()}

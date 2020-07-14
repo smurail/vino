@@ -135,6 +135,7 @@ class KernelVisualization extends Visualization {
         this.id = element.getAttribute('data-id');
         this.form = this.element.querySelector('form');
         this.kernel = this.form.elements['kernel'];
+        this.ppa = this.form.elements['ppa'];
         this.reload = this.form.querySelector('button');
         this.showShapes = document.getElementById('show-shapes-' + this.id);
 
@@ -166,7 +167,8 @@ class KernelVisualization extends Visualization {
     }
 
     url(pk) {
-        return URL_KERNEL_DATA(pk);
+        var ppa = this.ppa.value ? this.ppa.value + '/' : ''
+        return URL_KERNEL_DATA(pk) + ppa;
     }
 
     load() {
