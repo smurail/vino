@@ -241,9 +241,10 @@ class BarGridKernel(Kernel):
 
     def data_for_axis(self, axis: int):
         assert 0 <= axis < self.dimension
+        half_unit = self.get_axis_unit(axis) / 2
         for i in range(self.size):
-            yield self.get_bar_lower(i, axis)
-            yield self.get_bar_upper(i, axis)
+            yield self.get_bar_lower(i, axis) + half_unit
+            yield self.get_bar_upper(i, axis) - half_unit
 
     def get_axis_length(self, axis: int) -> int:
         assert 0 <= axis < self.dimension
