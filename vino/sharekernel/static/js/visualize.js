@@ -142,10 +142,18 @@ class KernelVisualization extends Visualization {
         this.options.showShapes = this.showShapes.checked;
 
         this.addEventListener('load', e => {
-            this.kernel.disabled = this.reload.disabled = true;
+            this.kernel.disabled = this.reload.disabled = this.ppa.disabled = this.showShapes.disabled = true;
         });
         this.addEventListener('plotend', e => {
-            this.kernel.disabled = this.reload.disabled = false;
+            this.kernel.disabled = this.reload.disabled = this.ppa.disabled = this.showShapes.disabled = false;
+            if (this.data) {
+                if (this.data.format != 'kdtree')
+                    this.ppa.disabled = true;
+                if (this.data.variables.length > 2)
+                    this.ppa.disabled = this.showShapes.disabled = true;
+            }
+            if (this.ppa.disabled)
+                this.ppa.value = null;
         });
         this.form.addEventListener('submit', e => {
             this.load();
