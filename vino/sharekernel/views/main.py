@@ -26,13 +26,14 @@ class KernelData(JsonDetailView):
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
 
-        ppa = self.kwargs.get('ppa')
-        if ppa is not None:
-            size_was = kernel.size
-            debug = False
-            bgk = kernel.to_bargrid(ppa=ppa, debug=debug)
-            assert isinstance(bgk, BarGridKernel)
-            kernel = kernel if debug else bgk
+        if kernel.dimension == 2 and isinstance(kernel, KdTreeKernel):
+            ppa = self.kwargs.get('ppa')
+            if ppa is not None:
+                size_was = kernel.size
+                debug = False
+                bgk = kernel.to_bargrid(ppa=ppa, debug=debug)
+                assert isinstance(bgk, BarGridKernel)
+                kernel = kernel if debug else bgk
 
         return {
             'vp': kernel.vp.id,
