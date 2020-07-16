@@ -147,7 +147,7 @@ class KernelVisualization extends Visualization {
         this.addEventListener('plotend', e => {
             this.kernel.disabled = this.reload.disabled = this.ppa.disabled = this.showShapes.disabled = false;
             if (this.data) {
-                if (this.data.format != 'kdtree')
+                if (this.data.originalFormat != 'kdtree')
                     this.ppa.disabled = true;
                 if (this.data.variables.length > 2)
                     this.ppa.disabled = this.showShapes.disabled = true;
