@@ -108,6 +108,10 @@ class Visualization extends EventTarget {
             }
         }
 
+        if (sameVP && view.layout && threeDimensional) {
+            update['scene.camera'] = view._fullLayout.scene._scene.getCamera();
+        }
+
         // See https://plotly.com/javascript/plotlyjs-function-reference/#plotlynewplot
         Plotly.react(view, plot);
 
