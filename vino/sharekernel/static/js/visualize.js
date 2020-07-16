@@ -45,9 +45,7 @@ class Visualization extends EventTarget {
                     hovermode: 'closest',
                     modebar: {
                         bgcolor: 'rgba(255,255,255,0.9)'
-                    },
-                    xaxis: { title: data.variables[0].fullname },
-                    yaxis: { title: data.variables[1].fullname },
+                    }
                 },
                 data: [{
                     type: threeDimensional ? 'scatter3d' : 'scattergl',
@@ -94,6 +92,8 @@ class Visualization extends EventTarget {
                 zaxis: { title: data.variables[2].name }
             }
         } else {
+            plot.layout.xaxis = { title: data.variables[0].fullname };
+            plot.layout.yaxis = { title: data.variables[1].fullname };
             plot.layout.dragmode = 'pan';
         }
 
