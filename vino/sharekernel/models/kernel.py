@@ -73,7 +73,9 @@ class Kernel(EntityWithMetadata):
 
     objects = KernelManager()
 
-    params = models.ForeignKey(ParameterSet, models.CASCADE, verbose_name="Parameters")
+    params = models.ForeignKey(ParameterSet, models.CASCADE,
+                               related_name="kernels",
+                               verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
     datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")

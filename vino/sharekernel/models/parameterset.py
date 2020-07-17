@@ -24,7 +24,9 @@ class ParameterSet(Entity):
         'targetparametervalues': 'target',
     }
 
-    vp = models.ForeignKey(ViabilityProblem, models.CASCADE, verbose_name="Viability problem")
+    vp = models.ForeignKey(ViabilityProblem, models.CASCADE,
+                           related_name="parametersets",
+                           verbose_name="Viability problem")
     dynamics = models.CharField(max_length=200, blank=True)
     constraints = models.CharField(max_length=200, blank=True)
     target = models.CharField(max_length=200, blank=True)

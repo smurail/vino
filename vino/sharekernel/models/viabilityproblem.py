@@ -150,3 +150,8 @@ class ViabilityProblem(EntityWithMetadata):
     @property
     def state_variables(self):
         return self.symbols.filter(type=Symbol.STATE)
+
+    @property
+    def kernels(self):
+        from .kernel import Kernel
+        return Kernel.objects.filter(params__vp=self)
