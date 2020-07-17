@@ -18,3 +18,8 @@ def visualize(context, kernels):
         'id': state['id'],
         'kernels': kernels,
     }
+
+
+@register.filter
+def lowfirst(x):
+    return x and str(x)[0].lower() + str(x)[1:]
