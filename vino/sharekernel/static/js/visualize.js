@@ -2,7 +2,47 @@
 
 const ASYNC_DELAY = 50;
 
-class Visualization extends EventTarget {
+// Safari doesn't allow to extend EventTarget, so implement a simple version
+// Borrowed from https://developer.mozilla.org/fr/docs/Web/API/EventTarget
+class EventDispatcher {
+    constructor() {
+        this.listeners = {};
+    }
+
+    addEventListener(type, callback) {
+        if (!(type in this.listeners)) {
+            this.listeners[type] = [];
+        }
+        this.listeners[type].push(callback);
+    }
+
+    removeEventListener(type, callback) {
+        if (!(type in this.listeners)) {
+            return;
+        }
+        var stack = this.listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            if (stack[i] === callback){
+                stack.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+    dispatchEvent(event) {
+        if (!(event.type in this.listeners)) {
+            return true;
+        }
+        var stack = this.listeners[event.type];
+
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(this, event);
+        }
+        return !event.defaultPrevented;
+    }
+}
+
+class Visualization extends EventDispatcher {
     constructor(element, options) {
         super();
         options = options || {};
