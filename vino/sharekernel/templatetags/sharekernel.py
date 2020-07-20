@@ -35,3 +35,13 @@ def pluck(value, arg):
             yield getter(item)
     except (TypeError, VariableDoesNotExist):
         pass
+
+
+@register.filter
+def mathjax(value):
+    return r'\(' + str(value).replace('\\', '\\\\') + r'\)'
+
+
+@register.filter
+def mathjax_list(value):
+    return [mathjax(item) for item in value]
