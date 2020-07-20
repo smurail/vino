@@ -44,6 +44,12 @@ class ParameterSet(Entity):
         values = chain.from_iterable((x.split(',') for x in values_set))
         return OrderedDict(zip(names, values))
 
+    def get_fields(self):
+        return self.to_dict().items()
+
+    @property
+    def fields_definition(self):
+        return ", ".join('='.join(item) for item in self.get_fields())
+
     def __str__(self):
-        fields = ('='.join(item) for item in self.to_dict().items())
-        return f'{self.vp}: {", ".join(fields)}'
+        return f'{self.vp}: {self.fields_definition}'
