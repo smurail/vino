@@ -1,3 +1,5 @@
+/* Global styles */
+
 main {
     padding-bottom: 2rem;
 }
@@ -15,6 +17,9 @@ footer a {
 footer a:hover {
     color: var(--primary);
 }
+
+/* Visualization styles */
+
 .view {
     height: 400px;
     margin: 0 auto;
@@ -28,7 +33,75 @@ footer a:hover {
     max-width: 25em;
 }
 
-/* Workaround to fix bootstrap interference in plotly modebar */
+/** Viz: workaround to fix bootstrap interference in plotly modebar */
 .plotly svg {
     vertical-align: baseline;
+}
+
+/* Viability problem page */
+
+/** VP: main image */
+
+img.vino-right {
+    float: right;
+}
+
+@media (max-width: 767.98px) {
+    img.vino-right {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/** VP: problem description */
+
+.card-body p:last-child {
+    margin-bottom: 0;
+}
+
+.vp.card-group .card {
+    flex: 2 1 auto;
+}
+
+/** VP: math formulas */
+
+@media (max-width: 767.98px) {
+    /* Smaller MathJax text size when width < breakpoint-md */
+    .MathJax {
+        font-size: 0.875rem !important;
+    }
+}
+
+/** VP: kernels table */
+
+.table .btn {
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    font-size: 0.75rem;
+}
+
+.table td.buttons, .table th.buttons {
+    color: #fff;
+    width: 1%;
+    white-space: nowrap;
+    border-right: 0;
+}
+
+.table td.buttons + td, .table th.buttons + th {
+    border-left: 0;
+}
+
+.table tr th:last-child, .table tr td:last-child {
+    text-align: right;
+}
+
+.table tr td[colspan] {
+    text-align: left !important;
+    border-left: 0;
+}
+
+.table td {
+    white-space: nowrap;
 }

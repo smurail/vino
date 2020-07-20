@@ -1,11 +1,17 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 
-from ..models import Kernel, BarGridKernel, KdTreeKernel
+from ..models import Kernel, BarGridKernel, KdTreeKernel, ViabilityProblem
 from .json import JsonDetailView
 
 
 class HomeView(TemplateView):
     template_name = 'sharekernel/home.html'
+
+
+class ViabilityProblemView(DetailView):
+    context_object_name = 'vp'
+    queryset = ViabilityProblem.objects.with_dimensions()
+    template_name = 'sharekernel/viabilityproblem.html'
 
 
 class VisualizationDemoView(TemplateView):
