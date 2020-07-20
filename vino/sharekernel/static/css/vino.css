@@ -118,6 +118,9 @@ img.vino-right {
 .vp.card .list-group b {
     font-size: 85%;
     margin-right: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .vp.card .list-group-item {
