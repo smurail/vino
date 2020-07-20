@@ -24,6 +24,10 @@ class Expression(Equation.Expression):
         return self.value
 
 
+StatementLiteral = Tuple[Expression, str, Expression]
+ManyStatementLiterals = Iterable[StatementLiteral]
+
+
 class DynamicsLeftExpression(Expression):
     DISCRETE = 1
     CONTINUOUS = 2
@@ -55,10 +59,6 @@ class DynamicsLeftExpression(Expression):
 
 class StatementsError(Exception):
     pass
-
-
-StatementLiteral = Tuple[Expression, str, Expression]
-ManyStatementLiterals = Iterable[StatementLiteral]
 
 
 class Statements:
@@ -125,13 +125,15 @@ class Statements:
     def __iter__(self):
         return iter(self.statements)
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: int, value: Any):
+        assert 0 <= index < len(self.statements)
         self.statements[index] = value
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
+        assert 0 <= index < len(self.statements)
         return self.statements[index]
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any):
         if isinstance(other, Statements):
             return self.statements == other.statements
         return False
