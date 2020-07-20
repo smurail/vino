@@ -243,7 +243,10 @@ class BarGridKernel(Kernel):
 
     @cached_property
     def baraxis(self):
-        return self._baraxis if hasattr(self, '_baraxis') else 0
+        return (
+            self._baraxis if hasattr(self, '_baraxis') else
+            self.metadata.get('dataformat.baraxis', 0)
+        )
 
     @cached_property
     def ppa(self):
