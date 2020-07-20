@@ -2,7 +2,9 @@
 {% load staticfiles %}
 {% load sharekernel %}
 {% block body %}
-    {% visualize kernels %}
+    <div class="container mt-3">
+        {% visualize kernels %}
+    </div>
     <script>
         URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);
     </script>

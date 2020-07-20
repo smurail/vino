@@ -2,17 +2,19 @@
 {% load staticfiles %}
 {% load sharekernel %}
 {% block body %}
-    <div class="jumbotron mt-4 pb-0 pt-md-5 pb-md-3 text-center text-md-left">
-        <h1 class="jumbotron-head text-primary">ViNO</h1>
-        <p class="lead">
-            <span class="text-primary">Vi</span>able <span class="text-primary">N</span>umericable <span class="text-primary">O</span>bject repository
-        </p>
-        <hr class="mr-4">
-        <p>Viability problems arise in several scientific fields (robotics, economics, environmental sciences). Once the set of constraints to be satisfied is specified and the dynamics described, the viability problem is the study of the compatibility between these constraints and these dynamics; Control strategies governing viable evolutions if any can then be deduced.</p>
-        <p>Analytical solutions to sustainability problems are very rare. Approximations can then be calculated, we call them Viable Numerical Objects.</p>
-        <div class="d-flex flex-column flex-md-row">
-            <a class="btn btn-primary mb-3 mr-md-3" href="{% url 'visualization_demo' %}" role="button">Visualization demo</a>
-            <a class="btn btn-dark mb-3" href="{% url 'admin:index' %}" role="button">Administration</a>
+    <div class="jumbotron pb-0 pb-md-3 text-center text-md-left">
+        <div class="container">
+            <h1 class="jumbotron-head text-primary display-3">ViNO</h1>
+            <p class="lead">
+                <span class="text-primary">Vi</span>able <span class="text-primary">N</span>umericable <span class="text-primary">O</span>bject repository
+            </p>
+            <hr class="mr-4">
+            <p>Viability problems arise in several scientific fields (robotics, economics, environmental sciences). Once the set of constraints to be satisfied is specified and the dynamics described, the viability problem is the study of the compatibility between these constraints and these dynamics; Control strategies governing viable evolutions if any can then be deduced.</p>
+            <p>Analytical solutions to sustainability problems are very rare. Approximations can then be calculated, we call them Viable Numerical Objects.</p>
+            <div class="d-flex flex-column flex-md-row">
+                <a class="btn btn-primary mb-3 mr-md-3" href="{% url 'visualization_demo' %}" role="button">Visualization demo</a>
+                <a class="btn btn-dark mb-3" href="{% url 'admin:index' %}" role="button">Administration</a>
+            </div>
         </div>
     </div>
     </div>
