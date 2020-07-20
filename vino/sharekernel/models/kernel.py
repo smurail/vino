@@ -68,6 +68,7 @@ class KernelManager(models.Manager):
 class Kernel(EntityWithMetadata):
     PREFIX = 'results.'
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
+    DATA_UNIT = '-'
 
     FORMAT: Optional[str] = None
 
@@ -127,6 +128,11 @@ class Kernel(EntityWithMetadata):
         if self.datafile:
             parse_datafile(self.datafile.path, metadata=metadata)
         return metadata
+
+    @property
+    def size_with_unit(self) -> Optional[str]:
+        if self.size:
+            return f'{self.size} {self.DATA_UNIT}{"s" if self.size > 1 else ""}'
 
     @property
     def columns(self) -> Optional[List[str]]:
@@ -224,6 +230,7 @@ class BarGridKernel(Kernel):
         proxy = True
 
     FORMAT = 'bars'
+    DATA_UNIT = 'bar'
 
     objects = KernelManager.create('BarGrid', FORMAT)()
 
@@ -320,6 +327,7 @@ class KdTreeKernel(Kernel):
         proxy = True
 
     FORMAT = 'kdtree'
+    DATA_UNIT = 'cell'
 
     objects = KernelManager.create('KdTree', FORMAT)()
 
