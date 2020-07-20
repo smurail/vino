@@ -241,8 +241,4 @@ window.addEventListener('wheel', (event) => {
     event.target.dispatchEvent(newEv);
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    document
-        .querySelectorAll('.kernel')
-        .forEach((element) => new KernelVisualization(element));
-});
+$(() => $('.kernel').each((_, element) => new KernelVisualization(element)));
