@@ -1,7 +1,20 @@
+main {
+    padding-bottom: 2rem;
+}
+
 footer {
+    background-color: #e9ecef;
     font-size: 85%;
 }
 
+footer a {
+    font-weight: 600;
+    color: #495057;
+}
+
+footer a:hover {
+    color: var(--primary);
+}
 .view {
     height: 400px;
     margin: 0 auto;
