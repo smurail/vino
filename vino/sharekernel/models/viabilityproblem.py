@@ -152,6 +152,18 @@ class ViabilityProblem(EntityWithMetadata):
         return self.symbols.filter(type=Symbol.STATE)
 
     @property
+    def control_variables(self):
+        return self.symbols.filter(type=Symbol.CONTROL)
+
+    @property
+    def dynamics_parameters(self):
+        return self.symbols.filter(type=Symbol.DYNAMICS)
+
+    @property
+    def constraint_parameters(self):
+        return self.symbols.filter(type=Symbol.CONSTRAINT)
+
+    @property
     def kernels(self):
         from .kernel import Kernel
         return Kernel.objects.filter(params__vp=self)
