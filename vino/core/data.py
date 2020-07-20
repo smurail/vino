@@ -163,6 +163,7 @@ def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]
                 # Permute column labels
                 columns = [columns[i] for i in np.dot(permut_cols, range(count))]
                 metadata['dataformat.columns'] = columns
+                metadata['dataformat.baraxis'] = bar_axis
                 # Permute column indices
                 column_indices = np.dot(permut_cols, column_indices)
 

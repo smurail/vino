@@ -127,6 +127,7 @@ class Metadata(dict):
         'ColumnDescription': TupleField(str),
         'dataformat.name': StringField(),
         'dataformat.columns': TupleField(str),
+        'dataformat.baraxis': IntegerField(),
         'parameters.dynamicsparametervalues': TupleField(float),
         'parameters.stateconstraintparametervalues': TupleField(float),
         'parameters.targetparametervalues': TupleField(float),
