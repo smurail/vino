@@ -1,4 +1,6 @@
 from django import template
+from django.template import VariableDoesNotExist
+from django.template.defaultfilters import _property_resolver
 
 
 register = template.Library()
@@ -23,3 +25,13 @@ def visualize(context, kernels):
 @register.filter
 def lowfirst(x):
     return x and str(x)[0].lower() + str(x)[1:]
+
+
+@register.filter
+def pluck(value, arg):
+    try:
+        getter = _property_resolver(arg)
+        for item in value:
+            yield getter(item)
+    except (TypeError, VariableDoesNotExist):
+        pass
