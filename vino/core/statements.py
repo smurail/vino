@@ -119,6 +119,17 @@ class Statements:
 
         return typed_statements
 
+    def unparse(self, index: Optional[int] = None):
+        assert index is None or 0 <= index < len(self.statements)
+        if index is None:
+            return ','.join(self.unparse(i) for i in range(len(self.statements)))
+        left, op, right = self.statements[index]
+        return ''.join((str(left), op, str(right)))
+
+    @property
+    def unparsed_statements(self):
+        return [self.unparse(i) for i in range(len(self.statements))]
+
     def __len__(self):
         return len(self.statements)
 
@@ -142,9 +153,7 @@ class Statements:
         return hash(str(self))
 
     def __str__(self):
-        return ','.join(
-            ''.join((str(left), op, str(right)))
-            for left, op, right in self.statements)
+        return self.unparse()
 
     def __repr__(self):
         return 'Statements(%r)' % self.statements
