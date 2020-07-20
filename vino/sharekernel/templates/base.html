@@ -23,9 +23,14 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
+                {% with active=request.resolver_match.url_name %}
+                    <li class="nav-item{% if active == 'visualization_demo' %} active{% endif %}">
                         <a class="nav-link" href="{% url 'visualization_demo' %}">Visualization demo</a>
                     </li>
+                    <li class="nav-item{% if active == 'about' %} active{% endif %}">
+                        <a class="nav-link" href="{% url 'about' %}">About</a>
+                    </li>
+                {% endwith %}
                 </ul>
                 <a class="btn btn-outline-warning" href="{% url 'admin:index' %}">Admin</a>
             </div>
