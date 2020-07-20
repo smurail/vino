@@ -7,6 +7,11 @@ from .json import JsonDetailView
 class HomeView(TemplateView):
     template_name = 'sharekernel/home.html'
 
+    def get_context_data(self, **kwargs):
+        return {
+            'last_viabilityproblems': ViabilityProblem.objects.with_dimensions().order_by('-date_updated')[:6],
+        }
+
 
 class ViabilityProblemView(DetailView):
     context_object_name = 'vp'

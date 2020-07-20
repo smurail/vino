@@ -105,3 +105,27 @@ img.vino-right {
 .table td {
     white-space: nowrap;
 }
+
+/* Home page */
+
+/** Home: VP card */
+
+.vp.card .list-group b {
+    font-size: 85%;
+    margin-right: auto;
+}
+
+.vp.card .list-group-item {
+    padding: .25rem 1.25rem;
+}
+
+.vp.card .list-group-item .badge {
+    margin-left: .25rem;
+}
+
+/** Home: VP card experiment */
+
+.vp2 img {
+    opacity: 0.2;
+    filter: saturate(60%) blur(1px);
+}

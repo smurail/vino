@@ -17,5 +17,41 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        <h2>Last viability problems</h2>
+        <div class="row vp1">
+        {% for vp in last_viabilityproblems %}
+            <div class="col-md-4">
+                <div class="vp card mb-4 shadow-sm">
+                    <a href="{% url 'viabilityproblem' vp.pk %}">
+                        <img src="{{ vp.image.url }}" class="card-img-top" alt="{{ vp.title }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{% url 'viabilityproblem' vp.pk %}">{{ vp.title }}</a></h5>
+                        <p class="card-text">{{ vp.description|truncatewords:10 }}</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <b>Data</b>
+                            <span class="badge badge-warning">{{ vp.parametersets.count }} parameter set{{ vp.parametersets.count|pluralize }}</span>
+                            <span class="badge badge-warning">{{ vp.kernels.count }} kernel{{ vp.kernels.count|pluralize }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-end align-items-center">
+                            <b>Dimensions</b>
+                            <span class="badge badge-primary">{{ vp.state_dimension }}D state</span>
+                            <span class="badge badge-primary">{{ vp.control_dimension }}D control</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <b>Dynamics type</b>
+                            <span class="badge badge-secondary">{{ vp.dynamics_type }}</span>
+                        </li>
+                    </ul>
+                    <div class="card-body text-right">
+                        <p class="card-text"><small class="text-muted">Last updated {{ vp.date_updated|date:"DATETIME_FORMAT"|lowfirst }}</small></p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
     </div>
 {% endblock %}
