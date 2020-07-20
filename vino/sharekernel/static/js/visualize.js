@@ -2,6 +2,19 @@
 
 const ASYNC_DELAY = 50;
 
+// https://github.com/plotly/plotly.js/issues/1085#issuecomment-564488236
+window.addEventListener('wheel', (event) => {
+    if (!event.isTrusted) return;
+    event.stopPropagation();
+    if (event.shiftKey) return false;
+    var newEv = new WheelEvent('wheel', {
+            clientX: event.clientX,
+            clientY: event.clientY,
+            deltaY:  event.deltaY*4
+        });
+    event.target.dispatchEvent(newEv);
+});
+
 // Safari doesn't allow to extend EventTarget, so implement a simple version
 // Borrowed from https://developer.mozilla.org/fr/docs/Web/API/EventTarget
 class EventDispatcher {
@@ -227,18 +240,3 @@ class KernelVisualization extends Visualization {
         super.load(this.url(this.kernel.value));
     }
 }
-
-// https://github.com/plotly/plotly.js/issues/1085#issuecomment-564488236
-window.addEventListener('wheel', (event) => {
-    if (!event.isTrusted) return;
-    event.stopPropagation();
-    if (event.shiftKey) return false;
-    var newEv = new WheelEvent('wheel', {
-            clientX: event.clientX,
-            clientY: event.clientY,
-            deltaY:  event.deltaY*4
-        });
-    event.target.dispatchEvent(newEv);
-});
-
-$(() => $('.kernel').each((_, element) => new KernelVisualization(element)));
