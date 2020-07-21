@@ -145,8 +145,14 @@ class Visualization extends EventDispatcher {
                 zaxis: { title: data.variables[2].name }
             }
         } else {
-            plot.layout.xaxis = { title: data.variables[0].fullname };
-            plot.layout.yaxis = { title: data.variables[1].fullname };
+            plot.layout.xaxis = {
+                title: data.variables[0].fullname,
+            };
+            plot.layout.yaxis = {
+                title: data.variables[1].fullname,
+                scaleanchor: 'x',
+                scaleratio: 1
+            };
             plot.layout.dragmode = 'pan';
         }
 
