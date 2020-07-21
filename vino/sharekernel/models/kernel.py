@@ -216,12 +216,10 @@ class BarGridKernel(Kernel):
 
     @cached_property
     def ppa(self):
-        ppa = self._ppa if hasattr(self, '_ppa') else self.size
-        return np.array(
-            [ppa or self.DEFAULT_PPA] * self.dimension
-            if ppa or 'PointNumberPerAxis' not in self.metadata else
-            self.metadata['PointNumberPerAxis']
-        )
+        if not hasattr(self, '_ppa'):
+            point_size = self.metadata['PointSize']
+            return np.array(self.metadata['PointNumberPerAxis']) / point_size
+        return np.array([self._ppa] * self.dimension)
 
     @cached_property
     def bounds(self):
