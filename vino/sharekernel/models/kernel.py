@@ -142,34 +142,6 @@ class Kernel(EntityWithMetadata):
         assert 0 <= axis < self.dimension
         return self.data[:, axis].tolist()
 
-    def add_bar(self, bar: List[float]):
-        pos, lower, upper = bar[:-2], bar[-2], bar[-1]
-
-        assert lower < upper
-
-        axes = range(self.dimension)
-        unit = self.get_axis_unit(self.baraxis)
-        pos_unit = np.fromiter((self.get_axis_unit(a) for a in axes if a != self.baraxis), float)
-        merge_bars = []
-
-        bars_at_pos = self.bars.irange((pos - pos_unit / 2).tolist(), (pos + pos_unit / 2).tolist())
-        for cur_bar in bars_at_pos:
-            cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
-
-            if round(upper/unit) >= round(cur_lower/unit) and round(lower/unit) <= round(cur_upper/unit):
-                # our new bar intersects this bar, merge them
-                merge_bars.append(cur_bar)
-                lower = min(lower, cur_lower)
-                upper = max(upper, cur_upper)
-
-        for bar in merge_bars:
-            self.bars.remove(bar)
-
-        # Insert the new bar
-        new_bar = pos + [lower, upper]
-        self.bars.add(new_bar)
-        self.size = len(self.bars)
-
     @classmethod
     def from_files(cls, *files, owner=None):
         # Parse data and metadata from files
@@ -323,6 +295,34 @@ class BarGridKernel(Kernel):
         x0, y0 = self.get_bar_lower(i, 0), self.get_bar_lower(i, 1)
         x1, y1 = self.get_bar_upper(i, 0), self.get_bar_upper(i, 1)
         return (x0, x1, y0, y1)
+
+    def add_bar(self, bar: List[float]):
+        pos, lower, upper = bar[:-2], bar[-2], bar[-1]
+
+        assert lower < upper
+
+        axes = range(self.dimension)
+        unit = self.get_axis_unit(self.baraxis)
+        pos_unit = np.fromiter((self.get_axis_unit(a) for a in axes if a != self.baraxis), float)
+        merge_bars = []
+
+        bars_at_pos = self.bars.irange((pos - pos_unit / 2).tolist(), (pos + pos_unit / 2).tolist())
+        for cur_bar in bars_at_pos:
+            cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
+
+            if round(upper/unit) >= round(cur_lower/unit) and round(lower/unit) <= round(cur_upper/unit):
+                # our new bar intersects this bar, merge them
+                merge_bars.append(cur_bar)
+                lower = min(lower, cur_lower)
+                upper = max(upper, cur_upper)
+
+        for bar in merge_bars:
+            self.bars.remove(bar)
+
+        # Insert the new bar
+        new_bar = pos + [lower, upper]
+        self.bars.add(new_bar)
+        self.size = len(self.bars)
 
 
 class KdTreeKernel(Kernel):
