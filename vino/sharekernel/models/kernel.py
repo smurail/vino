@@ -4,7 +4,7 @@ import numpy as np  # type: ignore
 
 from pathlib import Path
 from tempfile import mktemp
-from typing import List, Optional, Iterable, Tuple
+from typing import List, Optional, Iterable, Tuple, Dict
 from sortedcontainers import SortedList  # type: ignore
 from itertools import chain
 from operator import itemgetter
@@ -133,6 +133,7 @@ class Kernel(EntityWithMetadata):
     def size_with_unit(self) -> Optional[str]:
         if self.size:
             return f'{self.size} {self.DATA_UNIT}{"s" if self.size > 1 else ""}'
+        return None
 
     @property
     def columns(self) -> Optional[List[str]]:
@@ -388,7 +389,7 @@ class KdTreeKernel(Kernel):
         unit = length / bgk.ppa
 
         if debug:
-            cells = {}
+            cells: Dict[Tuple[float, ...], int] = {}
 
         seen = set()
 
