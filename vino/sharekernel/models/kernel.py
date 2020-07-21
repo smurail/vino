@@ -206,13 +206,6 @@ class BarGridKernel(Kernel):
 
     objects = KernelManager.create('BarGrid', FORMAT)()
 
-    def __init__(self, *args, ppa: Optional[int] = None, baraxis: int = 0, bounds=None, **kwargs):
-        assert ppa is None or ppa > 1
-        super().__init__(*args, **kwargs)
-        self._ppa = ppa
-        self._baraxis = baraxis
-        self._bounds = bounds
-
     @cached_property
     def baraxis(self):
         return (
@@ -265,6 +258,13 @@ class BarGridKernel(Kernel):
         for i in range(self.size):
             yield self.get_bar_lower(i, axis) + half_unit
             yield self.get_bar_upper(i, axis) - half_unit
+
+    def set_options(self, ppa: Optional[int] = None, baraxis: int = 0, bounds=None):
+        assert ppa is None or ppa > 1
+        assert 0 <= baraxis < self.dimension
+        self._ppa = ppa
+        self._baraxis = baraxis
+        self._bounds = bounds
 
     def get_axis_length(self, axis: int) -> int:
         assert 0 <= axis < self.dimension
@@ -377,7 +377,9 @@ class KdTreeKernel(Kernel):
             email=self.email,
             url=self.url,
             image=self.image,
-            params=self.params,
+            params=self.params
+        )
+        bgk.set_options(
             ppa=ppa,
             baraxis=0,
             bounds=tuple(np.array((minima[a], maxima[a])) for a in axes),
