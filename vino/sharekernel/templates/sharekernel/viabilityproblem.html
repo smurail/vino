@@ -3,8 +3,7 @@
 {% load sharekernel %}
 {% block head %}
     {{ block.super }}
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script id="MathJax-script" async src="{% static 'vendor/js/mathjax-tex-chtml-3.0.5.min.js' %}"></script>
 {% endblock %}
 {% block body %}
     <div class="container-xl mt-3 mt-md-5">
