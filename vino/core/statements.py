@@ -5,7 +5,7 @@ import re
 
 import Equation  # type: ignore
 
-from typing import Iterable, List, Tuple, Union, Optional, Pattern, Any
+from typing import Iterable, List, Tuple, Union, Optional, Pattern
 
 
 __all__ = ['Statements', 'Equations', 'Inequations', 'StatementsError']
@@ -71,7 +71,7 @@ class Statements:
         if isinstance(statements, str):
             self.statements = self.parse(statements)
         else:
-            self.statements = statements
+            self.statements = list(statements)
 
     @classmethod
     def split(cls, statement: str) -> Tuple[str, ...]:
@@ -81,7 +81,7 @@ class Statements:
                 r'\s*(%s)\s*' % '|'.join(cls.RELATIONS))
         return tuple(filter(None, map(str.strip, cls._relation.split(statement))))
 
-    def parse(self, value: str) -> ManyStatementLiterals:
+    def parse(self, value: str) -> List[StatementLiteral]:
         statements = [s for s in (s.strip() for s in value.split(',')) if s]
         splitted_statements = (self.split(stmt) for stmt in statements)
         valid_statements = [s for s in splitted_statements if len(s) == 3]
@@ -119,7 +119,7 @@ class Statements:
 
         return typed_statements
 
-    def unparse(self, index: Optional[int] = None):
+    def unparse(self, index: Optional[int] = None) -> str:
         assert index is None or 0 <= index < len(self.statements)
         if index is None:
             return ','.join(self.unparse(i) for i in range(len(self.statements)))
@@ -127,7 +127,7 @@ class Statements:
         return ''.join((str(left), op, str(right)))
 
     @property
-    def unparsed_statements(self):
+    def unparsed_statements(self) -> List[str]:
         return [self.unparse(i) for i in range(len(self.statements))]
 
     def __len__(self):
@@ -136,18 +136,18 @@ class Statements:
     def __iter__(self):
         return iter(self.statements)
 
-    def __setitem__(self, index: int, value: Any):
+    def __setitem__(self, index: int, value: StatementLiteral):
         assert 0 <= index < len(self.statements)
         self.statements[index] = value
 
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> StatementLiteral:
         assert 0 <= index < len(self.statements)
         return self.statements[index]
 
-    def __eq__(self, other: Any):
-        if isinstance(other, Statements):
-            return self.statements == other.statements
-        return False
+    def __eq__(self, other: object):
+        if not isinstance(other, Statements):
+            return NotImplemented
+        return self.statements == other.statements
 
     def __hash__(self):
         return hash(str(self))
@@ -178,7 +178,7 @@ class Equations(Statements):
     def dynamics_type_name(self):
         return self.DYNAMICS_TYPE_NAME.get(self.dynamics_type, '')
 
-    def parse(self, value: str) -> ManyStatementLiterals:
+    def parse(self, value):
         statements = super().parse(value)
         self.dynamics_type = None
 
