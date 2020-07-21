@@ -41,7 +41,6 @@ class KernelData(JsonDetailView):
         if kernel.dimension == 2 and isinstance(kernel, KdTreeKernel):
             ppa = self.kwargs.get('ppa')
             if ppa is not None:
-                size_was = kernel.size
                 debug = False
                 bgk = kernel.to_bargrid(ppa=ppa, debug=debug)
                 assert isinstance(bgk, BarGridKernel)

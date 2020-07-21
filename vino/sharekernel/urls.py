@@ -2,8 +2,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.views.generic import TemplateView
 
-from .views import HomeView, ViabilityProblemView, VisualizationDemoView, \
-                   KernelData
+from .views import (HomeView, ViabilityProblemView, VisualizationDemoView,
+                    KernelData)
 
 
 urlpatterns = [

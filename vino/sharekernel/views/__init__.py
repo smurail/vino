@@ -1,5 +1,5 @@
-from .main import HomeView, ViabilityProblemView, VisualizationDemoView, \
-                  KernelData
+from .main import (HomeView, ViabilityProblemView, VisualizationDemoView,
+                   KernelData)
 
 
 __all__ = [

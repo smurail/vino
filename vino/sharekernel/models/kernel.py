@@ -154,7 +154,7 @@ class Kernel(EntityWithMetadata):
 
         bars_at_pos = self.bars.irange((pos - pos_unit / 2).tolist(), (pos + pos_unit / 2).tolist())
         for cur_bar in bars_at_pos:
-            cur_pos, cur_lower, cur_upper = cur_bar[:-2], cur_bar[-2], cur_bar[-1]
+            cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
 
             if round(upper/unit) >= round(cur_lower/unit) and round(lower/unit) <= round(cur_upper/unit):
                 # our new bar intersects this bar, merge them
