@@ -253,10 +253,9 @@ class BarGridKernel(Kernel):
 
     def data_for_axis(self, axis: int):
         assert 0 <= axis < self.dimension
-        half_unit = self.get_axis_unit(axis) / 2
         for i in range(self.size):
-            yield self.get_bar_lower(i, axis) + half_unit
-            yield self.get_bar_upper(i, axis) - half_unit
+            yield self.get_bar_lower(i, axis)
+            yield self.get_bar_upper(i, axis)
 
     def set_options(self, ppa: int, baraxis: int = 0, bounds=None):
         assert ppa is None or ppa > 1
@@ -284,15 +283,25 @@ class BarGridKernel(Kernel):
     def get_bar_upper(self, i: int, axis: int) -> float:
         assert 0 <= i < len(self.bars)
         assert 0 <= axis < self.dimension
-        offset = 0 if axis == self.baraxis else self.get_axis_unit(axis)
-        return offset + self.bars[i][
+        return self.bars[i][
             -1 if axis == self.baraxis else
             axis if axis < self.baraxis else axis-1]
 
     def get_bar_rect(self, i: int) -> Tuple[float, float, float, float]:
         assert self.dimension == 2
-        x0, y0 = self.get_bar_lower(i, 0), self.get_bar_lower(i, 1)
-        x1, y1 = self.get_bar_upper(i, 0), self.get_bar_upper(i, 1)
+
+        # Get start point and end point
+        start = np.array([self.get_bar_lower(i, 0), self.get_bar_lower(i, 1)])
+        end = np.array([self.get_bar_upper(i, 0), self.get_bar_upper(i, 1)])
+
+        # Compute half step of the grid for both dimensions
+        axes = range(self.dimension)
+        half_unit = np.fromiter((self.get_axis_unit(a) for a in axes), float) / 2
+
+        # Compute coordinates for both opposite corners of each rect
+        x0, y0 = start - half_unit
+        x1, y1 = end + half_unit
+
         return (x0, x1, y0, y1)
 
     def add_bar(self, bar: List[float]):
