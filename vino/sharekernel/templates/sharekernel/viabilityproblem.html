@@ -86,7 +86,8 @@
                     <tr>
                         <th scope="col" class="buttons"></th>
                         <th scope="col">Title</th>
-                        <th scope="col">Uploaded by</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Published by</th>
                         <th scope="col">Software</th>
                         <th scope="col" class="text-right">Size</th>
                         <th scope="col">File size</th>
@@ -96,7 +97,7 @@
                 {% for p in vp.parametersets.all %}
                     <tr>
                         <td class="buttons bg-white"></td>
-                        <td colspan="6" class="text-muted bg-white"><small>Parameter set: {{ p.fields_definition }}</small></td>
+                        <td colspan="7" class="text-muted bg-white"><small>Parameter set: {{ p.fields_definition }}</small></td>
                     </tr>
                     {% for k in p.kernels.all %}
                     <tr>
@@ -105,6 +106,7 @@
                             <a href="{{ k.datafile.url }}" class="btn btn-primary btn-sm"><i class="fas fa-file-download"></i></a>
                         </td>
                         <td>{{ k.title }}</td>
+                        <td>{{ k.date_created }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
                         <td>{{ k.software }}</td>
                         <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
