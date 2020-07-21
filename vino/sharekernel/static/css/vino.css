@@ -107,7 +107,7 @@ img.vino-right {
     border-left: 0;
 }
 
-.table td {
+.table td, .table th {
     white-space: nowrap;
 }
 
