@@ -18,7 +18,7 @@ from django.utils.functional import cached_property
 
 from vino.core.data import parse_datafile, iter_datafile, Metadata
 
-from .entity import EntityWithMetadata
+from .entity import EntityWithMetadata, EntityQuerySet, EntityManager
 from .parameterset import ParameterSet
 from .dataformat import DataFormat
 from .software import Software
@@ -35,13 +35,13 @@ class KernelIterable(ModelIterable):
             yield kernel.promote()
 
 
-class KernelQuerySet(models.QuerySet):
+class KernelQuerySet(EntityQuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._iterable_class = KernelIterable
 
 
-class KernelManager(models.Manager):
+class KernelManager(EntityManager):
     FORMAT = None
 
     def get_queryset(self):

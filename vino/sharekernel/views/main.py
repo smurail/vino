@@ -9,13 +9,13 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {
-            'last_viabilityproblems': ViabilityProblem.objects.with_dimensions().order_by('-date_updated')[:6],
+            'last_viabilityproblems': ViabilityProblem.objects.with_dimensions().last_updated()[:6],
         }
 
 
 class ViabilityProblemView(DetailView):
     context_object_name = 'vp'
-    queryset = ViabilityProblem.objects.with_dimensions()
+    queryset = ViabilityProblem.objects.with_dimensions()  # type: ignore
     template_name = 'sharekernel/viabilityproblem.html'
 
 

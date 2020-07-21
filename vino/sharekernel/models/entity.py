@@ -7,6 +7,22 @@ from django_currentuser.db.models import CurrentUserField  # type: ignore
 from vino.core.data import parse_datafile, Metadata
 
 
+class EntityQuerySet(models.QuerySet):
+    def last_updated(self):
+        return self.order_by('-date_updated')
+
+    def last_created(self):
+        return self.order_by('-date_created')
+
+
+class EntityManager(models.Manager):
+    def last_updated(self):
+        return self.get_queryset().last_updated()
+
+    def last_created():
+        return self.get_queryset().last_created()
+
+
 class Entity(models.Model):
     class Meta:
         abstract = True

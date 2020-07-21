@@ -5,11 +5,11 @@ from django.db import models
 from django.db.models import Count, Q
 
 from .fields import EquationsField, InequationsField
-from .entity import EntityWithMetadata
+from .entity import EntityWithMetadata, EntityQuerySet
 from .symbol import Symbol
 
 
-class ViabilityProblemQuerySet(models.QuerySet):
+class ViabilityProblemQuerySet(EntityQuerySet):
     def with_dimension_of(self, type, name):
         opts = {name: Count('symbols', filter=Q(symbols__type=type))}
         return self.annotate(**opts)
