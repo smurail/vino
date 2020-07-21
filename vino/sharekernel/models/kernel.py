@@ -258,7 +258,7 @@ class BarGridKernel(Kernel):
             yield self.get_bar_lower(i, axis) + half_unit
             yield self.get_bar_upper(i, axis) - half_unit
 
-    def set_options(self, ppa: Optional[int] = None, baraxis: int = 0, bounds=None):
+    def set_options(self, ppa: int, baraxis: int = 0, bounds=None):
         assert ppa is None or ppa > 1
         assert 0 <= baraxis < self.dimension
         self._ppa = ppa
