@@ -10,6 +10,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         return {
             'last_viabilityproblems': ViabilityProblem.objects.active().with_dimensions().last_updated()[:6],
+            'last_kernels': Kernel.objects.active().last_created()[:12],
         }
 
 
