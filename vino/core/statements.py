@@ -5,7 +5,7 @@ import re
 
 import Equation  # type: ignore
 
-from typing import Iterable, List, Tuple, Union, Optional, Pattern
+from typing import Iterable, List, Tuple, Union, Optional, Pattern, Any
 
 
 __all__ = ['Statements', 'Equations', 'Inequations', 'StatementsError']
