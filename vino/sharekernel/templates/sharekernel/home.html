@@ -24,7 +24,7 @@
             <div class="col-md-4">
                 <div class="vp card mb-4 shadow-sm">
                     <a href="{% url 'viabilityproblem' vp.pk %}">
-                        <img src="{{ vp.image.url }}" class="card-img-top" alt="{{ vp.title }}">
+                        <img src="{% if vp.image %}{{ vp.image.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}" class="card-img-top" alt="{{ vp.title }}">
                     </a>
                     <div class="card-body">
                         <h5 class="card-title"><a href="{% url 'viabilityproblem' vp.pk %}">{{ vp.title }}</a></h5>
@@ -92,7 +92,7 @@
         {% for vp in last_viabilityproblems %}
             <div class="col-md-4">
                 <div class="vp card bg-dark text-white mb-4 shadow-sm">
-                    <img src="{{ vp.image.url }}" class="card-img-top" alt="{{ vp.title }}">
+                    <img src="{% if vp.image %}{{ vp.image.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}" class="card-img-top" alt="{{ vp.title }}">
                     <a href="{% url 'viabilityproblem' vp.pk %}">
                         <div class="card-img-overlay">
                             <h5 class="card-title">{{ vp.title }}</h5>

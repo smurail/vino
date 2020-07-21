@@ -9,7 +9,9 @@
 {% block body %}
     <div class="container-xl mt-3 mt-md-5">
         <div class="clearfix pb-3">
+            {% if vp.image %}
             <img src="{{ vp.image.url }}" class="rounded vino-right ml-3 mb-3" height="180" alt="{{ vp.title }}">
+            {% endif %}
             <h2>{{ vp.title }}</h2>
             <p><small class="text-muted">
                 Created by {{ vp.owner.get_full_name }}
