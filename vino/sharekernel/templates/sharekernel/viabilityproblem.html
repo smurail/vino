@@ -41,48 +41,6 @@
                     </div>
                     {% endfor %}
                 </div>
-                <!--
-                <table class="table table-sm">
-                    <thead>
-                        <tr><th colspan="3">State space</th></tr>
-                    </thead>
-                    <tbody>
-                    {% for v in vp.state_variables %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ v.name }}</td>
-                            <td>{{ v.longname }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <table class="table table-sm">
-                    <thead>
-                        <tr><th colspan="3">Control space</th></tr>
-                    </thead>
-                    <tbody>
-                    {% for v in vp.control_variables %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ v.name }}</td>
-                            <td>{{ v.longname }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                -->
-                <!--
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>State space</b>
-                        <span class="badge badge-primary">{{ vp.state_dimension }}D</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Control space</b>
-                        <span class="badge badge-primary">{{ vp.control_dimension }}D</span>
-                    </li>
-                </ul>
-                -->
             </div>
             <div class="card">
                 <div class="card-header">Dynamics</div>
