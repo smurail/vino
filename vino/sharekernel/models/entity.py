@@ -8,6 +8,10 @@ from vino.core.data import parse_datafile, Metadata
 
 
 class EntityQuerySet(models.QuerySet):
+    def active(self, is_active=True):
+        wanted_state = Entity.ACTIVE if is_active else Entity.DELETED
+        return self.filter(state=wanted_state)
+
     def last_updated(self):
         return self.order_by('-date_updated')
 
@@ -16,6 +20,9 @@ class EntityQuerySet(models.QuerySet):
 
 
 class EntityManager(models.Manager):
+    def active(self, is_active=True):
+        return self.get_queryset().active(is_active)
+
     def last_updated(self):
         return self.get_queryset().last_updated()
 
