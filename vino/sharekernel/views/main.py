@@ -9,13 +9,13 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {
-            'last_viabilityproblems': ViabilityProblem.objects.with_dimensions().last_updated()[:6],
+            'last_viabilityproblems': ViabilityProblem.objects.active().with_dimensions().last_updated()[:6],
         }
 
 
 class ViabilityProblemView(DetailView):
     context_object_name = 'vp'
-    queryset = ViabilityProblem.objects.with_dimensions()  # type: ignore
+    queryset = ViabilityProblem.objects.active().with_dimensions()  # type: ignore
     template_name = 'sharekernel/viabilityproblem.html'
 
 
@@ -24,7 +24,7 @@ class VisualizationDemoView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        kernels = Kernel.objects.filter(size__lt=100000).all()
+        kernels = Kernel.objects.active().filter(size__lt=100000).all()
         context['kernels'] = [
             (k.pk, f"{k.params.vp}: {k.title} ({k.size})") for k in kernels
         ]
