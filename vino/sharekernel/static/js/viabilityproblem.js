@@ -8,7 +8,9 @@ function selectKernel(id) {
 $(function() {
     var kernels = $('#kernels tr[data-kernel-id]'),
         checkboxes = $('#kernels input[type=checkbox]'),
-        currentKernel = $('.vz-container input[name=kernel]');
+        currentKernel = $('.vz-container input[name=kernel]'),
+        hashPrefix = '#kernel/',
+        kernelId;
 
     // If there is only one kernel, disable the checkbox
     if (kernels.length == 1)
@@ -38,6 +40,11 @@ $(function() {
         }
     });
 
-    // Select and show first kernel
-    selectKernel(kernels.first().data('kernel-id'));
+    // Select and show kernel in hash or fallback to first
+    if (location.hash.startsWith(hashPrefix)) {
+        kernelId = location.hash.substring(hashPrefix.length);
+    } else {
+        kernelId = kernels.first().data('kernel-id');
+    }
+    selectKernel(kernelId);
 });
