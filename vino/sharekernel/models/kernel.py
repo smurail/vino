@@ -87,13 +87,13 @@ class Kernel(EntityWithMetadata):
         super().__init__(*args, **kwargs)
 
         # Ensure Kernel subclasses instances always have the right format
-        if self.FORMAT and (not self.format_id or self.format.title != self.FORMAT):
+        if self.FORMAT and (not self.format_id or str(self.format) != self.FORMAT):
             self.format = DataFormat.objects.get(title=self.FORMAT)
-            assert self.format.title == self.FORMAT
+            assert str(self.format) == self.FORMAT
 
     def promote(self) -> Kernel:
         # https://schinckel.net/2013/07/28/django-single-table-inheritance-on-the-cheap./
-        format_name = self.format.title
+        format_name = str(self.format)
         if format_name in _CUSTOM_KERNELS:
             subclass = _CUSTOM_KERNELS[format_name]
             self.__class__ = subclass
