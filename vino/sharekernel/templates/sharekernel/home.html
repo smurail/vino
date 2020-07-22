@@ -126,28 +126,29 @@
             <table class="table table-sm table-hover table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col" class="buttons"></th>
                         <th scope="col">Title</th>
-                        <th scope="col">Date</th>
+                        <th scope="col">Viability Problem</th>
+                        <th scope="col">Publication date</th>
                         <th scope="col">Published by</th>
                         <th scope="col">Software</th>
+                        <th scope="col">Format</th>
                         <th scope="col" class="text-right">Size</th>
-                        <th scope="col">File size</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for k in last_kernels %}
                     <tr>
-                        <td class="buttons">
-                            <a class="btn btn-primary btn-sm disabled"><i class="fas fa-eye"></i></a>
-                            <a href="{{ k.datafile.url }}" class="btn btn-primary btn-sm"><i class="fas fa-file-download"></i></a>
+                        <td>
+                            <a href="{% kernel_url k %}">{{ k.title }}</a>
                         </td>
-                        <td>{{ k.title }}</td>
+                        <td>
+                            <a href="{% url 'viabilityproblem' k.vp.pk %}">{{ k.vp.title }}</a>
+                        </td>
                         <td>{{ k.date_created }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
                         <td>{{ k.software }}</td>
+                        <td>{{ k.format }}</td>
                         <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
-                        <td>{{ k.datafile.size|filesizeformat }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
