@@ -25,6 +25,10 @@ footer a:hover {
 
 /* Visualization styles */
 
+body.loading {
+    cursor: wait !important;
+}
+
 .vz-view {
     height: 400px;
     margin: 0 auto;

@@ -73,9 +73,7 @@ class Visualization extends EventDispatcher {
     }
 
     loading(isLoading) {
-        if (!this.defaultCursor)
-            this.defaultCursor = document.body.style.cursor || 'default';
-        document.body.style.cursor = isLoading ? 'wait' : this.defaultCursor;
+        document.body.classList.toggle('loading', isLoading);
         this.loader.classList.toggle('visible', isLoading);
     }
 
