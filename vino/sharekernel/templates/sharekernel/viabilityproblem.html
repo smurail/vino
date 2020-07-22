@@ -4,12 +4,12 @@
 {% block head %}
     {{ block.super }}
     <script src="{% static 'vendor/js/plotly-1.54.1.min.js' %}"></script>
-    <script id="MathJax-script" async src="{% static 'vendor/js/mathjax-tex-chtml-3.0.5.min.js' %}"></script>
     <script src="{% static 'js/visualize.js' %}"></script>
     <script src="{% static 'js/viabilityproblem.js' %}"></script>
     <script>
         URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);
     </script>
+    <script id="MathJax-script" async src="{% static 'vendor/js/mathjax-tex-chtml-3.0.5.min.js' %}"></script>
 {% endblock %}
 {% block body %}
     <div class="container-xl mt-3 mt-md-5">
@@ -90,9 +90,9 @@
                 </div>
             </div>
         </div>
-        <h3 class="mt-5">Kernels</h3>
+        <h3 id="kernels" class="mt-5">Kernels</h3>
         <div class="table-responsive">
-            <table id="kernels" class="table table-sm table-hover table-bordered">
+            <table id="kernels-table" class="table table-sm table-hover table-bordered">
                 <thead>
                     <tr>
                         <th scope="col" class="min merge-right"></th>

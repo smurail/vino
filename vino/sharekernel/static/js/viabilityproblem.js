@@ -6,8 +6,8 @@ function selectKernel(id) {
 }
 
 $(function() {
-    var kernels = $('#kernels tr[data-kernel-id]'),
-        checkboxes = $('#kernels input[type=checkbox]'),
+    var kernels = $('#kernels-table tr[data-kernel-id]'),
+        checkboxes = $('#kernels-table input[type=checkbox]'),
         currentKernel = $('.vz-container input[name=kernel]'),
         hashPrefix = '#kernel/',
         kernelId;
@@ -45,6 +45,7 @@ $(function() {
     // Select and show kernel in hash or fallback to first
     if (location.hash.startsWith(hashPrefix)) {
         kernelId = location.hash.substring(hashPrefix.length);
+        $('html, body').scrollTop($('#kernels').offset().top);
     } else {
         kernelId = kernels.first().data('kernel-id');
     }
