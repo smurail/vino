@@ -25,17 +25,13 @@ footer a:hover {
 
 /* Visualization styles */
 
-.view {
+.vz-view {
     height: 400px;
     margin: 0 auto;
 }
 
-.loader {
+.vz-loader {
     visibility: hidden;
-}
-
-.col .kernel select[name=kernel] {
-    max-width: 25em;
 }
 
 /** Viz: workaround to fix bootstrap interference in plotly modebar */

@@ -10,7 +10,7 @@
     <script>
         URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);
         window.addEventListener('DOMContentLoaded', () => {
-            $('.kernel').each((_, element) => new KernelVisualization(element));
+            $('.vz-container').each((_, element) => new KernelVisualization(element));
         });
     </script>
 {% endblock %}

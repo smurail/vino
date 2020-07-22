@@ -62,7 +62,7 @@ class Visualization extends EventDispatcher {
         this.element = element instanceof HTMLElement ?
                        element :
                        document.querySelector(element);
-        this.loader = this.element.querySelector('.loader');
+        this.loader = this.element.querySelector('.vz-loader');
         this.options = {
             showShapes: options.showShapes || false
         };
@@ -88,7 +88,7 @@ class Visualization extends EventDispatcher {
         const AXES = ['x', 'y', 'z'];
 
         var threeDimensional = data.variables.length > 2 ? true : false,
-            view = this.element.querySelector('.view'),
+            view = this.element.querySelector('.vz-view'),
             plot = {
                 layout: {
                     margin:
