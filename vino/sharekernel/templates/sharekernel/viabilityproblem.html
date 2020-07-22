@@ -123,8 +123,16 @@
                         <td>{{ k.title }}</td>
                         <td>{{ k.date_created }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
-                        <td>{{ k.software }}</td>
-                        <td>{{ k.format }}</td>
+                        <td>
+                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="software:{{ k.software.pk }}">
+                                {{ k.software }}
+                            </abbr>
+                        </td>
+                        <td>
+                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="dataformat:{{ k.format.pk }}">
+                                {{ k.format }}
+                            </abbr>
+                        </td>
                         <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
                         <td class="text-right merge-right">{{ k.datafile.size|filesizeformat }}</td>
                         <td>
@@ -140,4 +148,5 @@
         </div>
         {% visualize %}
     </div>
+    {% include 'modal.html' with database=database %}
 {% endblock %}

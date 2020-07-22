@@ -23,6 +23,12 @@ footer a:hover {
     color: var(--primary);
 }
 
+/* Generic styles */
+
+.description {
+    font-size: 0.875rem;
+}
+
 /* Visualization styles */
 
 body.loading {

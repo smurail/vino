@@ -1,6 +1,12 @@
-from django.views.generic import TemplateView, DetailView
+import json
 
-from ..models import Kernel, BarGridKernel, KdTreeKernel, ViabilityProblem
+from django.views.generic import TemplateView, ListView, DetailView
+from django.core.serializers import serialize
+from django.forms.models import model_to_dict
+from django.utils.safestring import mark_safe
+
+from ..models import (Kernel, BarGridKernel, KdTreeKernel, ViabilityProblem,
+                      Software, DataFormat)
 from .json import JsonDetailView
 
 
@@ -14,7 +20,30 @@ class HomeView(TemplateView):
         }
 
 
-class ViabilityProblemView(DetailView):
+class ModalMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        def instance_to_serializable(instance):
+            return {
+                k: str(v) for k, v in model_to_dict(instance).items()
+            }
+
+        def queryset_to_dict(queryset):
+            return {
+                instance.pk: instance_to_serializable(instance)
+                for instance in queryset
+            }
+
+        database = mark_safe(json.dumps({
+            'software': queryset_to_dict(Software.objects.all()),
+            'dataformat': queryset_to_dict(DataFormat.objects.all()),
+        }))
+
+        return dict(context, database=database)
+
+
+class ViabilityProblemView(ModalMixin, DetailView):
     context_object_name = 'vp'
     queryset = ViabilityProblem.objects.active().with_dimensions()  # type: ignore
     template_name = 'sharekernel/viabilityproblem.html'
