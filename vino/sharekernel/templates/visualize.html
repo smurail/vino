@@ -2,7 +2,8 @@
     <div class="card-header px-3 py-2">
         <form>
             <div class="form-inline">
-                <div class="form-group" title="Kernel">
+                {% if kernels %}
+                <div class="form-group mr-2" title="Kernel">
                     <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
                     <div class="input-group mx-2">
                         <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm">
@@ -17,14 +18,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group ml-2" title="Points per axis">
+                {% else %}
+                <input type="hidden" name="kernel" value="">
+                {% endif %}
+                <div class="form-group mr-2" title="Points per axis">
                     <label for="ppa-{{ id }}">
                         <i class="fas fa-ruler"></i>
                     </label>
                     <input id="ppa-{{ id }}" name="ppa" type="number" size="5"
                         placeholder="PPA" class="form-control form-control-sm ml-2">
                 </div>
-                <div class="custom-control custom-checkbox ml-2" title="Shapes">
+                <div class="custom-control custom-checkbox" title="Shapes">
                     <input id="show-shapes-{{ id }}" type="checkbox" class="custom-control-input" checked>
                     <label class="custom-control-label" for="show-shapes-{{ id }}">
                         <i class="fas fa-layer-group"></i>

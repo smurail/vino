@@ -9,7 +9,7 @@ register = template.Library()
 
 
 @register.inclusion_tag('visualize.html', takes_context=True)
-def visualize(context, kernels):
+def visualize(context, kernels=None):
     if 'visualize' not in context:
         context['visualize'] = {
             'id': 0,

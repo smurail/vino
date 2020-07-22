@@ -87,14 +87,16 @@ img.vino-right {
     font-size: 0.75rem;
 }
 
-.table td.buttons, .table th.buttons {
-    color: #fff;
+.table td.min, .table th.min {
     width: 1%;
     white-space: nowrap;
+}
+
+.table td.merge-right, th.merge-right {
     border-right: 0;
 }
 
-.table td.buttons + td, .table th.buttons + th {
+.table td.merge-right + td, .table th.merge-right + th {
     border-left: 0;
 }
 
@@ -104,7 +106,6 @@ img.vino-right {
 
 .table tr td[colspan] {
     text-align: left !important;
-    border-left: 0;
 }
 
 .table td, .table th {
