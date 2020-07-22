@@ -100,6 +100,7 @@
                         <th scope="col">Date</th>
                         <th scope="col">Published by</th>
                         <th scope="col">Software</th>
+                        <th scope="col">Format</th>
                         <th scope="col" class="text-right">Size</th>
                         <th scope="col" class="text-right merge-right">File size</th>
                         <th scope="col" class="min"></th>
@@ -109,7 +110,7 @@
                 {% for p in vp.parametersets.all %}
                     <tr>
                         <td class="bg-white merge-right"></td>
-                        <td colspan="7" class="text-muted bg-white"><small>Parameter set: {{ p.fields_definition }}</small></td>
+                        <td colspan="8" class="text-muted bg-white"><small>Parameter set: {{ p.fields_definition }}</small></td>
                     </tr>
                     {% for k in p.kernels.all %}
                     <tr data-kernel-id="{{ k.pk }}">
@@ -123,6 +124,7 @@
                         <td>{{ k.date_created }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
                         <td>{{ k.software }}</td>
+                        <td>{{ k.format }}</td>
                         <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
                         <td class="text-right merge-right">{{ k.datafile.size|filesizeformat }}</td>
                         <td>
