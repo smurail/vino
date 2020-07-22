@@ -17,20 +17,25 @@ $(function() {
     // Attach change event to each kernel checkbox
     checkboxes.on('change', function() {
         var cb = $(this),
-            row = cb.closest('tr');
+            row = cb.closest('tr'),
+            kernelId = row.data('kernel-id');
 
-        // Update visualization
-        currentKernel.val(row.data('kernel-id'));
-
-        // Colorize selected row
-        row.toggleClass('table-primary', cb.prop('checked'));
-
-        // Unselect all rows but selected row
+        // Unselect all rows but changed row
         checkboxes.not(this).prop('checked', false)
             .closest('tr').removeClass('table-primary');
 
-        // Trigger change event with DOM style because its visualize way
-        currentKernel[0].dispatchEvent(new Event('change'));
+        // Colorize changed row in any case:
+        // - Handles page reload
+        // - Once visualized a kernel can't be "unvisualized"
+        row.addClass('table-primary');
+
+        // Update visualization if needed
+        if (currentKernel.val() != kernelId) {
+            // Change current kernel
+            currentKernel.val(kernelId);
+            // Trigger change event with DOM style (see visualize.js)
+            currentKernel[0].dispatchEvent(new Event('change'));
+        }
     });
 
     // Select and show first kernel
