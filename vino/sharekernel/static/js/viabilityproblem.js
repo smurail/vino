@@ -33,6 +33,8 @@ $(function() {
 
         // Update visualization if needed
         if (currentKernel.val() != kernelId) {
+            // Change URL hash
+            location.hash = hashPrefix + kernelId;
             // Change current kernel
             currentKernel.val(kernelId);
             // Trigger change event with DOM style (see visualize.js)
