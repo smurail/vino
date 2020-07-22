@@ -2,6 +2,10 @@
 
 const ASYNC_DELAY = 50;
 
+window.addEventListener('DOMContentLoaded', () => {
+    $('.vz-container').each((_, element) => new KernelVisualization(element));
+});
+
 // https://github.com/plotly/plotly.js/issues/1085#issuecomment-564488236
 window.addEventListener('wheel', (event) => {
     if (!event.isTrusted) return;
