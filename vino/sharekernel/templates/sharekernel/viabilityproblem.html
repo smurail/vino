@@ -25,22 +25,26 @@
                     Model
                 </div>
                 <div class="card-body">
+                {% if vp.state_dimension > 0 %}
                     <h6 class="card-subtitle mb-2 text-muted">{{ vp.state_dimension}}-dimensional state space</h6>
-                    <div class="mb-3">
                     {% for v in vp.state_variables %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ v.name|mathjax }}</span>
+                        {{ v.longname }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% if vp.control_dimension > 0 %}
+                    <h6 class="card-subtitle mt-3 mb-2 text-muted">{{ vp.control_dimension}}-dimensional control space</h6>
+                    <div class="mb-3">
+                    {% for v in vp.control_variables %}
                         <div class="d-flex justify-content-between align-items-center">
                             <span>{{ v.name|mathjax }}</span>
                             {{ v.longname }}
                         </div>
                     {% endfor %}
                     </div>
-                    <h6 class="card-subtitle mt-3 mb-2 text-muted">{{ vp.control_dimension}}-dimensional control space</h6>
-                    {% for v in vp.control_variables %}
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>{{ v.name|mathjax }}</span>
-                        {{ v.longname }}
-                    </div>
-                    {% endfor %}
+                {% endif %}
                 </div>
             </div>
             <div class="card">
