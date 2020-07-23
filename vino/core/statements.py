@@ -119,12 +119,15 @@ class Statements:
 
         return typed_statements
 
+    def _unparse(self, statement) -> str:
+        left, op, right = statement
+        return ''.join((str(left), op, str(right)))
+
     def unparse(self, index: Optional[int] = None) -> str:
         assert index is None or 0 <= index < len(self.statements)
-        if index is None:
-            return ','.join(self.unparse(i) for i in range(len(self.statements)))
-        left, op, right = self.statements[index]
-        return ''.join((str(left), op, str(right)))
+        if index is not None:
+            return self._unparse(self.statements[index])
+        return ','.join(self._unparse(stmt) for stmt in self.statements)
 
     @property
     def unparsed_statements(self) -> List[str]:
