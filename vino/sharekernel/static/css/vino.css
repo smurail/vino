@@ -85,6 +85,10 @@ img.vino-right {
 
 /** VP: kernels table */
 
+#kernels-table {
+    margin-bottom: 0;
+}
+
 .table .btn {
     padding: 0;
     width: 22px;
