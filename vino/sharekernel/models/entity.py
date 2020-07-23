@@ -26,7 +26,7 @@ class EntityManager(models.Manager):
     def last_updated(self):
         return self.get_queryset().last_updated()
 
-    def last_created():
+    def last_created(self):
         return self.get_queryset().last_created()
 
 

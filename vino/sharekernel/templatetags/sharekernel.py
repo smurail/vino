@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.html import conditional_escape
 
 # For pluck filter
-from django.template import VariableDoesNotExist
+from django.template import VariableDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import _property_resolver
 
 
@@ -42,7 +42,7 @@ class KernelURLNode(template.Node):
         except AttributeError:
             try:
                 current_app = context.request.resolver_match.namespace
-            except:
+            except Exception:
                 current_app = None
 
         kernel = self.arg.resolve(context)
@@ -83,6 +83,7 @@ def pluck(value, arg):
 
 
 _mathjax_indice = re.compile("([a-zA-Z_][a-zA-Z0-9_']*)_([a-zA-Z0-9']{2,})")
+
 
 @register.filter
 def mathjax(value):

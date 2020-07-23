@@ -1,7 +1,6 @@
 import json
 
 from django.views.generic import TemplateView, ListView, DetailView
-from django.core.serializers import serialize
 from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
 
