@@ -93,6 +93,16 @@ img.vino-right {
     font-size: 0.75rem;
 }
 
+.icn {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    color: #333;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+}
+
 .table td.min, .table th.min {
     width: 1%;
     white-space: nowrap;

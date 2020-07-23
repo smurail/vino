@@ -43,6 +43,12 @@ class ModalMixin:
         return dict(context, database=database)
 
 
+class ExploreView(ModalMixin, ListView):
+    context_object_name = 'viabilityproblems'
+    queryset = ViabilityProblem.objects.active().last_updated()  # type: ignore
+    template_name = 'sharekernel/explore.html'
+
+
 class ViabilityProblemView(ModalMixin, DetailView):
     context_object_name = 'vp'
     queryset = ViabilityProblem.objects.active().with_dimensions()  # type: ignore

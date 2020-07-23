@@ -2,12 +2,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.views.generic import TemplateView
 
-from .views import (HomeView, ViabilityProblemView, VisualizationDemoView,
-                    KernelData)
+from .views import (HomeView, ExploreView, ViabilityProblemView,
+                    VisualizationDemoView, KernelData)
 
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
+    path('explore', ExploreView.as_view(), name='explore'),
     path('viabilityproblem/<int:pk>/', ViabilityProblemView.as_view(), name='viabilityproblem'),
     path('visualization-demo', VisualizationDemoView.as_view(), name='visualization_demo'),
     path('about', TemplateView.as_view(template_name='sharekernel/about.html'), name='about'),

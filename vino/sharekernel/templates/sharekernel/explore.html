@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load sharekernel %}
+{% block body %}
+    <div class="container-xl mt-3 mt-md-5">
+        <h2>ViNO database</h2>
+        <nav class="mb-2" aria-label="Group by">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'explore' %}">Viability Problem</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="btn-toolbar mb-2">
+            <nav class="flex-grow-1" aria-label="Pagination">
+                <ul class="pagination mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            <i class="fas fa-angle-left" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="{% url 'explore' %}">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Published by</th>
+                        <th scope="col">Software</th>
+                        <th scope="col">Format</th>
+                        <th scope="col" class="text-right">Size</th>
+                        <th scope="col">File size</th>
+                    </tr>
+                </thead>
+                {% for vp in viabilityproblems %}
+                <tbody>
+                    <tr class="table-secondary">
+                        <td>
+                            <span class="icn"><i class="fas fa-flask" title="Viability Problem"></i></span>
+                            <a href="{% url 'viabilityproblem' vp.pk %}">{{ vp.title }}</a>
+                        </td>
+                        <td>{{ vp.date_created }}</td>
+                        <td>{{ vp.owner.get_full_name }}</td>
+                        <td colspan="4"></td>
+                    </tr>
+                    {% for k in vp.kernels %}
+                    <tr>
+                        <td>
+                            <span class="icn"><i class="fas fa-cube" title="Kernel"></i></span>
+                            <a href="{% kernel_url k %}">{{ k.title }}</a>
+                        </td>
+                        <td>{{ k.date_created }}</td>
+                        <td>{{ k.owner.get_full_name }}</td>
+                        <td>
+                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="software:{{ k.software.pk }}">
+                                {{ k.software }}
+                            </attr>
+                        </td>
+                        <td>
+                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="dataformat:{{ k.format.pk }}">
+                                {{ k.format }}
+                            </abbr>
+                        </td>
+                        <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
+                        <td>{{ k.datafile.size|filesizeformat }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% include 'modal.html' with database=database %}
+{% endblock %}

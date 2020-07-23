@@ -1,7 +1,8 @@
-from .main import (HomeView, ViabilityProblemView, VisualizationDemoView,
-                   KernelData)
+from .main import (HomeView, ExploreView, ViabilityProblemView,
+                   VisualizationDemoView, KernelData)
 
 
 __all__ = [
-    'HomeView', 'ViabilityProblemView', 'VisualizationDemoView', 'KernelData'
+    'HomeView', 'ExploreView', 'ViabilityProblemView', 'VisualizationDemoView',
+    'KernelData'
 ]
