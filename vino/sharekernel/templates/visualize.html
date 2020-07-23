@@ -7,8 +7,8 @@
                     <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
                     <div class="input-group mx-2">
                         <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm">
-                            {% for pk, title in kernels %}
-                            <option value="{{ pk }}">{{ title }}</option>
+                            {% for k in kernels %}
+                            <option value="{{ k.pk }}">{{ k.title }}</option>
                             {% endfor %}
                         </select>
                         <div class="input-group-append">
