@@ -6,6 +6,7 @@ import re
 import Equation  # type: ignore
 
 from typing import Iterable, List, Tuple, Union, Optional, Pattern
+from itertools import chain
 
 
 __all__ = ['Statements', 'Equations', 'Inequations', 'StatementsError']
@@ -170,6 +171,8 @@ class Equations(Statements):
         DynamicsLeftExpression.CONTINUOUS: 'continuous',
     }
 
+    _show: Optional[Pattern] = None
+
     def __init__(
             self,
             statements: Union[str, ManyStatementLiterals],
@@ -191,7 +194,21 @@ class Equations(Statements):
             elif self.dynamics_type != left.dynamics_type:
                 raise StatementsError("Can't mix different dynamics types.")
 
+        variables = chain.from_iterable([stmt[0].variables for stmt in statements])
+        self._show = re.compile(r'\b(' + '|'.join(variables) + r')\b')
+
         return statements
+
+    def _unparse(self, statement):
+        left, op, right = statement
+
+        if left.dynamics_type == left.DISCRETE:
+            left = left.variables[0] + '_{n+1}'
+            right = self._show.sub(r'\1_n', str(right))
+        else:
+            left, right = str(left), str(right)
+
+        return ''.join((left, op, right))
 
 
 class Inequations(Statements):
