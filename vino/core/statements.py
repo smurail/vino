@@ -120,19 +120,19 @@ class Statements:
 
         return typed_statements
 
-    def _unparse(self, statement) -> str:
+    def _show(self, statement) -> str:
         left, op, right = statement
         return ''.join((str(left), op, str(right)))
 
-    def unparse(self, index: Optional[int] = None) -> str:
+    def show(self, index: Optional[int] = None) -> str:
         assert index is None or 0 <= index < len(self.statements)
         if index is not None:
-            return self._unparse(self.statements[index])
-        return ','.join(self._unparse(stmt) for stmt in self.statements)
+            return self._show(self.statements[index])
+        return ','.join(self._show(stmt) for stmt in self.statements)
 
     @property
-    def unparsed_statements(self) -> List[str]:
-        return [self.unparse(i) for i in range(len(self.statements))]
+    def showable_statements(self) -> List[str]:
+        return [self.show(i) for i in range(len(self.statements))]
 
     def __len__(self):
         return len(self.statements)
@@ -157,7 +157,7 @@ class Statements:
         return hash(str(self))
 
     def __str__(self):
-        return self.unparse()
+        return self.show()
 
     def __repr__(self):
         return 'Statements(%r)' % self.statements
@@ -171,7 +171,7 @@ class Equations(Statements):
         DynamicsLeftExpression.CONTINUOUS: 'continuous',
     }
 
-    _show: Optional[Pattern] = None
+    _variables: Optional[Pattern] = None
 
     def __init__(
             self,
@@ -195,16 +195,16 @@ class Equations(Statements):
                 raise StatementsError("Can't mix different dynamics types.")
 
         variables = chain.from_iterable([stmt[0].variables for stmt in statements])
-        self._show = re.compile(r'\b(' + '|'.join(variables) + r')\b')
+        self._variables = re.compile(r'\b(' + '|'.join(variables) + r')\b')
 
         return statements
 
-    def _unparse(self, statement):
+    def _show(self, statement):
         left, op, right = statement
 
         if left.dynamics_type == left.DISCRETE:
             left = left.variables[0] + '_{n+1}'
-            right = self._show.sub(r'\1_n', str(right))
+            right = self._variables.sub(r'\1_n', str(right))
         else:
             left, right = str(left), str(right)
 

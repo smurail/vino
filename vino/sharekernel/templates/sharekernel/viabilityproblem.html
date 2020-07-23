@@ -57,12 +57,12 @@
                 <div class="card-header">Dynamics</div>
                 <div class="card-body">
                     <p>
-                    {% for stmt in vp.dynamics.unparsed_statements %}
+                    {% for stmt in vp.dynamics.showable_statements %}
                         {{ stmt|mathjax }}<br>
                     {% endfor %}
                     </p>
                     <p>
-                    {% for stmt in vp.controls.unparsed_statements %}
+                    {% for stmt in vp.controls.showable_statements %}
                         {{ stmt|mathjax }}<br>
                     {% endfor %}
                     <p>
@@ -75,12 +75,12 @@
                 <div class="card-header">Constraints</div>
                 <div class="card-body">
                     <p>
-                    {% for stmt in vp.constraints.unparsed_statements %}
+                    {% for stmt in vp.constraints.showable_statements %}
                         {{ stmt|mathjax }}<br>
                     {% endfor %}
                     </p>
                     <p>
-                    {% for stmt in vp.domain.unparsed_statements %}
+                    {% for stmt in vp.domain.showable_statements %}
                         {{ stmt|mathjax }}<br>
                     {% endfor %}
                     </p>
