@@ -1,4 +1,5 @@
 function selectKernel(id) {
+    if (!id) return;
     // Check the checkbox and triggers change event to visualize it
     $('#select-kernel-' + id)
         .prop('checked', true)
@@ -8,7 +9,7 @@ function selectKernel(id) {
 $(function() {
     var kernels = $('#kernels-table tr[data-kernel-id]'),
         checkboxes = $('#kernels-table input[type=checkbox]'),
-        currentKernel = $('.vz-container input[name=kernel]'),
+        currentKernel = $('.vz-container *[name=kernel]'),
         hashPrefix = '#kernel/',
         kernelId;
 
@@ -40,6 +41,11 @@ $(function() {
             // Trigger change event with DOM style (see visualize.js)
             currentKernel[0].dispatchEvent(new Event('change'));
         }
+    });
+
+    // Other way around: attach change event to kernel chooser
+    currentKernel.on('change', function() {
+        selectKernel(currentKernel.val());
     });
 
     // Select and show kernel in hash or fallback to first
