@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% load sharekernel %}
 {% block head %}
-    <script src="{% static 'vendor/js/plotly-1.54.1.min.js' %}"></script>
+    <script src="{% static 'vendor/js/plotly-1.54.6.min.js' %}"></script>
     <script src="{% static 'js/visualize.js' %}"></script>
     <script>
         URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);
