@@ -233,32 +233,14 @@ class KernelVisualization extends Visualization {
                 newIcon = isFullscreen ? 'fa-compress' : 'fa-expand',
                 axis, i;
 
-            // Toggle fullscreen class
-            this.element.classList.toggle(cls);
+            // Toggle fullscreen class on body
+            document.body.classList.toggle(cls);
+
+            // Update fullscreen button icon
             this.fullscreen.querySelector('.fas').classList.replace(oldIcon, newIcon);
 
-            // Plotly seems to change zoom when resizing view, to workaround
-            // this issue save pan and zoom and restore it when exiting
-            // fullscreen
-            if (isFullscreen) {
-                // Backup zoom and pan
-                this.save = {vp: this.data.vp};
-                for (i in AXES) {
-                    axis = AXES[i] + 'axis';
-                    if (this.view.layout[axis]) {
-                        this.save[axis+'.range[0]'] = this.view.layout[axis].range[0];
-                        this.save[axis+'.range[1]'] = this.view.layout[axis].range[1];
-                    }
-                }
-                Plotly.Plots.resize(this.view);
-            } else if (this.save && this.save.vp == this.data.vp) {
-                // Restore zoom and pan if VP hasn't changed
-                var update = {}
-                for (i in this.save)
-                    update[i] = this.save[i];
-                Plotly.relayout(this.view, update);
-                //Plotly.Plots.resize(this.view);
-            }
+            // Resize plotly view
+            Plotly.relayout(this.view, {autosize: true});
         });
 
         setTimeout(this.load.bind(this), ASYNC_DELAY);

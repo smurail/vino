@@ -35,7 +35,11 @@ body.loading {
     cursor: wait !important;
 }
 
-.vz-container.vz-fullscreen {
+body.vz-fullscreen {
+    overflow: hidden;
+}
+
+body.vz-fullscreen .vz-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -43,21 +47,21 @@ body.loading {
     right: 0;
 }
 
-.vz-container.vz-fullscreen.card {
+body.vz-fullscreen .vz-container.card {
     border: 0;
 }
 
-.vz-container.vz-fullscreen .vz-view {
+body.vz-fullscreen .vz-view {
     width: 100%;
     height: 100%;
 }
 
-.vz-view, .vz-fullscreen + .vz-placeholder {
+.vz-view, body.vz-fullscreen .vz-placeholder {
     height: 400px;
     margin: 0 auto;
 }
 
-.vz-fullscreen + .vz-placeholder {
+body.vz-fullscreen .vz-placeholder {
     position: static;
 }
 
