@@ -55,14 +55,10 @@ class ViabilityProblemView(ModalMixin, DetailView):
     template_name = 'sharekernel/viabilityproblem.html'
 
 
-class VisualizationDemoView(TemplateView):
+class VisualizationDemoView(ListView):
+    context_object_name = 'kernels'
+    queryset = Kernel.objects.active().filter(size__lt=100000).all()  # type: ignore
     template_name = 'sharekernel/visualization_demo.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return dict(context, **{
-            'kernels': Kernel.objects.active().filter(size__lt=100000).all(),
-        })
 
 
 class KernelData(JsonDetailView):
