@@ -1,6 +1,7 @@
 "use strict";
 
 const ASYNC_DELAY = 50;
+const AXES = ['x', 'y', 'z'];
 
 window.addEventListener('DOMContentLoaded', () => {
     $('.vz-container').each((_, element) => new KernelVisualization(element));
@@ -67,6 +68,7 @@ class Visualization extends EventDispatcher {
                        element :
                        document.querySelector(element);
         this.loader = this.element.querySelector('.vz-loader');
+        this.view = this.element.querySelector('.vz-view');
         this.options = {
             showShapes: options.showShapes || false
         };
@@ -87,10 +89,7 @@ class Visualization extends EventDispatcher {
         this.data = data = data || this.data;
         this.dispatchCustomEvent('plotstart', {data: data});
 
-        const AXES = ['x', 'y', 'z'];
-
         var threeDimensional = data.variables.length > 2 ? true : false,
-            view = this.element.querySelector('.vz-view'),
             plot = {
                 layout: {
                     margin:
@@ -162,22 +161,22 @@ class Visualization extends EventDispatcher {
             trace[AXES[i]] = data.variables[i].data;
 
             // Keep pan and zoom
-            if (sameVP && view.layout && !threeDimensional) {
+            if (sameVP && this.view.layout && !threeDimensional) {
                 var axis = AXES[i] + 'axis';
-                update[axis+'.range[0]'] = view.layout[axis].range[0];
-                update[axis+'.range[1]'] = view.layout[axis].range[1];
+                update[axis+'.range[0]'] = this.view.layout[axis].range[0];
+                update[axis+'.range[1]'] = this.view.layout[axis].range[1];
             }
         }
 
-        if (sameVP && view.layout && threeDimensional) {
-            update['scene.camera'] = view._fullLayout.scene._scene.getCamera();
+        if (sameVP && this.view.layout && threeDimensional) {
+            update['scene.camera'] = this.view._fullLayout.scene._scene.getCamera();
         }
 
         // See https://plotly.com/javascript/plotlyjs-function-reference/#plotlynewplot
-        Plotly.react(view, plot);
+        Plotly.react(this.view, plot);
 
         if (update)
-            Plotly.relayout(view, update);
+            Plotly.relayout(this.view, update);
 
         this.dispatchCustomEvent('plotend');
     }
