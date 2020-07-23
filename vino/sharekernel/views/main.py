@@ -10,17 +10,6 @@ from ..models import (Kernel, BarGridKernel, KdTreeKernel, ViabilityProblem,
 from .json import JsonDetailView
 
 
-class HomeView(TemplateView):
-    template_name = 'sharekernel/home.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return dict(context, **{
-            'last_viabilityproblems': ViabilityProblem.objects.active().with_dimensions().last_updated()[:6],
-            'last_kernels': Kernel.objects.active().last_created()[:12],
-        })
-
-
 class ModalMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -42,6 +31,17 @@ class ModalMixin:
         }))
 
         return dict(context, database=database)
+
+
+class HomeView(ModalMixin, TemplateView):
+    template_name = 'sharekernel/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return dict(context, **{
+            'last_viabilityproblems': ViabilityProblem.objects.active().with_dimensions().last_updated()[:6],
+            'last_kernels': Kernel.objects.active().last_created()[:12],
+        })
 
 
 class ExploreView(ModalMixin, ListView):
