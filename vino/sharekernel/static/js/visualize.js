@@ -4,7 +4,7 @@ const ASYNC_DELAY = 50;
 const AXES = ['x', 'y', 'z'];
 
 window.addEventListener('DOMContentLoaded', () => {
-    $('.vz-container').each((_, element) => new KernelVisualization(element));
+    $('.vz-container').each((_, element) => element.vz = new KernelVisualization(element));
 });
 
 // https://github.com/plotly/plotly.js/issues/1085#issuecomment-564488236

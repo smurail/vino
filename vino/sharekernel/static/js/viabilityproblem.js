@@ -10,12 +10,20 @@ $(function() {
     var kernels = $('#kernels-table tr[data-kernel-id]'),
         checkboxes = $('#kernels-table input[type=checkbox]'),
         currentKernel = $('.vz-container *[name=kernel]'),
+        visualizations = $('.vz-container'),
         hashPrefix = '#kernel/',
         kernelId;
 
     // If there is only one kernel, disable the checkbox
     if (kernels.length == 1)
         checkboxes.prop('disabled', true);
+
+    // Visualization loading can't be interrupted for now, as a workaround
+    // disable all checkboxes while a kernel is loading
+    visualizations.each((_, el) => {
+        el.vz.addEventListener('load', () => checkboxes.prop('disabled', true));
+        el.vz.addEventListener('plotend', () => checkboxes.prop('disabled', false));
+    });
 
     // Attach change event to each kernel checkbox
     checkboxes.on('change', function() {
