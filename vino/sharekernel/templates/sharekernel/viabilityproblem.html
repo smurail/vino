@@ -136,7 +136,7 @@
                         <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
                         <td class="text-right merge-right">{{ k.datafile.size|filesizeformat }}</td>
                         <td>
-                            <a href="{{ k.datafile.url }}" class="btn btn-primary btn-sm">
+                            <a href="{{ k.datafile.url }}" class="btn btn-primary btn-sm" download>
                                 <i class="fas fa-file-download"></i>
                             </a>
                         </td>
