@@ -110,7 +110,7 @@
                 {% for p in vp.parametersets.all %}
                     <tr>
                         <td class="bg-white merge-right"></td>
-                        <td colspan="8" class="text-muted bg-white"><small>Parameters values: {{ p.fields_definition }}</small></td>
+                        <td colspan="8" class="bg-white"><small>Parameters values: {{ p.fields_definition|mathjax }}</small></td>
                     </tr>
                     {% for k in p.kernels.all %}
                     <tr data-kernel-id="{{ k.pk }}">
