@@ -176,37 +176,3 @@ img.vino-right {
 .vp.card .list-group-item .badge {
     margin-left: .25rem;
 }
-
-/** Home: VP card experiment */
-
-.vp2 img {
-    -webkit-transition: 0.2s opacity ease, 0.2s -webkit-filter ease;
-    -moz-transition: 0.2s opacity ease, 0.2s -moz-filter ease;
-    -moz-transition: 0.2s opacity ease, 0.2s filter ease;
-    -ms-transition: 0.2s opacity ease, 0.2s -ms-filter ease;
-    -o-transition: 0.2s opacity ease, 0.2s -o-filter ease;
-    transition: 0.2s opacity ease, 0.2s filter ease, 0.2s -webkit-filter ease;
-    opacity: 0.2;
-    filter: saturate(60%) blur(1px);
-}
-
-.vp2 .card {
-    overflow: hidden;
-}
-
-.vp2 .card:hover img {
-    opacity: 0.4;
-    filter: none;
-}
-
-.vp2 .list-group {
-    margin: 0 -1.25rem;
-}
-
-.vp2 .list-group-item {
-    background-color: transparent;
-}
-
-.vp2 a {
-    color: inherit;
-}
