@@ -228,7 +228,7 @@ class KernelVisualization extends Visualization {
         this.showShapes.addEventListener('change', e => this.updateShapes());
         this.fullscreen.addEventListener('click', e => {
             var cls = 'vz-fullscreen',
-                isFullscreen = !this.element.classList.contains(cls),
+                isFullscreen = !document.body.classList.contains(cls),
                 oldIcon = isFullscreen ? 'fa-expand' : 'fa-compress',
                 newIcon = isFullscreen ? 'fa-compress' : 'fa-expand',
                 axis, i;
