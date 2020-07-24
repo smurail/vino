@@ -137,12 +137,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = Path(DATA_DIR, 'static').as_posix()
 
 
 # Media files
 
 MEDIA_URL = '/files/'
-MEDIA_ROOT = DATA_DIR
+MEDIA_ROOT = Path(DATA_DIR, 'files').as_posix()
 
 
 # Debug toolbar
