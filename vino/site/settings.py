@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'vino.sharekernel',
+    'vino.sharekernel.apps.SharekernelConfig',
 ]
 
 MIDDLEWARE = [
