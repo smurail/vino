@@ -106,8 +106,8 @@
                         <th scope="col" class="min"></th>
                     </tr>
                 </thead>
-                <tbody>
                 {% for p in vp.parametersets.all %}
+                <tbody>
                     <tr>
                         <td class="bg-white merge-right"></td>
                         <td colspan="8" class="bg-white"><small>Parameters values: {{ p.fields_definition|mathjax }}</small></td>
@@ -142,8 +142,8 @@
                         </td>
                     </tr>
                     {% endfor %}
-                {% endfor %}
                 </tbody>
+                {% endfor %}
             </table>
         </div>
         {% visualize vp.kernels %}
