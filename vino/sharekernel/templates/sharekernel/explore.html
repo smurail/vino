@@ -19,7 +19,7 @@
                 <thead>
                     <tr>
                         <th scope="col">Title</th>
-                        <th scope="col">Date</th>
+                        <th scope="col">Publication date</th>
                         <th scope="col">Published by</th>
                         <th scope="col">Software</th>
                         <th scope="col">Format</th>
@@ -41,7 +41,7 @@
                     {% for k in vp.kernels %}
                     <tr>
                         <td>
-                            <span class="icn"><i class="fas fa-cube" title="Kernel"></i></span>
+                            <span class="icn"><i class="fas fa-cube" title="ViNO"></i></span>
                             <a href="{% kernel_url k %}">{{ k.title }}</a>
                         </td>
                         <td>{{ k.date_created }}</td>

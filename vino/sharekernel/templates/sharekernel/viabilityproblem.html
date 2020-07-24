@@ -90,7 +90,7 @@
                 </div>
             </div>
         </div>
-        <h3 id="kernels" class="mt-5">Kernels</h3>
+        <h3 id="kernels" class="mt-5">ViNOs</h3>
         <div class="table-responsive mb-3">
             <table id="kernels-table" class="table table-sm table-hover table-bordered">
                 <thead>
@@ -110,7 +110,7 @@
                 {% for p in vp.parametersets.all %}
                     <tr>
                         <td class="bg-white merge-right"></td>
-                        <td colspan="8" class="text-muted bg-white"><small>Parameter set: {{ p.fields_definition }}</small></td>
+                        <td colspan="8" class="text-muted bg-white"><small>Parameters values: {{ p.fields_definition }}</small></td>
                     </tr>
                     {% for k in p.kernels.all %}
                     <tr data-kernel-id="{{ k.pk }}">
