@@ -13,28 +13,6 @@
         </nav>
         <div class="btn-toolbar mb-2">
             {% include 'pagination.html' %}
-            <div class="input-group mr-2">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="sort">Sort</label>
-                </div>
-                <select class="custom-select" id="sort">
-                    <option value="" selected>...</option>
-                </select>
-            </div>
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-primary">
-                    <input type="radio" name="mode" value="cards">
-                    <i class="fas fa-th-large" aria-hidden="true"></i>
-                </label>
-                <label class="btn btn-primary">
-                    <input type="radio" name="mode" value="table">
-                    <i class="fas fa-th-list" aria-hidden="true"></i>
-                </label>
-                <label class="btn btn-primary active">
-                    <input type="radio" name="mode" value="compact" checked>
-                    <i class="fas fa-align-justify" aria-hidden="true"></i>
-                </label>
-            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-sm table-hover table-bordered">
