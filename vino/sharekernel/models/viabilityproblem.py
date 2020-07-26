@@ -27,6 +27,23 @@ class ViabilityProblemQuerySet(EntityQuerySet):
         return self.with_state_dimension().filter(state_dimension=value)
 
 
+class ViabilityProblemManagerMixin:
+    def with_dimension_of(self, type, name):
+        return self.get_queryset().with_dimension_of(type, name)
+
+    def with_state_dimension(self):
+        return self.get_queryset().with_state_dimension()
+
+    def with_control_dimension(self):
+        return self.get_queryset().with_control_dimension()
+
+    def with_dimensions(self):
+        return self.get_queryset().with_dimensions()
+
+    def of_dimension(self, value: int):
+        return self.get_queryset().of_dimension(value)
+
+
 class ViabilityProblem(EntityWithMetadata):
     class Meta:
         constraints = [

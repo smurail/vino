@@ -10,7 +10,7 @@ from itertools import chain
 from operator import itemgetter
 
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count, Q
 from django.db.models.query import ModelIterable
 from django.conf import settings
 from django.utils.text import slugify
@@ -18,12 +18,13 @@ from django.utils.functional import cached_property
 
 from vino.core.data import parse_datafile, iter_datafile, Metadata
 
-from .entity import EntityWithMetadata, EntityQuerySet, EntityManager
+from .entity import EntityWithMetadata, EntityManager
 from .parameterset import ParameterSet
 from .dataformat import DataFormat
 from .software import Software
 from .sourcefile import SourceFile
-from .viabilityproblem import ViabilityProblem
+from .viabilityproblem import (ViabilityProblem, ViabilityProblemQuerySet,
+                               ViabilityProblemManagerMixin)
 from .symbol import Symbol
 
 from ..utils import generate_media_path, store_one_file
@@ -35,13 +36,22 @@ class KernelIterable(ModelIterable):
             yield kernel.promote()
 
 
-class KernelQuerySet(EntityQuerySet):
+class KernelQuerySet(ViabilityProblemQuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._iterable_class = KernelIterable
 
+    def with_dimension_of(self, type, name):
+        opts = {
+            name: Count(
+                'params__vp__symbols',
+                filter=Q(params__vp__symbols__type=type)
+            )
+        }
+        return self.annotate(**opts)
 
-class KernelManager(EntityManager):
+
+class KernelManager(ViabilityProblemManagerMixin, EntityManager):
     FORMAT = None
 
     def get_queryset(self):
