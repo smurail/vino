@@ -3,6 +3,10 @@ from collections import OrderedDict
 from django.db import models
 
 
+# Must be congruent with Symbol.type field
+SymbolType = str
+
+
 class SymbolManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().order_by('order')

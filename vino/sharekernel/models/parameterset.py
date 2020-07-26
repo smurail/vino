@@ -36,9 +36,8 @@ class ParameterSet(Entity):
     def to_dict(self):
         types = [Symbol.DYNAMICS, Symbol.CONSTRAINT, Symbol.TARGET]
         # List all names from symbols within `types`
-        symbols = self.vp.symbols.filter(type__in=types).order_by('order').all()
-        sorted_symbols = sorted(symbols, key=lambda s: types.index(s.type))
-        names = (symbol.name for symbol in sorted_symbols)
+        symbols = self.vp.get_symbols(types)
+        names = (symbol.name for symbol in symbols)
         # List all values from those types
         values_set = (self.dynamics, self.constraints, self.target)
         values = chain.from_iterable((x.split(',') for x in values_set))

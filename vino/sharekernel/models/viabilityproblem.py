@@ -1,12 +1,12 @@
-from typing import Dict
+from typing import Dict, Union, Iterable
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Case, When, Value
 
 from .fields import EquationsField, InequationsField
 from .entity import EntityWithMetadata, EntityQuerySet
-from .symbol import Symbol
+from .symbol import Symbol, SymbolType
 
 
 class ViabilityProblemQuerySet(EntityQuerySet):
@@ -164,21 +164,41 @@ class ViabilityProblem(EntityWithMetadata):
     def dynamics_type(self):
         return self.dynamics.dynamics_type_name.capitalize()
 
+    def get_symbols(self, type: Union[SymbolType, Iterable[SymbolType]] = None):
+        qs = self.symbols.all()
+
+        # Filter with `type` parameter if it's a singleton
+        # WARNING isinstance(type, SymbolType) == isinstance(type, Iterable)
+        #         so we MUST check this FIRST
+        if isinstance(type, SymbolType):
+            qs = qs.filter(type=type)
+
+        # When looking for multiple symbol types, use order given by parameter
+        elif isinstance(type, Iterable):
+            types = list(type)
+            order = Case(*[
+                When(type=t, then=Value(i)) for i, t in enumerate(types)
+            ])
+            return qs.filter(type__in=types).order_by(order, 'order')
+
+        # And order by `type` and `order` columns
+        return qs.order_by('type', 'order')
+
     @property
     def state_variables(self):
-        return self.symbols.filter(type=Symbol.STATE)
+        return self.get_symbols(Symbol.STATE)
 
     @property
     def control_variables(self):
-        return self.symbols.filter(type=Symbol.CONTROL)
+        return self.get_symbols(Symbol.CONTROL)
 
     @property
     def dynamics_parameters(self):
-        return self.symbols.filter(type=Symbol.DYNAMICS)
+        return self.get_symbols(Symbol.DYNAMICS)
 
     @property
     def constraint_parameters(self):
-        return self.symbols.filter(type=Symbol.CONSTRAINT)
+        return self.get_symbols(Symbol.CONSTRAINT)
 
     @property
     def kernels(self):
