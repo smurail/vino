@@ -120,19 +120,19 @@ class Statements:
 
         return typed_statements
 
-    def _show(self, statement) -> str:
+    def _unparse(self, statement: StatementLiteral, show: bool = False) -> str:
         left, op, right = statement
         return ''.join((str(left), op, str(right)))
 
-    def show(self, index: Optional[int] = None) -> str:
+    def unparse(self, index: Optional[int] = None, show: bool = False) -> str:
         assert index is None or 0 <= index < len(self.statements)
         if index is not None:
-            return self._show(self.statements[index])
-        return ','.join(self._show(stmt) for stmt in self.statements)
+            return self._unparse(self.statements[index], show)
+        return ','.join(self._unparse(stmt, show) for stmt in self.statements)
 
     @property
     def showable_statements(self) -> List[str]:
-        return [self.show(i) for i in range(len(self.statements))]
+        return [self.unparse(i, show=True) for i in range(len(self.statements))]
 
     def __len__(self):
         return len(self.statements)
@@ -157,7 +157,7 @@ class Statements:
         return hash(str(self))
 
     def __str__(self):
-        return self.show()
+        return self.unparse()
 
     def __repr__(self):
         return 'Statements(%r)' % self.statements
@@ -199,10 +199,10 @@ class Equations(Statements):
 
         return statements
 
-    def _show(self, statement):
+    def _unparse(self, statement, show=False):
         left, op, right = statement
 
-        if left.dynamics_type == left.DISCRETE:
+        if show and left.dynamics_type == left.DISCRETE:
             left = left.variables[0] + '_{n+1}'
             right = self._variables.sub(r'\1_n', str(right))
         else:
