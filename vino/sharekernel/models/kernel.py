@@ -284,10 +284,26 @@ class BarGridKernel(Kernel):
             yield self.get_bar_lower(i, axis)
             yield self.get_bar_upper(i, axis)
 
-    def set_options(self, ppa: int, baraxis: int = 0, bounds: Iterable[Iterable[float]] = None):
-        assert ppa is None or ppa > 1
+    def set_options(self,
+            ppa: int,
+            baraxis: int = 0,
+            bounds: Iterable[Iterable[float]] = None,
+            origin: Iterable[float] = None,
+            opposite: Iterable[float] = None):
+
+        assert ppa > 1
         assert 0 <= baraxis < self.dimension
+
         self._ppa = ppa
+
+        if origin is not None or opposite is not None:
+            assert origin is not None and opposite is not None
+            origin, opposite = np.array(origin), np.array(opposite)
+            half_unit = (opposite - origin) / (2 * ppa)
+            bounds = np.column_stack((origin + half_unit, opposite - half_unit))
+
+        assert bounds is not None
+
         self._baraxis = baraxis
         self._bounds = np.array(bounds)
 
@@ -349,6 +365,52 @@ class BarGridKernel(Kernel):
         new_bar = pos + [lower, upper]
         self.bars.add(new_bar)
         self.size = len(self.bars)
+
+    def to_bargrid(self, ppa, debug=False):
+        grid = BarGridKernel(
+            owner=self.owner,
+            title=self.title,
+            description=self.description,
+            publication=self.publication,
+            author=self.author,
+            email=self.email,
+            url=self.url,
+            image=self.image,
+            params=self.params
+        )
+
+        extremum = self.bounds.transpose()
+        origin = extremum[0] - self.unit / 2
+        opposite = extremum[1] + self.unit / 2
+
+        grid.set_options(
+            ppa=ppa,
+            baraxis=self.baraxis,
+            origin=origin,
+            opposite=opposite
+        )
+
+        grid_min, grid_max = grid.bounds.transpose()
+        grid_space = [
+            np.linspace(grid_min[a], grid_max[a], grid.ppa[a])
+            for a in grid.pos_axes
+        ]
+        pu_2 = grid.pos_unit / 2
+        bu = grid.unit[grid.baraxis]
+
+        # Iterate over grid
+        for pos in product(*grid_space):
+            # Look for bars at current position
+            bars = list(self.bars.irange(tuple(pos - pu_2), tuple(pos + pu_2)))
+            # Snap found bars to the grid and add them to the new BarGrid
+            for bar in bars:
+                bar = np.round(np.array(bar) / bu) * bu
+                baraxis = [bar[-2] + bu/2, bar[-1] - bu/2]
+                if baraxis[0] < baraxis[1]:
+                    new_bar = list(pos) + baraxis
+                    grid.add_bar(new_bar)
+
+        return grid
 
 
 class KdTreeKernel(Kernel):
