@@ -4,8 +4,7 @@ from django.views.generic import TemplateView, ListView, DetailView
 from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
 
-from ..models import (Kernel, BarGridKernel, KdTreeKernel, ViabilityProblem,
-                      Software, DataFormat)
+from ..models import Kernel, ViabilityProblem, Software, DataFormat
 from .json import JsonDetailView
 
 
@@ -68,12 +67,11 @@ class KernelData(JsonDetailView):
         kernel = self.get_object()
 
         original_format = str(kernel.format)
-        if kernel.dimension == 2 and isinstance(kernel, KdTreeKernel):
-            ppa = self.kwargs.get('ppa')
-            if ppa is not None:
-                debug = False
-                bgk = kernel.to_bargrid(ppa=ppa, debug=debug)
-                assert isinstance(bgk, BarGridKernel)
+        ppa = self.kwargs.get('ppa')
+        if ppa is not None and ppa > 1:
+            debug = False
+            bgk = kernel.to_bargrid(ppa=ppa, debug=debug)
+            if bgk:
                 kernel = kernel if debug else bgk
 
         return {
