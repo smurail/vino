@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import mktemp
 from typing import List, Optional, Iterable, Tuple, Dict
 from sortedcontainers import SortedList  # type: ignore
-from itertools import chain
+from itertools import chain, product
 from operator import itemgetter
 
 from django.db import models
@@ -122,6 +122,10 @@ class Kernel(EntityWithMetadata):
         return len(self.variables)
 
     @property
+    def axes(self) -> Iterable[int]:
+        return range(self.dimension)
+
+    @property
     def rectangles(self) -> Optional[List[float]]:
         return None
 
@@ -152,6 +156,9 @@ class Kernel(EntityWithMetadata):
     def data_for_axis(self, axis: int) -> Iterable[float]:
         assert 0 <= axis < self.dimension
         return self.data[:, axis].tolist()
+
+    def to_bargrid(self, ppa: int, debug: bool = False) -> Optional['BarGridKernel']:
+        return None
 
     @classmethod
     def from_files(cls, *files, owner=None):
@@ -217,6 +224,18 @@ class BarGridKernel(Kernel):
 
     objects = KernelManager.create('BarGrid', FORMAT)()
 
+    @property
+    def pos_axes(self):
+        return (a for a in self.axes if a != self.baraxis)
+
+    @cached_property
+    def unit(self):
+        return np.array([self.get_axis_unit(a) for a in self.axes])
+
+    @cached_property
+    def pos_unit(self):
+        return np.array([self.get_axis_unit(a) for a in self.pos_axes])
+
     @cached_property
     def baraxis(self):
         return (
@@ -235,15 +254,15 @@ class BarGridKernel(Kernel):
     def bounds(self):
         if hasattr(self, '_bounds'):
             return self._bounds
-        defv = [.0 for _ in range(self.dimension)]
+        defv = [.0 for _ in self.axes]
         minv = self.metadata.get('MinimalValues', defv)
         maxv = self.metadata.get('MaximalValues', defv)
-        return tuple(
-            (np.array((minv[i], maxv[i])) for i in range(self.dimension))
+        return np.array(
+            [(minv[i], maxv[i]) for i in self.axes]
         )
 
     @cached_property
-    def axis_order(self) -> List[int]:
+    def bar_order(self) -> List[int]:
         return list(chain(
             range(0, self.baraxis),
             range(self.baraxis+2, self.dimension+1),
@@ -253,7 +272,7 @@ class BarGridKernel(Kernel):
     @cached_property
     def bars(self):
         return SortedList(
-            [tuple(datum[a] for a in self.axis_order) for datum in self.data],
+            [tuple(datum[a] for a in self.bar_order) for datum in self.data],
         )
 
     @property
@@ -267,12 +286,12 @@ class BarGridKernel(Kernel):
             yield self.get_bar_lower(i, axis)
             yield self.get_bar_upper(i, axis)
 
-    def set_options(self, ppa: int, baraxis: int = 0, bounds=None):
+    def set_options(self, ppa: int, baraxis: int = 0, bounds: Iterable[Iterable[float]] = None):
         assert ppa is None or ppa > 1
         assert 0 <= baraxis < self.dimension
         self._ppa = ppa
         self._baraxis = baraxis
-        self._bounds = bounds
+        self._bounds = np.array(bounds)
 
     def get_axis_length(self, axis: int) -> int:
         assert 0 <= axis < self.dimension
@@ -281,7 +300,7 @@ class BarGridKernel(Kernel):
 
     def get_axis_unit(self, axis: int, ppa: int = None):
         assert 0 <= axis < self.dimension
-        return self.get_axis_length(axis) / self.ppa[axis]
+        return self.get_axis_length(axis) / (self.ppa[axis]-1)
 
     def get_bar_lower(self, i: int, axis: int) -> float:
         assert 0 <= i < len(self.bars)
@@ -305,8 +324,7 @@ class BarGridKernel(Kernel):
         end = np.array([self.get_bar_upper(i, 0), self.get_bar_upper(i, 1)])
 
         # Compute half step of the grid for both dimensions
-        axes = range(self.dimension)
-        half_unit = np.fromiter((self.get_axis_unit(a) for a in axes), float) / 2
+        half_unit = np.fromiter((self.get_axis_unit(a) for a in self.axes), float) / 2
 
         # Compute coordinates for both opposite corners of each rect
         x0, y0 = start - half_unit
@@ -319,12 +337,13 @@ class BarGridKernel(Kernel):
 
         assert lower < upper
 
-        axes = range(self.dimension)
         unit = self.get_axis_unit(self.baraxis)
-        pos_unit = np.fromiter((self.get_axis_unit(a) for a in axes if a != self.baraxis), float)
         merge_bars = []
 
-        bars_at_pos = self.bars.irange((pos - pos_unit / 2).tolist(), (pos + pos_unit / 2).tolist())
+        bars_at_pos = self.bars.irange(
+            (pos - self.pos_unit / 2).tolist(),
+            (pos + self.pos_unit / 2).tolist()
+        )
         for cur_bar in bars_at_pos:
             cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
 
@@ -367,24 +386,24 @@ class KdTreeKernel(Kernel):
         assert 0 <= axis < self.dimension
         return self.data[i][self.dimension + axis*2 + 1]
 
-    def to_bargrid(self, ppa: int, debug: bool = False) -> BarGridKernel:
+    def to_bargrid(self, ppa, debug=False):
         assert ppa > 1
 
-        # Alias for state space dimension
-        dim = self.dimension
-        axes = range(dim)
         # Lower bounds for each axis
         minima = np.array([
             min(self.get_cell_lower(i, a) for i in range(self.size))
-            for a in axes
+            for a in self.axes
         ])
         # Upper bounds for each axis
         maxima = np.array([
             max(self.get_cell_upper(i, a) for i in range(self.size))
-            for a in axes
+            for a in self.axes
         ])
-        # Size
-        length = maxima - minima
+        # Bounds of the new bars points
+        unit = (maxima - minima) / ppa
+        origin = minima + unit / 2
+        opposite = maxima - unit / 2
+        bounds = np.column_stack((origin, opposite))
         # Brand new BarGridKernel
         bgk = BarGridKernel(
             owner=self.owner,
@@ -400,53 +419,61 @@ class KdTreeKernel(Kernel):
         bgk.set_options(
             ppa=ppa,
             baraxis=0,
-            bounds=tuple(np.array((minima[a], maxima[a])) for a in axes),
+            bounds=bounds
         )
-        # Grid unit vector
-        unit = length / bgk.ppa
 
         if debug:
             cells: Dict[Tuple[float, ...], int] = {}
 
         seen = set()
 
+        ba, pu = bgk.baraxis, bgk.pos_unit
+
+        # Iterate over cells
         for i in range(self.size):
 
-            lower_point = np.fromiter((self.get_cell_lower(i, a) for a in axes), float)
-            lower = minima + np.floor((lower_point - minima) / unit) * unit
+            lower_point = np.fromiter((self.get_cell_lower(i, a) for a in self.axes), float)
+            lower = origin + np.floor((lower_point - minima) / bgk.unit) * bgk.unit
 
-            upper_point = np.fromiter((self.get_cell_upper(i, a) for a in axes), float)
-            upper = minima + np.ceil((upper_point - minima) / unit) * unit
+            upper_point = np.fromiter((self.get_cell_upper(i, a) for a in self.axes), float)
+            upper = origin + np.floor((upper_point - minima) / bgk.unit) * bgk.unit
 
-            assert lower[bgk.baraxis] < upper[bgk.baraxis]
+            upper[ba] = np.minimum(upper[ba], opposite[ba])
 
-            if debug:
-                new_cell = tuple(lower) + sum(((lower[a], upper[a]) for a in axes), ())
-                if new_cell not in cells:
-                    cells[new_cell] = len(cells)
+            if lower[ba] >= upper[ba]:
+                continue
 
-            pos = np.delete(lower, bgk.baraxis)
-            pos_start = np.copy(pos)
-            pos_limit = np.delete(upper, bgk.baraxis)
-            pos_unit = np.delete(unit, bgk.baraxis)
+            pos_lower = np.delete(lower, ba)
+            pos_limit = np.delete(opposite, ba)
+            pos_upper = np.minimum(np.delete(upper, ba), pos_limit) + pu
+            pos_num = np.round((pos_upper - pos_lower) / pu).astype(int)
 
-            while np.all(np.round(pos/pos_unit) < np.round(pos_limit/pos_unit)):
-                bar = pos.tolist() + [lower[bgk.baraxis], upper[bgk.baraxis]]
+            if np.any(pos_lower > pos_upper):
+                continue
+
+            cell_spaces = [
+                np.linspace(pos_lower[i], pos_upper[i], num=pos_num[i], endpoint=False)
+                for i in range(len(pos_lower))
+            ]
+
+            for pos in product(*cell_spaces):
+                bar = list(pos) + [lower[ba], upper[ba]]
+
+                if debug:
+                    c0, c1 = np.array(pos), pos + pu
+                    c0 = np.insert(c0, ba, lower[ba])
+                    c1 = np.insert(c1, ba, upper[ba])
+                    new_cell = tuple(c0) + sum(((c0[a], c1[a]) for a in self.axes), ())
+                    if new_cell not in cells:
+                        cells[new_cell] = len(cells)
 
                 bar_id = tuple(bar)
                 if bar_id not in seen:
                     bgk.add_bar(bar)
                     seen.add(bar_id)
 
-                for k in range(len(pos)):
-                    if round(pos[k]/pos_unit[k]) < round(pos_limit[k]/pos_unit[k]):
-                        pos[k] += pos_unit[k]
-                        break
-                    else:
-                        pos[k] = pos_start[k]
-
         if debug:
-            sorted_cells = list(it[0] for it in sorted(cells.items(), key=itemgetter(1)))
+            sorted_cells = list(it[0] for it in sorted(cells.items(), key=itemgetter(bgk.baraxis)))
             for cell in sorted_cells:
                 print(cell)
             print('Cell count:', len(cells))
