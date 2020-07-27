@@ -224,24 +224,14 @@ class BarGridKernel(Kernel):
 
     objects = KernelManager.create('BarGrid', FORMAT)()
 
-    @property
-    def pos_axes(self):
-        return (a for a in self.axes if a != self.baraxis)
-
     @cached_property
-    def unit(self):
-        return np.array([self.get_axis_unit(a) for a in self.axes])
-
-    @cached_property
-    def pos_unit(self):
-        return np.array([self.get_axis_unit(a) for a in self.pos_axes])
-
-    @cached_property
-    def baraxis(self):
-        return (
-            self._baraxis if hasattr(self, '_baraxis') else
-            self.metadata.get('dataformat.baraxis', 0)
-        )
+    def bounds(self):
+        if hasattr(self, '_bounds'):
+            return self._bounds
+        defv = [.0 for _ in self.axes]
+        minv = np.array(self.metadata.get('MinimalValues', defv))
+        maxv = np.array(self.metadata.get('MaximalValues', defv))
+        return np.column_stack((minv, maxv))
 
     @cached_property
     def ppa(self):
@@ -251,15 +241,23 @@ class BarGridKernel(Kernel):
         return np.array([self._ppa] * self.dimension)
 
     @cached_property
-    def bounds(self):
-        if hasattr(self, '_bounds'):
-            return self._bounds
-        defv = [.0 for _ in self.axes]
-        minv = self.metadata.get('MinimalValues', defv)
-        maxv = self.metadata.get('MaximalValues', defv)
-        return np.array(
-            [(minv[i], maxv[i]) for i in self.axes]
+    def unit(self):
+        return (self.bounds[:, 1] - self.bounds[:, 0]) / (self.ppa - 1)
+
+    @cached_property
+    def baraxis(self):
+        return (
+            self._baraxis if hasattr(self, '_baraxis') else
+            self.metadata.get('dataformat.baraxis', 0)
         )
+
+    @property
+    def pos_axes(self):
+        return (a for a in self.axes if a != self.baraxis)
+
+    @cached_property
+    def pos_unit(self):
+        return np.delete(self.unit, self.baraxis)
 
     @cached_property
     def bar_order(self) -> List[int]:
@@ -293,15 +291,6 @@ class BarGridKernel(Kernel):
         self._baraxis = baraxis
         self._bounds = np.array(bounds)
 
-    def get_axis_length(self, axis: int) -> int:
-        assert 0 <= axis < self.dimension
-        lower, upper = self.bounds[axis]
-        return upper - lower
-
-    def get_axis_unit(self, axis: int, ppa: int = None):
-        assert 0 <= axis < self.dimension
-        return self.get_axis_length(axis) / (self.ppa[axis]-1)
-
     def get_bar_lower(self, i: int, axis: int) -> float:
         assert 0 <= i < len(self.bars)
         assert 0 <= axis < self.dimension
@@ -324,7 +313,7 @@ class BarGridKernel(Kernel):
         end = np.array([self.get_bar_upper(i, 0), self.get_bar_upper(i, 1)])
 
         # Compute half step of the grid for both dimensions
-        half_unit = np.fromiter((self.get_axis_unit(a) for a in self.axes), float) / 2
+        half_unit = self.unit / 2
 
         # Compute coordinates for both opposite corners of each rect
         x0, y0 = start - half_unit
@@ -337,7 +326,7 @@ class BarGridKernel(Kernel):
 
         assert lower < upper
 
-        unit = self.get_axis_unit(self.baraxis)
+        unit = self.unit[self.baraxis]
         merge_bars = []
 
         bars_at_pos = self.bars.irange(
