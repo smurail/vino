@@ -309,18 +309,15 @@ class BarGridKernel(Kernel):
             yield self.get_bar_lower(i, axis)
             yield self.get_bar_upper(i, axis)
 
-    def set_options(self,
-                    ppa: int,
-                    baraxis: int = 0,
-                    bounds: Optional[Iterable[Iterable[float]]] = None,
-                    origin: Optional[Iterable[float]] = None,
-                    opposite: Optional[Iterable[float]] = None):
+    def with_metrics(self,
+                     ppa: int,
+                     baraxis: int = 0,
+                     bounds: Optional[Iterable[Iterable[float]]] = None,
+                     origin: Optional[Iterable[float]] = None,
+                     opposite: Optional[Iterable[float]] = None):
 
         assert ppa > 1
         assert 0 <= baraxis < self.dimension
-
-        self._ppa = ppa
-        self._baraxis = baraxis
 
         if bounds is not None:
             bounds = np.array(list(bounds))
@@ -333,7 +330,11 @@ class BarGridKernel(Kernel):
             opposite = np.array(list(opposite))
             assert origin.shape == opposite.shape == (self.dimension,)
 
+        self._ppa = ppa
+        self._baraxis = baraxis
         self._grid_bounds = np.array([origin, opposite])
+
+        return self
 
     def get_bar_lower(self, i: int, axis: int) -> float:
         assert 0 <= i < len(self.bars)
@@ -405,9 +406,7 @@ class BarGridKernel(Kernel):
             url=self.url,
             image=self.image,
             params=self.params
-        )
-
-        grid.set_options(
+        ).with_metrics(
             ppa=ppa,
             baraxis=self.baraxis,
             bounds=self.bounds,
@@ -503,8 +502,7 @@ class KdTreeKernel(Kernel):
             url=self.url,
             image=self.image,
             params=self.params
-        )
-        bgk.set_options(
+        ).with_metrics(
             ppa=ppa,
             baraxis=0,
             origin=origin,
