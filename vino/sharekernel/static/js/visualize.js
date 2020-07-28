@@ -116,8 +116,7 @@ class Visualization extends EventDispatcher {
                     scrollZoom: true
                 }
             },
-            trace = plot.data[0],
-            update = {};
+            trace = plot.data[0];
 
         if (!threeDimensional && this.options.showShapes && data.rectangles) {
             plot.data.unshift({
@@ -139,13 +138,21 @@ class Visualization extends EventDispatcher {
             });
         }
 
+        for (var i in data.variables)
+            trace[AXES[i]] = data.variables[i].data;
+
         if (threeDimensional) {
+            // Setup axis titles
             plot.layout.scene = {
                 xaxis: { title: data.variables[0].name },
                 yaxis: { title: data.variables[1].name },
                 zaxis: { title: data.variables[2].name }
             }
+            // Keep camera view
+            if (sameVP && this.view._fullLayout)
+                plot.layout.scene.camera = this.view._fullLayout.scene._scene.getCamera();
         } else {
+            // Setup axis titles and 1:1 aspectratio
             plot.layout.xaxis = {
                 title: data.variables[0].fullname,
             };
@@ -154,29 +161,18 @@ class Visualization extends EventDispatcher {
                 scaleanchor: 'x',
                 scaleratio: 1
             };
-            plot.layout.dragmode = 'pan';
-        }
-
-        for (var i in data.variables) {
-            trace[AXES[i]] = data.variables[i].data;
-
-            // Keep pan and zoom
-            if (sameVP && this.view.layout && !threeDimensional) {
-                var axis = AXES[i] + 'axis';
-                update[axis+'.range[0]'] = this.view.layout[axis].range[0];
-                update[axis+'.range[1]'] = this.view.layout[axis].range[1];
+            // Keep pan, zoom and dragmode
+            if (sameVP && this.view.layout) {
+                plot.layout.xaxis.range = this.view.layout.xaxis.range;
+                plot.layout.yaxis.range = this.view.layout.yaxis.range;
+                plot.layout.dragmode = this.view.layout.dragmode;
+            } else {
+                plot.layout.dragmode = 'pan';
             }
-        }
-
-        if (sameVP && this.view.layout && threeDimensional) {
-            update['scene.camera'] = this.view._fullLayout.scene._scene.getCamera();
         }
 
         // See https://plotly.com/javascript/plotlyjs-function-reference/#plotlynewplot
         Plotly.react(this.view, plot);
-
-        if (update)
-            Plotly.relayout(this.view, update);
 
         this.dispatchCustomEvent('plotend');
     }
