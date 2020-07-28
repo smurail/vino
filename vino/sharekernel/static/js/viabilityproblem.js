@@ -1,13 +1,21 @@
-const HASH_PREFIX = '#kernel/';
+const HASH_ROUTE = /#kernel\/(\d+)(?:\/ppa\/(\d+))?\/?/,
+      HASH_ROUTE_URL = (id, ppa) => '#kernel/'+id+(ppa?'/ppa/'+ppa:'')+'/';
 
-function selectKernel(id) {
+function selectKernel(id, ppa=null) {
     if (!id) return;
+    var currentPPA = $('input[name=ppa]');
+    // Setup PPA if any
+    if ((ppa = parseInt(ppa))) {
+        currentPPA.val(ppa);
+    } else {
+        ppa = currentPPA.val();
+    }
     // Check the checkbox and triggers change event to visualize it
     $('#select-kernel-' + id)
         .prop('checked', true)
         .trigger('change');
     // Change URL hash
-    location.hash = HASH_PREFIX + id;
+    location.hash = HASH_ROUTE_URL(id, ppa);
 }
 
 $(function() {
@@ -16,7 +24,8 @@ $(function() {
         currentKernel = $('.vz-container *[name=kernel]'),
         visualizations = $('.vz-container'),
         doc = $('html, body'),
-        kernelId;
+        ppa = null,
+        args, kernelId;
 
     // If there is only one kernel, disable the checkbox
     if (kernels.length == 1) {
@@ -59,13 +68,21 @@ $(function() {
         selectKernel(currentKernel.val());
     });
 
+    // Update hash when user change PPA
+    visualizations[0].vz.addEventListener('load', (e) => {
+        location.hash = HASH_ROUTE_URL(
+            visualizations[0].vz.kernel.value,
+            visualizations[0].vz.ppa.value
+        );
+    });
+
     // Select and show kernel in hash or fallback to first
-    if (location.hash.startsWith(HASH_PREFIX)) {
-        kernelId = location.hash.substring(HASH_PREFIX.length);
+    if ((args = location.hash.match(HASH_ROUTE))) {
+        kernelId = args[1], ppa = args[2];
         if (doc.scrollTop() == 0)
             doc.scrollTop($('#kernels').offset().top);
     } else {
         kernelId = kernels.first().data('kernel-id');
     }
-    selectKernel(kernelId);
+    selectKernel(kernelId, ppa);
 });
