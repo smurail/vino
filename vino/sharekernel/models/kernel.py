@@ -260,6 +260,18 @@ class BarGridKernel(Kernel):
         return np.delete(self.unit, self.baraxis)
 
     @cached_property
+    def axis_order(self):
+        return list(chain(
+            range(0, self.baraxis),
+            range(self.baraxis+1, self.dimension),
+            (self.baraxis, self.baraxis)
+        ))
+
+    @cached_property
+    def bar_unit(self):
+        return np.array([self.unit[a] for a in self.axis_order])
+
+    @cached_property
     def bar_order(self) -> List[int]:
         return list(chain(
             range(0, self.baraxis),
@@ -404,7 +416,7 @@ class BarGridKernel(Kernel):
             bars = list(self.bars.irange(tuple(pos - pu_2), tuple(pos + pu_2)))
             # Snap found bars to the grid and add them to the new BarGrid
             for bar in bars:
-                bar = np.round(np.array(bar) / bu) * bu
+                bar = np.round(np.array(bar) / self.bar_unit) * self.bar_unit
                 baraxis = [bar[-2] + bu/2, bar[-1] - bu/2]
                 if baraxis[0] < baraxis[1]:
                     new_bar = list(pos) + baraxis
