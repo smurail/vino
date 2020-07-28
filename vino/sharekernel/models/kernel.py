@@ -420,7 +420,8 @@ class BarGridKernel(Kernel):
         ])
 
         # Half step in the new grid
-        pu_2 = grid.pos_unit / 2
+        old_pu_2 = grid.pos_unit / 2
+        new_pu_2 = self.pos_unit / 2
 
         # Grid step for bar dimension in old grid and new grid
         old_bu = self.unit[self.baraxis]
@@ -435,7 +436,10 @@ class BarGridKernel(Kernel):
         # Iterate over grid
         for pos in grid_positions:
             # Look for bars at current position
-            bars = list(self.bars.irange(tuple(pos - pu_2), tuple(pos + pu_2)))
+            bars = list(self.bars.irange(
+                tuple(pos - old_pu_2 - new_pu_2),
+                tuple(pos + old_pu_2 + new_pu_2)
+            ))
             # Snap found bars to the grid and add them to the new BarGrid
             for bar in bars:
                 bar_min = b_min + (np.floor(b_ppa * (bar[-2] - 0.5 * old_bu - b_min) / b_len) + 0.5) * new_bu
