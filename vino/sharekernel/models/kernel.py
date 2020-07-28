@@ -413,10 +413,11 @@ class BarGridKernel(Kernel):
             bounds=self.bounds,
         )
 
-        grid_space = [
+        # Every grid points (in dimension n-1)
+        grid_positions = product(*[
             np.linspace(grid.origin[a], grid.opposite[a], grid.ppa[a])
             for a in grid.pos_axes
-        ]
+        ])
 
         # Half step in the new grid
         pu_2 = grid.pos_unit / 2
@@ -425,14 +426,14 @@ class BarGridKernel(Kernel):
         old_bu = self.unit[self.baraxis]
         new_bu = grid.unit[grid.baraxis]
 
-        # PPA, lower point and upper point for bar dimension
+        # PPA, lowest grid point and upmost grid point for bar dimension
         b_ppa = grid.ppa[grid.baraxis]
         b_min = grid.bounds[0][grid.baraxis]
         b_max = grid.bounds[1][grid.baraxis]
         b_len = (b_max - b_min)
 
         # Iterate over grid
-        for pos in product(*grid_space):
+        for pos in grid_positions:
             # Look for bars at current position
             bars = list(self.bars.irange(tuple(pos - pu_2), tuple(pos + pu_2)))
             # Snap found bars to the grid and add them to the new BarGrid
