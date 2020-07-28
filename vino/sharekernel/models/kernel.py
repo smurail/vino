@@ -225,15 +225,6 @@ class BarGridKernel(Kernel):
     objects = KernelManager.create('BarGrid', FORMAT)()
 
     @cached_property
-    def bounds(self):
-        if hasattr(self, '_bounds'):
-            return self._bounds
-        defv = [.0 for _ in self.axes]
-        minv = np.array(self.metadata.get('MinimalValues', defv))
-        maxv = np.array(self.metadata.get('MaximalValues', defv))
-        return np.column_stack((minv, maxv))
-
-    @cached_property
     def ppa(self):
         if not hasattr(self, '_ppa'):
             point_size = self.metadata['PointSize']
@@ -241,8 +232,29 @@ class BarGridKernel(Kernel):
         return np.array([self._ppa] * self.dimension)
 
     @cached_property
+    def grid_bounds(self):
+        if hasattr(self, '_grid_bounds'):
+            return self._grid_bounds
+        grid_min = np.array(self.metadata.get('MinimalValues'))
+        grid_max = np.array(self.metadata.get('MaximalValues'))
+        return np.array([grid_min, grid_max])
+
+    @property
+    def origin(self):
+        return self.grid_bounds[0]
+
+    @property
+    def opposite(self):
+        return self.grid_bounds[1]
+
+    @cached_property
     def unit(self):
-        return (self.bounds[:, 1] - self.bounds[:, 0]) / (self.ppa - 1)
+        return (self.opposite - self.origin) / (self.ppa - 1)
+
+    @property
+    def bounds(self):
+        half_unit = self.unit / 2
+        return np.array([self.origin - half_unit, self.opposite + half_unit])
 
     @cached_property
     def baraxis(self):
@@ -297,27 +309,30 @@ class BarGridKernel(Kernel):
             yield self.get_bar_upper(i, axis)
 
     def set_options(self,
-            ppa: int,
-            baraxis: int = 0,
-            bounds: Iterable[Iterable[float]] = None,
-            origin: Iterable[float] = None,
-            opposite: Iterable[float] = None):
+                    ppa: int,
+                    baraxis: int = 0,
+                    bounds: Optional[Iterable[Iterable[float]]] = None,
+                    origin: Optional[Iterable[float]] = None,
+                    opposite: Optional[Iterable[float]] = None):
 
         assert ppa > 1
         assert 0 <= baraxis < self.dimension
 
         self._ppa = ppa
-
-        if origin is not None or opposite is not None:
-            assert origin is not None and opposite is not None
-            origin, opposite = np.array(origin), np.array(opposite)
-            half_unit = (opposite - origin) / (2 * ppa)
-            bounds = np.column_stack((origin + half_unit, opposite - half_unit))
-
-        assert bounds is not None
-
         self._baraxis = baraxis
-        self._bounds = np.array(bounds)
+
+        if bounds is not None:
+            bounds = np.array(list(bounds))
+            assert bounds.shape == (2, self.dimension)
+            half_unit = (bounds[1] - bounds[0]) / (2 * ppa)
+            origin, opposite = bounds[0] + half_unit, bounds[1] - half_unit
+        else:
+            assert origin is not None and opposite is not None
+            origin = np.array(list(origin))
+            opposite = np.array(list(opposite))
+            assert origin.shape == opposite.shape == (self.dimension,)
+
+        self._grid_bounds = np.array([origin, opposite])
 
     def get_bar_lower(self, i: int, axis: int) -> float:
         assert 0 <= i < len(self.bars)
@@ -391,26 +406,20 @@ class BarGridKernel(Kernel):
             params=self.params
         )
 
-        extremum = self.bounds.transpose()
-        origin = extremum[0] - self.unit / 2
-        opposite = extremum[1] + self.unit / 2
-
         grid.set_options(
             ppa=ppa,
             baraxis=self.baraxis,
-            origin=origin,
-            opposite=opposite
+            bounds=self.bounds,
         )
 
-        grid_min, grid_max = grid.bounds.transpose()
         grid_space = [
-            np.linspace(grid_min[a], grid_max[a], grid.ppa[a])
+            np.linspace(grid.origin[a], grid.opposite[a], grid.ppa[a])
             for a in grid.pos_axes
         ]
         pu_2 = grid.pos_unit / 2
         bu = grid.unit[grid.baraxis]
 
-        bar_origin = np.array([origin[a] for a in self.axis_order])
+        bar_origin = np.array([self.origin[a] for a in self.axis_order])
 
         # Iterate over grid
         for pos in product(*grid_space):
@@ -455,12 +464,12 @@ class KdTreeKernel(Kernel):
     def to_bargrid(self, ppa, debug=False):
         assert ppa > 1
 
-        # Lower bounds for each axis
+        # Lower bounds of new bars for each dimension
         minima = np.array([
             min(self.get_cell_lower(i, a) for i in range(self.size))
             for a in self.axes
         ])
-        # Upper bounds for each axis
+        # Upper bounds of new bars for each dimension
         maxima = np.array([
             max(self.get_cell_upper(i, a) for i in range(self.size))
             for a in self.axes
@@ -469,7 +478,6 @@ class KdTreeKernel(Kernel):
         unit = (maxima - minima) / ppa
         origin = minima + unit / 2
         opposite = maxima - unit / 2
-        bounds = np.column_stack((origin, opposite))
         # Brand new BarGridKernel
         bgk = BarGridKernel(
             owner=self.owner,
@@ -485,7 +493,8 @@ class KdTreeKernel(Kernel):
         bgk.set_options(
             ppa=ppa,
             baraxis=0,
-            bounds=bounds
+            origin=origin,
+            opposite=opposite,
         )
 
         if debug:
