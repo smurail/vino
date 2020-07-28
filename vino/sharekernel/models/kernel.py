@@ -381,7 +381,12 @@ class BarGridKernel(Kernel):
         for cur_bar in bars_at_pos:
             cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
 
-            if round(upper/unit) >= round(cur_lower/unit) and round(lower/unit) <= round(cur_upper/unit):
+            a, b = np.floor([
+                [lower/unit, upper/unit],
+                [cur_lower/unit, cur_upper/unit]
+            ])
+
+            if (a[1] >= b[0]+1 and a[0] <= b[1]+1) or (b[1] >= a[0]+1 and b[0] <= a[1]+1):
                 # our new bar intersects this bar, merge them
                 merge_bars.append(cur_bar)
                 lower = min(lower, cur_lower)
