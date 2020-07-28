@@ -410,13 +410,16 @@ class BarGridKernel(Kernel):
         pu_2 = grid.pos_unit / 2
         bu = grid.unit[grid.baraxis]
 
+        bar_origin = np.array([origin[a] for a in self.axis_order])
+
         # Iterate over grid
         for pos in product(*grid_space):
             # Look for bars at current position
             bars = list(self.bars.irange(tuple(pos - pu_2), tuple(pos + pu_2)))
             # Snap found bars to the grid and add them to the new BarGrid
             for bar in bars:
-                bar = np.round(np.array(bar) / self.bar_unit) * self.bar_unit
+                bar_ints = np.round((bar - bar_origin) / self.bar_unit)
+                bar = bar_origin + bar_ints * self.bar_unit
                 baraxis = [bar[-2] + bu/2, bar[-1] - bu/2]
                 if baraxis[0] < baraxis[1]:
                     new_bar = list(pos) + baraxis
