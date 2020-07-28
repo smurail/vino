@@ -15,6 +15,7 @@ $(function() {
         checkboxes = $('#kernels-table input[type=checkbox]'),
         currentKernel = $('.vz-container *[name=kernel]'),
         visualizations = $('.vz-container'),
+        doc = $('html, body'),
         kernelId;
 
     // If there is only one kernel, disable the checkbox
@@ -61,7 +62,8 @@ $(function() {
     // Select and show kernel in hash or fallback to first
     if (location.hash.startsWith(HASH_PREFIX)) {
         kernelId = location.hash.substring(HASH_PREFIX.length);
-        $('html, body').scrollTop($('#kernels').offset().top);
+        if (doc.scrollTop() == 0)
+            doc.scrollTop($('#kernels').offset().top);
     } else {
         kernelId = kernels.first().data('kernel-id');
     }
