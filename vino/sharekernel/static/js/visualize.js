@@ -2,6 +2,7 @@
 
 const ASYNC_DELAY = 50;
 const AXES = ['x', 'y', 'z'];
+const DEFAULT_PPA = 100;
 
 window.addEventListener('DOMContentLoaded', () => {
     $('.vz-container').each((_, element) => element.vz = new KernelVisualization(element));
@@ -230,7 +231,12 @@ class KernelVisualization extends Visualization {
         });
         this.kernel.addEventListener('change', e => this.load());
         this.showShapes.addEventListener('change', e => this.updateShapes());
-        this.showDistances.addEventListener('change', e => this.load());
+        this.showDistances.addEventListener('change', e => {
+            var ppa = parseInt(this.ppa.value);
+            if (!ppa || ppa < 1)
+                this.ppa.value = DEFAULT_PPA;
+            this.load()
+        });
         this.fullscreen.addEventListener('click', e => {
             var cls = 'vz-fullscreen',
                 isFullscreen = !document.body.classList.contains(cls),
@@ -262,7 +268,7 @@ class KernelVisualization extends Visualization {
 
     url(pk) {
         var distance = this.showDistances.checked ? 'distance/' : '',
-            ppa = this.ppa.value || distance ? (this.ppa.value || '100') + '/' : '';
+            ppa = this.ppa.value ? this.ppa.value + '/' : '';
         return URL_KERNEL_DATA(pk) + ppa + distance;
     }
 
