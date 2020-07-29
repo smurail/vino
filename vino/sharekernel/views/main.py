@@ -4,6 +4,8 @@ from django.views.generic import TemplateView, ListView, DetailView
 from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
 
+from vino.kernels.distance import Matrix, EucNorm
+
 from ..models import Kernel, ViabilityProblem, Software, DataFormat
 from .json import JsonDetailView
 
@@ -74,6 +76,15 @@ class KernelData(JsonDetailView):
             if bgk:
                 kernel = kernel if debug else bgk
 
+        distance = self.kwargs.get('distance')
+        if distance and ppa is not None:
+            borders = [True]*kernel.dimension
+            d = Matrix.initFromBarGridKernel(kernel)
+            d.distance(EucNorm(), borders, borders)
+            distances = d.toData(kernel)
+        else:
+            distances = None
+
         return {
             'vp': kernel.vp.id,
             'format': str(kernel.format),
@@ -82,9 +93,10 @@ class KernelData(JsonDetailView):
                 {
                     'name': v.name,
                     'fullname': v.fullname,
-                    'data': list(kernel.data_for_axis(i)),
+                    'data': list(kernel.data_for_axis(i)) if distances is None else list(distances[:, i]),
                 }
                 for i, v in enumerate(kernel.variables)
             ],
             'rectangles': kernel.rectangles,
+            'distances': None if distances is None else list(distances[:, -1])
         }

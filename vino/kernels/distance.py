@@ -1,6 +1,6 @@
 import numpy as np
 
-from .bargridkernel import BarGridKernel
+from vino.sharekernel.models import BarGridKernel
 
 
 class Line(object):
@@ -225,7 +225,7 @@ class EucNorm(object):
 
 class Matrix(object):
     def __init__(self, dimensions = [], data = []):
-        self.dimensions = map(lambda e: int(e), dimensions)
+        self.dimensions = list(int(e) for e in dimensions)
         self.data = data
         self.maximum = max(data)
 
@@ -236,8 +236,7 @@ class Matrix(object):
         and to +infty otherwise.
         '''
         newmatrix = None
-        dimensions = list(bargrid.intervalNumberperaxis)
-        dimensions = map(lambda e: e+1, dimensions)
+        dimensions = list(bargrid.ppa)
         maxdim = int(max(dimensions))
         nbdim = len(dimensions)
 #        print dimensions
@@ -252,7 +251,7 @@ class Matrix(object):
         for i in range(1,nbdim):
             spacesizes[nbdim-1-i] = spacesizes[nbdim-i]*dimensions[nbdim-i]
 #        print spacesizes
-        for bar in bargrid.bars:
+        for bar in bargrid.integer_bars:
             position = 0
             for i in range(nbdim-1):
                 position = position + spacesizes[i]*bar[i]
@@ -262,8 +261,7 @@ class Matrix(object):
         return newmatrix
 
     def boundsAreInDefDom(self,direction,positions,bargrid,stateabbrevs,eqs):
-        dimensions = list(bargrid.intervalNumberperaxis)
-        dimensions = map(lambda e: e+1, dimensions)
+        dimensions = list(bargrid.ppa)
         nbdim = len(dimensions)
         spacesizes = [1]*nbdim
 #        print newmatrix.dimensions
@@ -286,8 +284,8 @@ class Matrix(object):
 #                print self.data[positions[0]]
 #               print point
 
-                pas =  (bargrid.oppositeCoords - bargrid.originCoords)/bargrid.intervalNumberperaxis
-                realpoint = bargrid.originCoords+np.dot(np.transpose(bargrid.permutation),np.array(point,float))*pas
+                pas =  (bargrid.opposite - bargrid.origin)/(bargrid.ppa - 1)
+                realpoint = bargrid.origin+np.dot(np.transpose(bargrid.permutation),np.array(point,float))*pas
                 b = True
                 for con in eqs:
 #                print con
@@ -313,8 +311,8 @@ class Matrix(object):
                     point.append(icurrent//spacesizes[j])
                     icurrent = icurrent % spacesizes[j]
                 point[direction-1] = point[direction-1]+1
-                pas =  (bargrid.oppositeCoords - bargrid.originCoords)/bargrid.intervalNumberperaxis
-                realpoint = bargrid.originCoords+np.dot(np.transpose(bargrid.permutation),np.array(point,float))*pas
+                pas =  (bargrid.opposite - bargrid.origin)/(bargrid.ppa - 1)
+                realpoint = bargrid.origin+np.dot(np.transpose(bargrid.permutation),np.array(point,float))*pas
                 b = True
                 for con in eqs:
 #                print con
@@ -341,8 +339,7 @@ class Matrix(object):
         and to +infty otherwise.
         '''
         newmatrix = None
-        dimensions = list(bargrid.intervalNumberperaxis)
-        dimensions = map(lambda e: e+1, dimensions)
+        dimensions = list(bargrid.ppa)
         maxdim = int(max(dimensions))
         nbdim = len(dimensions)
 #        print dimensions
@@ -358,14 +355,14 @@ class Matrix(object):
         for i in range(1,nbdim):
             spacesizes[nbdim-1-i] = spacesizes[nbdim-i]*dimensions[nbdim-i]
 #        print spacesizes
-        for bar in bargrid.bars:
+        for bar in bargrid.integer_bars:
             position = 0
             for i in range(nbdim-1):
                 position = position + spacesizes[i]*bar[i]
             for i in range(int(bar[-2]),int(bar[-1]+1)):
                 newmatrix.data[int(position) + i] = maxdim
         newmatrix.maximum = max(newmatrix.data)
-        pas =  (bargrid.oppositeCoords - bargrid.originCoords)/bargrid.intervalNumberperaxis
+        pas =  (bargrid.opposite - bargrid.origin)/(bargrid.ppa - 1)
         for i in range(total):
             if newmatrix.data[i] == 0:
                 icurrent = i
@@ -373,7 +370,7 @@ class Matrix(object):
                 for j in range(nbdim):
                     point.append(icurrent//spacesizes[j])
                     icurrent = icurrent % spacesizes[j]
-                realpoint = bargrid.originCoords+np.dot(np.transpose(bargrid.permutation),np.array(point,float))*pas
+                realpoint = bargrid.origin+np.dot(np.transpose(bargrid.permutation),np.array(point,float))*pas
                 for con in eqs:
 #                print con
 #                print statetrajectories[0]
@@ -389,7 +386,6 @@ class Matrix(object):
                         newmatrix.data[i] = -1
                         break
         return newmatrix
-
 
     def toDataPointDistance(self):
         '''
@@ -413,6 +409,13 @@ class Matrix(object):
                 else :
                     point[nbdim-1-i] = 0
         return data
+
+    def toData(self, bargrid):
+        data = []
+        for d in self.toDataPointDistance():
+            d[:-1] = bargrid.origin + np.dot(bargrid.permutation, np.array(d[:-1])) * bargrid.unit
+            data.append(d)
+        return np.array(data)
 
     def toDataPointSectionDistance(self):
         '''
@@ -498,7 +501,7 @@ class Matrix(object):
                     self.writeFromLine(line,positions)
 #                    print line.data
 #                    print positions
-                    positions = map(lambda e: e+1, positions)
+                    positions = [p+1 for p in positions]
 
             else:
 #            elif toto == 1:
@@ -514,8 +517,8 @@ class Matrix(object):
                         arethey = self.boundsAreInDefDom(direction,positions,bargrid,stateabbrevs,eqs)
                         line.updateWithDefDom(norm,arethey)
                         self.writeFromLine(line,positions)
-                        positions = map(lambda e: e+1, positions)
-                    positions = map(lambda e: e-spacesize+spacesizeup, positions)
+                        positions = [p+1 for p in positions]
+                    positions = [p-espacesize+spacesizeup for p in positions]
             self.maximum = max(self.data)
 
     def distance(self,norm,lowborders,upborders):
@@ -536,11 +539,11 @@ class Matrix(object):
                     self.writeFromLine(line,positions)
 #                    print line.data
 #                    print positions
-                    positions = map(lambda e: e+1, positions)
+                    positions = [p+1 for p in positions]
 
             else :
                 spacesizeup = self.spaceSize(direction-1)
-                for i in range(self.totalpointNumber()/spacesizeup):
+                for i in range(self.totalpointNumber()//spacesizeup):
 #                    print i
                     for j in range(spacesize):
                         line.getLineFromMatrix(self,positions)
@@ -549,8 +552,8 @@ class Matrix(object):
 #                        print line.data
                         line.update(norm,lowborders[direction - 1],upborders[direction - 1])
                         self.writeFromLine(line,positions)
-                        positions = map(lambda e: e+1, positions)
-                    positions = map(lambda e: e-spacesize+spacesizeup, positions)
+                        positions = [p+1 for p in positions]
+                    positions = [p-spacesize+spacesizeup for p in positions]
             self.maximum = max(self.data)
 
     def histogramFromBarGrid(self,bargrid,barnum,maxdistance):
@@ -570,7 +573,7 @@ class Matrix(object):
             spacesizes = [1]*nbdim
             for i in range(1,nbdim):
                 spacesizes[nbdim-1-i] = spacesizes[nbdim-i]*self.dimensions[nbdim-i]
-            for bar in bargrid.bars:
+            for bar in bargrid.integer_bars:
                 position = 0
                 for i in range(nbdim-1):
                     position = position + spacesizes[i]*bar[i]

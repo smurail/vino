@@ -280,6 +280,14 @@ class BarGridKernel(Kernel):
             (self.baraxis, self.baraxis)
         ))
 
+    @property
+    def permutation(self):
+        order = self.axis_order[:-1]
+        permutation = np.zeros((len(order), len(order)))
+        for i, a in enumerate(order):
+            permutation[i, a] = 1
+        return permutation
+
     @cached_property
     def bar_unit(self):
         return np.array([self.unit[a] for a in self.axis_order])
@@ -297,6 +305,13 @@ class BarGridKernel(Kernel):
         return SortedList(
             [tuple(datum[a] for a in self.bar_order) for datum in self.data],
         )
+
+    @property
+    def integer_bars(self):
+        bar_origin = np.array([self.origin[a] for a in self.axis_order])
+        for bar in self.bars:
+            int_bar = np.floor((bar - bar_origin) / self.bar_unit + 0.5)
+            yield int_bar.astype(int)
 
     @property
     def rectangles(self):
@@ -449,8 +464,11 @@ class BarGridKernel(Kernel):
             ))
             # Snap found bars to the grid and add them to the new BarGrid
             for bar in bars:
+                #bar_pos = pos_min + (np.floor((np.array(bar[:-2]) - pos_min) / new_pu) + 0.5) * new_pu
                 bar_min = b_min + (np.floor(b_ppa * (bar[-2] - 0.5 * old_bu - b_min) / b_len) + 0.5) * new_bu
                 bar_max = b_min + (np.floor(b_ppa * (bar[-1] + 0.5 * old_bu - b_min) / b_len) + 0.5) * new_bu
+                #bar_min = b_min + (np.floor((bar[-2] - b_min) / new_bu) + 0.5) * new_bu
+                #bar_max = b_min + (np.floor((bar[-1] - b_min) / new_bu) + 0.5) * new_bu
 
                 if bar_min < bar_max:
                     grid.add_bar(tuple(pos) + (bar_min, bar_max))

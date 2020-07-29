@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, re_path, include
 from django.conf import settings
 from django.views.generic import TemplateView
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path('about', TemplateView.as_view(template_name='sharekernel/about.html'), name='about'),
     path('kernel/<int:pk>/data/', KernelData.as_view(), name='kernel_data'),
     path('kernel/<int:pk>/data/<int:ppa>/', KernelData.as_view()),
+    path('kernel/<int:pk>/data/<int:ppa>/distance/', KernelData.as_view(), {'distance': True}),
 ]
 
 

@@ -142,6 +142,11 @@ class Visualization extends EventDispatcher {
         for (var i in data.variables)
             trace[AXES[i]] = data.variables[i].data;
 
+        if (data.distances) {
+            trace.marker.size = 4;
+            trace.marker.color = data.distances;
+        }
+
         if (threeDimensional) {
             // Setup axis titles
             plot.layout.scene = {
@@ -199,18 +204,22 @@ class KernelVisualization extends Visualization {
         this.ppa = this.form.elements['ppa'];
         this.reload = this.form.querySelector('button') || {};
         this.showShapes = document.getElementById('show-shapes-' + this.id);
+        this.showDistances = document.getElementById('show-distances-' + this.id);
         this.fullscreen = document.getElementById('fullscreen-' + this.id);
 
         this.options.showShapes = this.showShapes.checked;
+        this.options.showDistances = this.showDistances.checked;
 
         this.addEventListener('load', e => {
-            this.kernel.disabled = this.reload.disabled = this.ppa.disabled = this.showShapes.disabled = true;
+            this.kernel.disabled = this.reload.disabled = this.ppa.disabled =
+                this.showShapes.disabled = this.showDistances.disabled = true;
         });
         this.addEventListener('plotend', e => {
-            this.kernel.disabled = this.reload.disabled = this.ppa.disabled = this.showShapes.disabled = false;
+            this.kernel.disabled = this.reload.disabled = this.ppa.disabled =
+                this.showShapes.disabled = this.showDistances.disabled = false;
             if (this.data) {
                 if (this.data.variables.length > 2)
-                    this.showShapes.disabled = true;
+                    this.showShapes.disabled = this.showDistances.disabled = true;
             }
             if (this.ppa.disabled)
                 this.ppa.value = null;
@@ -221,6 +230,7 @@ class KernelVisualization extends Visualization {
         });
         this.kernel.addEventListener('change', e => this.load());
         this.showShapes.addEventListener('change', e => this.updateShapes());
+        this.showDistances.addEventListener('change', e => this.load());
         this.fullscreen.addEventListener('click', e => {
             var cls = 'vz-fullscreen',
                 isFullscreen = !document.body.classList.contains(cls),
@@ -251,8 +261,9 @@ class KernelVisualization extends Visualization {
     }
 
     url(pk) {
-        var ppa = this.ppa.value ? this.ppa.value + '/' : ''
-        return URL_KERNEL_DATA(pk) + ppa;
+        var distance = this.showDistances.checked ? 'distance/' : '',
+            ppa = this.ppa.value || distance ? (this.ppa.value || '100') + '/' : '';
+        return URL_KERNEL_DATA(pk) + ppa + distance;
     }
 
     load() {

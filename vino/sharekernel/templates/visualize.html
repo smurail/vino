@@ -21,17 +21,24 @@
                 {% else %}
                 <input type="hidden" name="kernel" value="">
                 {% endif %}
-                <div class="form-group mr-2" title="Points per axis">
+                <div class="form-group mr-3" title="Points per axis">
                     <label for="ppa-{{ id }}">
                         <i class="fas fa-ruler"></i>
                     </label>
                     <input id="ppa-{{ id }}" name="ppa" type="number" size="5"
                         placeholder="PPA" class="form-control form-control-sm ml-2">
                 </div>
-                <div class="custom-control custom-checkbox" title="Show rectangles">
+                <div class="custom-control custom-checkbox mr-3" title="Show rectangles">
                     <input id="show-shapes-{{ id }}" type="checkbox" class="custom-control-input" checked>
                     <label class="custom-control-label" for="show-shapes-{{ id }}">
                         <i class="fas fa-object-ungroup"></i>
+                        &nbsp;<!-- This non-breaking space fixes vertical align -->
+                    </label>
+                </div>
+                <div class="custom-control custom-checkbox mr-3" title="Show distances">
+                    <input id="show-distances-{{ id }}" type="checkbox" class="custom-control-input">
+                    <label class="custom-control-label" for="show-distances-{{ id }}">
+                        <i class="fas fa-drafting-compass"></i>
                         &nbsp;<!-- This non-breaking space fixes vertical align -->
                     </label>
                 </div>
