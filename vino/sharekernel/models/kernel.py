@@ -366,22 +366,22 @@ class BarGridKernel(Kernel):
 
         return (x0, x1, y0, y1)
 
-    def add_bar(self, bar: Tuple[float]):
+    def add_bar(self, bar: Tuple[float], hack=False):
         pos, lower, upper = bar[:-2], bar[-2], bar[-1]
 
         assert lower < upper
 
         unit = self.unit[self.baraxis]
+        pu = self.pos_unit
         merge_bars = []
 
-        bars_at_pos = self.bars.irange(
-            tuple(pos - self.pos_unit / 2),
-            tuple(pos + self.pos_unit / 2)
-        )
+        start, end = (pos - pu/2, pos + pu/2) if hack else (pos, pos + pu)
+        bars_at_pos = self.bars.irange(tuple(start), tuple(end))
 
         for cur_bar in bars_at_pos:
             cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
 
+            # XXX Is np.floor really better than np.round for this?
             a, b = np.floor([
                 [lower/unit, upper/unit],
                 [cur_lower/unit, cur_upper/unit]
@@ -425,8 +425,8 @@ class BarGridKernel(Kernel):
         ])
 
         # Half step in the new grid
-        old_pu_2 = grid.pos_unit / 2
-        new_pu_2 = self.pos_unit / 2
+        old_pu = self.pos_unit
+        new_pu = grid.pos_unit
 
         # Grid step for bar dimension in old grid and new grid
         old_bu = self.unit[self.baraxis]
@@ -436,14 +436,16 @@ class BarGridKernel(Kernel):
         b_ppa = grid.ppa[grid.baraxis]
         b_min = grid.bounds[0][grid.baraxis]
         b_max = grid.bounds[1][grid.baraxis]
-        b_len = (b_max - b_min)
+        b_len = b_max - b_min
+
+        pos_min = np.array([grid.bounds[0][a] for a in grid.pos_axes])
 
         # Iterate over grid
         for pos in grid_positions:
             # Look for bars at current position
             bars = list(self.bars.irange(
-                tuple(pos - old_pu_2 - new_pu_2),
-                tuple(pos + old_pu_2 + new_pu_2)
+                tuple(pos - old_pu/2 - new_pu/2),
+                tuple(pos + old_pu/2 + new_pu/2)
             ))
             # Snap found bars to the grid and add them to the new BarGrid
             for bar in bars:
@@ -452,6 +454,8 @@ class BarGridKernel(Kernel):
 
                 if bar_min < bar_max:
                     grid.add_bar(tuple(pos) + (bar_min, bar_max))
+
+        print('Bar count:', grid.size)
 
         return grid
 
@@ -562,7 +566,7 @@ class KdTreeKernel(Kernel):
 
                 bar_id = tuple(bar)
                 if bar_id not in seen:
-                    bgk.add_bar(bar)
+                    bgk.add_bar(bar, hack=True)
                     seen.add(bar_id)
 
         if debug:
