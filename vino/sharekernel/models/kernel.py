@@ -366,7 +366,7 @@ class BarGridKernel(Kernel):
 
         return (x0, x1, y0, y1)
 
-    def add_bar(self, bar: List[float]):
+    def add_bar(self, bar: Tuple[float]):
         pos, lower, upper = bar[:-2], bar[-2], bar[-1]
 
         assert lower < upper
@@ -375,9 +375,10 @@ class BarGridKernel(Kernel):
         merge_bars = []
 
         bars_at_pos = self.bars.irange(
-            (pos - self.pos_unit / 2).tolist(),
-            (pos + self.pos_unit / 2).tolist()
+            tuple(pos - self.pos_unit / 2),
+            tuple(pos + self.pos_unit / 2)
         )
+
         for cur_bar in bars_at_pos:
             cur_lower, cur_upper = cur_bar[-2], cur_bar[-1]
 
@@ -396,7 +397,7 @@ class BarGridKernel(Kernel):
             self.bars.remove(bar)
 
         # Insert the new bar
-        new_bar = pos + [lower, upper]
+        new_bar = pos + (lower, upper)
         self.bars.add(new_bar)
         self.size = len(self.bars)
 
@@ -450,7 +451,7 @@ class BarGridKernel(Kernel):
                 bar_max = b_min + (np.floor(b_ppa * (bar[-1] + 0.5 * old_bu - b_min) / b_len) + 0.5) * new_bu
 
                 if bar_min < bar_max:
-                    grid.add_bar(list(pos) + [bar_min, bar_max])
+                    grid.add_bar(tuple(pos) + (bar_min, bar_max))
 
         return grid
 
@@ -549,7 +550,7 @@ class KdTreeKernel(Kernel):
             ]
 
             for pos in product(*cell_spaces):
-                bar = list(pos) + [lower[ba], upper[ba]]
+                bar = tuple(pos) + (lower[ba], upper[ba])
 
                 if debug:
                     c0, c1 = np.array(pos), pos + pu
