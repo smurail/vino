@@ -59,7 +59,7 @@
                 <thead>
                     <tr>
                         <th scope="col">ViNO title</th>
-                        <th scope="col">Related Viability Problem</th>
+                        <th scope="col">Viability Problem</th>
                         <th scope="col">Publication date</th>
                         <th scope="col">Published by</th>
                         <th scope="col">Software</th>
@@ -76,7 +76,7 @@
                         <td>
                             <a href="{% url 'viabilityproblem' k.vp.pk %}">{{ k.vp.title }}</a>
                         </td>
-                        <td>{{ k.date_created }}</td>
+                        <td>{{ k.date_created|date:"DATE_FORMAT" }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
                         <td>
                             <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="software:{{ k.software.pk }}">
