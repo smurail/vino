@@ -8,7 +8,7 @@
                     <div class="input-group mx-2">
                         <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm">
                             {% for k in kernels %}
-                            <option value="{{ k.pk }}">{{ k.title }}</option>
+                            <option value="{{ k.pk }}">{{ k.title }} ({{ k.size_with_unit }})</option>
                             {% endfor %}
                         </select>
                         <div class="input-group-append">
