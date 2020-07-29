@@ -133,7 +133,8 @@ class Visualization extends EventDispatcher {
                 ]),
                 line: {
                     width: 1,
-                    color: '#afeeee' // pale turquoise
+                    // See https://encycolorpedia.fr/afeeee
+                    color: '#80d0d0'
                 }
             });
         }
