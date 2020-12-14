@@ -82,8 +82,8 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            if key in Metadata.FIELDS:
-                parsed = Metadata.FIELDS[key].parse(value)
+            if Metadata.has_field(key):
+                parsed = Metadata.parse_field(key, value)
                 if parsed is not None:
                     yield Datum(datum.section, (key, parsed))
         else:
@@ -210,8 +210,8 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
         for datum in data:
             if datum.section == Datum.META:
                 key, value = datum.data
-                if key in Metadata.FIELDS:
-                    unparse = Metadata.FIELDS[key].unparse
+                if Metadata.has_field(key):
+                    unparse = Metadata.unparse_field(key, value)
                     out.write(f'#{key}: {unparse(value)}\n')
 
             elif datum.section == Datum.DATA:

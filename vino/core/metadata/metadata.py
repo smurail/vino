@@ -5,8 +5,24 @@ from .fields import (
 )
 
 
-class Metadata(dict):
-    FIELDS: Dict[str, Field] = {
+class BaseMetadata(dict):
+    FIELDS: Dict[str, Field] = {}
+
+    @classmethod
+    def has_field(cls, field):
+        return field in cls.FIELDS
+
+    @classmethod
+    def parse_field(cls, field, value):
+        return cls.FIELDS[field].parse(value)
+
+    @classmethod
+    def unparse_field(cls, field, value):
+        return cls.FIELDS[field].unparse(value)
+
+
+class Metadata(BaseMetadata):
+    FIELDS = {
         'MinimalValues': TupleField(float, sep=' '),
         'MaximalValues': TupleField(float, sep=' '),
         'PointNumberPerAxis': TupleField(int),
