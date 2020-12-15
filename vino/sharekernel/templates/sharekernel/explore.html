@@ -32,7 +32,7 @@
                     <tr class="table-secondary">
                         <td>
                             <span class="icn"><i class="fas fa-flask" title="Viability Problem"></i></span>
-                            <a href="{% url 'viabilityproblem' vp.pk %}">{{ vp.title }}</a>
+                            <a href="{% url 'viabilityproblem' vp.pk %}">{{ vp.title }} ({{ vp.state_dimension }}D)</a>
                         </td>
                         <td>{{ vp.date_created }}</td>
                         <td>{{ vp.owner.get_full_name }}</td>

@@ -46,7 +46,7 @@ class HomeView(ModalMixin, TemplateView):
 
 class ExploreView(ModalMixin, ListView):
     context_object_name = 'viabilityproblems'
-    queryset = ViabilityProblem.objects.active().last_updated()  # type: ignore
+    queryset = ViabilityProblem.objects.active().with_dimensions().last_updated()  # type: ignore
     template_name = 'sharekernel/explore.html'
 
 
