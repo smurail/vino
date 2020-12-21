@@ -49,4 +49,3 @@ class Field(metaclass=FieldMeta):
     @abstractmethod
     def do_unparse(self, value: Any) -> str:
         raise NotImplementedError
-

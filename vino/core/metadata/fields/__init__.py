@@ -6,6 +6,6 @@ from .types import (
 
 
 __all__ = [
-    'TupleField', 'LiteralField', 'DateTimeField', 'BuiltinTypeField',
-    'IntegerField'
+    'Field', 'TupleField', 'LiteralField', 'DateTimeField', 'BuiltinTypeField',
+    'IntegerField', 'StringField',
 ]
