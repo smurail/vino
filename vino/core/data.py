@@ -211,8 +211,8 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
             if datum.section == Datum.META:
                 key, value = datum.data
                 if Metadata.has_field(key):
-                    unparse = Metadata.unparse_field(key, value)
-                    out.write(f'#{key}: {unparse(value)}\n')
+                    unparsed = Metadata.unparse_field(key, value)
+                    out.write(f'#{key}: {unparsed}\n')
 
             elif datum.section == Datum.DATA:
                 if not writer:
