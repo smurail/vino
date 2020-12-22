@@ -26,6 +26,9 @@ class Datum:
         object.__setattr__(self, 'data', tuple(data))
 
 
+DataFlow = Iterable[Datum]
+
+
 SPACES = re.compile(r' +')
 TOKENS = {
     'BLANK_LINE':     re.compile(r'^\s*$'),
@@ -36,7 +39,7 @@ TOKENS = {
 }
 
 
-def parse_lines(inp: Iterable[str]) -> Iterable[Datum]:
+def parse_lines(inp: Iterable[str]) -> DataFlow:
     section = Datum.META
     csv_reader = None
 
@@ -78,7 +81,7 @@ def parse_lines(inp: Iterable[str]) -> Iterable[Datum]:
             yield Datum(section, typed_values)
 
 
-def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
+def parse_metadata(data: DataFlow) -> DataFlow:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
@@ -90,7 +93,7 @@ def parse_metadata(data: Iterable[Datum]) -> Iterable[Datum]:
             yield datum
 
 
-def feed_metadata(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+def feed_metadata(data: DataFlow, metadata: Metadata) -> DataFlow:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
@@ -98,7 +101,7 @@ def feed_metadata(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
         yield datum
 
 
-def to_vectors(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+def to_vectors(data: DataFlow, metadata: Metadata) -> DataFlow:
     columns: Tuple[Any, ...] = ()
 
     for datum in data:
@@ -127,7 +130,7 @@ def to_vectors(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
             yield datum
 
 
-def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+def normalize_data(data: DataFlow, metadata: Metadata) -> DataFlow:
     permut_cols = None
     column_indices: List[int] = []
     resampling_params: List[Tuple[float, float, int]] = []
@@ -187,7 +190,7 @@ def normalize_data(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]
             yield datum
 
 
-def to_dicts(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
+def to_dicts(data: DataFlow, metadata: Metadata) -> DataFlow:
     yielded_metadata = False
 
     for datum in data:
@@ -203,7 +206,7 @@ def to_dicts(data: Iterable[Datum], metadata: Metadata) -> Iterable[Datum]:
             yield Datum(datum.section, values)
 
 
-def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterable[Datum]:
+def write_csv(data: DataFlow, target: str, metadata: Metadata) -> DataFlow:
     with open(target, 'a', newline='\r\n') as out:
         writer = None
 
@@ -225,7 +228,7 @@ def write_csv(data: Iterable[Datum], target: str, metadata: Metadata) -> Iterabl
             yield datum
 
 
-def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[Metadata] = None) -> DataFlow:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata()
     pipeline = compose(
         parse_lines,
@@ -257,7 +260,7 @@ def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Option
     return size
 
 
-def iter_datafile(filepath: str, metadata: Optional[Metadata] = None) -> Iterable[Datum]:
+def iter_datafile(filepath: str, metadata: Optional[Metadata] = None) -> DataFlow:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata()
     pipeline = compose(
         parse_lines,
