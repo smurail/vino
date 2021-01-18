@@ -80,6 +80,7 @@ class Kernel(EntityWithMetadata):
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
     DATA_UNIT = '-'
 
+    DATAFILE_PATH = 'kernels/%Y/%m/%d'
     FORMAT: Optional[str] = None
 
     objects = KernelManager()
@@ -89,7 +90,7 @@ class Kernel(EntityWithMetadata):
                                verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
-    datafile = models.FileField(upload_to='kernels/%Y/%m/%d', verbose_name="Data file")
+    datafile = models.FileField(upload_to=DATAFILE_PATH, verbose_name="Data file")
     sourcefiles = models.ManyToManyField(SourceFile, verbose_name="Source files")
     size = models.IntegerField(default=0)
 
@@ -179,7 +180,7 @@ class Kernel(EntityWithMetadata):
         fields = ('viabilityproblem.title', 'results.title')
         parts = (slugify(metadata.get(x)) for x in fields)
         filename = '_'.join(parts) + '.csv'
-        datafile = Path(cls.datafile.field.upload_to) / filename
+        datafile = Path(cls.DATAFILE_PATH) / filename
 
         # Store datafile and remove temporary file
         datafile = store_one_file(datafile, tmpfile.open())

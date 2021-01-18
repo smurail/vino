@@ -8,11 +8,13 @@ from ..utils import store_files, sorted_by_size
 
 
 class SourceFile(Entity):
-    file = models.FilePathField(path='import/%Y/%m/%d', verbose_name="Source file")
+    FILE_PATH = 'import/%Y/%m/%d'
+
+    file = models.FilePathField(path=FILE_PATH, verbose_name="Source file")
 
     @classmethod
     def from_files(cls, *files):
-        saved_files = store_files(cls._meta.get_field('file').path, *files)
+        saved_files = store_files(cls.FILE_PATH, *files)
         return [
             cls.objects.get_or_create(file=f)[0]
             for f in sorted_by_size(saved_files)

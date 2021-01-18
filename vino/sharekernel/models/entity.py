@@ -100,6 +100,7 @@ class EntityWithMetadata(Entity):
         'contact': 'email',
         'website': 'url',
     }
+    IMAGE_PATH = 'images/%Y/%m/%d'
 
     title = models.CharField(max_length=200)
     description = models.TextField(default='', blank=True)
@@ -107,7 +108,7 @@ class EntityWithMetadata(Entity):
     author = models.CharField(max_length=200, default='', blank=True)
     email = models.CharField(max_length=200, default='', blank=True)
     url = models.URLField(default='', blank=True)
-    image = models.ImageField(upload_to='images/%Y/%m/%d', blank=True)
+    image = models.ImageField(upload_to=IMAGE_PATH, blank=True)
 
     def __str__(self):
         return self.title
