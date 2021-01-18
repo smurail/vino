@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import IO, AnyStr
 
 from django.db import models
 from django.conf import settings
@@ -13,7 +14,7 @@ class SourceFile(Entity):
     file = models.FilePathField(path=FILE_PATH, verbose_name="Source file")
 
     @classmethod
-    def from_files(cls, *files):
+    def from_files(cls, *files: IO[AnyStr]):
         saved_files = store_files(cls.FILE_PATH, *files)
         return [
             cls.objects.get_or_create(file=f)[0]
