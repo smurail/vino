@@ -27,7 +27,7 @@ from .viabilityproblem import (ViabilityProblem, ViabilityProblemQuerySet,
                                ViabilityProblemManagerMixin)
 from .symbol import Symbol
 
-from ..utils import generate_media_path, store_one_file
+from ..utils import store_one_file
 
 
 class KernelIterable(ModelIterable):
@@ -179,7 +179,7 @@ class Kernel(EntityWithMetadata):
         fields = ('viabilityproblem.title', 'results.title')
         parts = (slugify(metadata.get(x)) for x in fields)
         filename = '_'.join(parts) + '.csv'
-        datafile = generate_media_path(cls.datafile.field.upload_to) / filename
+        datafile = Path(cls.datafile.field.upload_to) / filename
 
         # Store datafile and remove temporary file
         datafile = store_one_file(datafile, tmpfile.open())

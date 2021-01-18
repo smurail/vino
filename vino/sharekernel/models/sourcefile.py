@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 
 from .entity import Entity
-from ..utils import generate_media_path, store_files, sorted_by_size
+from ..utils import store_files, sorted_by_size
 
 
 class SourceFile(Entity):
@@ -12,8 +12,7 @@ class SourceFile(Entity):
 
     @classmethod
     def from_files(cls, *files):
-        path = generate_media_path(cls._meta.get_field('file').path)
-        saved_files = store_files(path, *files)
+        saved_files = store_files(cls._meta.get_field('file').path, *files)
         return [
             cls.objects.get_or_create(file=f)[0]
             for f in sorted_by_size(saved_files)
