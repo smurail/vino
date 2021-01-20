@@ -2,14 +2,13 @@ import datetime
 
 from pathlib import Path
 from os import PathLike
-from typing import Union, IO, AnyStr, Iterable
+from typing import IO, AnyStr, Iterable
 
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage, default_storage
 
-
-AnyPath = Union[str, PathLike]
+from vino.core.files import AnyPath
 
 
 def interpolate_path(path: AnyPath):
@@ -23,13 +22,13 @@ def as_django_file(f: IO[AnyStr]):
     return f if isinstance(f, File) else File(f)
 
 
-def store_files(path: AnyPath, *files: IO[AnyStr], storage: Storage = default_storage):
+def store_files(path: AnyPath, *files: IO[AnyStr], storage: Storage = default_storage) -> Path:
     if not isinstance(path, PathLike):
         path = Path(path)
     return [store_one_file(path / f.name, f, storage) for f in files]
 
 
-def store_one_file(filepath: AnyPath, content: IO[AnyStr], storage: Storage = default_storage):
+def store_one_file(filepath: AnyPath, content: IO[AnyStr], storage: Storage = default_storage) -> Path:
     path = interpolate_path(filepath).as_posix()
     return Path(storage.save(path, as_django_file(content)))
 
