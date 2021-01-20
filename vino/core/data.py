@@ -11,6 +11,7 @@ from collections import OrderedDict
 
 from vino.core.utils import cast, to_int, compose
 from vino.core.metadata import Metadata
+from vino.core.files import AnyPath
 
 
 @dataclass(frozen=True)
@@ -228,7 +229,7 @@ def write_csv(data: DataFlow, target: str, metadata: Metadata) -> DataFlow:
             yield datum
 
 
-def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[Metadata] = None) -> DataFlow:
+def parse(inp: Iterable[str], target: Optional[AnyPath] = None, metadata: Optional[Metadata] = None) -> DataFlow:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata()
     pipeline = compose(
         parse_lines,
@@ -248,7 +249,7 @@ def parse(inp: Iterable[str], target: Optional[str] = None, metadata: Optional[M
     return pipeline(inp)
 
 
-def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Optional[Metadata] = None) -> int:
+def parse_datafile(filepath: AnyPath, target: Optional[AnyPath] = None, metadata: Optional[Metadata] = None) -> int:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata()
     size = 0
 
@@ -260,7 +261,7 @@ def parse_datafile(filepath: str, target: Optional[str] = None, metadata: Option
     return size
 
 
-def iter_datafile(filepath: str, metadata: Optional[Metadata] = None) -> DataFlow:
+def iter_datafile(filepath: AnyPath, metadata: Optional[Metadata] = None) -> DataFlow:
     metadata = metadata if isinstance(metadata, Metadata) else Metadata()
     pipeline = compose(
         parse_lines,
