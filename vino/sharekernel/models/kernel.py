@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import numpy as np  # type: ignore
 
-from pathlib import Path
-from tempfile import mktemp
 from typing import List, Optional, Iterable, Tuple, Dict
 from sortedcontainers import SortedList  # type: ignore
 from itertools import chain, product
@@ -13,10 +11,10 @@ from django.db import models
 from django.db.models import QuerySet, Count, Q
 from django.db.models.query import ModelIterable
 from django.conf import settings
-from django.utils.text import slugify
 from django.utils.functional import cached_property
 
 from vino.core.data import parse_datafile, iter_datafile, Metadata
+from vino.core.datafile import DataFile
 
 from .entity import EntityWithMetadata, EntityManager
 from .parameterset import ParameterSet
@@ -73,6 +71,14 @@ class KernelManager(ViabilityProblemManagerMixin, EntityManager):
             (KernelManager,),
             {'FORMAT': format_name}
         )
+
+
+class KernelDataFile(DataFile):
+    TEMPFILE_DIR = settings.MEDIA_ROOT
+    DATAFILE_DIR = settings.MEDIA_ROOT
+
+    def store(self, filename):
+        return store_one_file(filename, self.tempfile.open())
 
 
 class Kernel(EntityWithMetadata):
@@ -163,28 +169,9 @@ class Kernel(EntityWithMetadata):
 
     @classmethod
     def from_files(cls, *files, owner=None):
-        # Parse data and metadata from files
         sourcefiles = SourceFile.from_files(*files)
-        tmpfile = Path(mktemp(dir=settings.MEDIA_ROOT, prefix='vino-'))
-        metadata = Metadata()
-        size = 0
-
-        try:
-            for sf in sourcefiles:
-                size += parse_datafile(sf.file, target=tmpfile, metadata=metadata)
-        except Exception:
-            tmpfile.unlink()
-            raise
-
-        # Generate datafile name from metadata
-        fields = ('viabilityproblem.title', 'results.title')
-        parts = (slugify(metadata.get(x)) for x in fields)
-        filename = '_'.join(parts) + '.csv'
-        datafile = Path(cls.DATAFILE_PATH) / filename
-
-        # Store datafile and remove temporary file
-        datafile = store_one_file(datafile, tmpfile.open())
-        tmpfile.unlink()
+        datafile = KernelDataFile([sf.file for sf in sourcefiles])
+        metadata = datafile.metadata
 
         # Generate models instances from metadata
         vp = ViabilityProblem.from_metadata(metadata, owner=owner)
@@ -192,8 +179,8 @@ class Kernel(EntityWithMetadata):
             'params': ParameterSet.from_metadata(metadata, vp=vp, owner=owner),
             'software': Software.from_metadata(metadata, owner=owner),
             'format': DataFormat.from_metadata(metadata, owner=owner),
-            'datafile': datafile.relative_to(settings.MEDIA_ROOT).as_posix(),
-            'size': size,
+            'datafile': datafile.relative_path,
+            'size': datafile.size,
             'owner': owner,
         }
         kernel = Kernel.from_metadata(metadata, **fields)
