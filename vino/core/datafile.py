@@ -56,11 +56,6 @@ class DataFile:
         if sources:
             self.parse(sources)
 
-    @property
-    def relative_path(self) -> str:
-        """Datafile path relative to self.DATAFILE_DIR"""
-        return self.path.relative_to(self.DATAFILE_DIR).as_posix()
-
     def feed(self, source: AnyPath) -> int:
         """Parse `source` file and append result to temporary file
 

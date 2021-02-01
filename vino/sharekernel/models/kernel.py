@@ -6,6 +6,7 @@ from typing import List, Optional, Iterable, Tuple, Dict
 from sortedcontainers import SortedList  # type: ignore
 from itertools import chain, product
 from operator import itemgetter
+from pathlib import Path
 
 from django.db import models
 from django.db.models import QuerySet, Count, Q
@@ -75,10 +76,11 @@ class KernelManager(ViabilityProblemManagerMixin, EntityManager):
 
 class KernelDataFile(DataFile):
     TEMPFILE_DIR = settings.MEDIA_ROOT
-    DATAFILE_DIR = settings.MEDIA_ROOT
+    DATAFILE_DIR = 'kernels/%Y/%m/%d'
 
     def store(self, filename):
-        return store_one_file(filename, self.tempfile.open())
+        path = Path(self.DATAFILE_DIR) / filename
+        return store_one_file(path, self.tempfile.open())
 
 
 class Kernel(EntityWithMetadata):
@@ -86,7 +88,6 @@ class Kernel(EntityWithMetadata):
     IDENTITY = ('title', 'params', 'format', 'software', 'datafile')
     DATA_UNIT = '-'
 
-    DATAFILE_PATH = 'kernels/%Y/%m/%d'
     FORMAT: Optional[str] = None
 
     objects = KernelManager()
@@ -96,7 +97,7 @@ class Kernel(EntityWithMetadata):
                                verbose_name="Parameters")
     format = models.ForeignKey(DataFormat, models.CASCADE, verbose_name="Data format")
     software = models.ForeignKey(Software, models.CASCADE)
-    datafile = models.FileField(upload_to=DATAFILE_PATH, verbose_name="Data file")
+    datafile = models.FileField(upload_to=KernelDataFile.DATAFILE_DIR, verbose_name="Data file")
     sourcefiles = models.ManyToManyField(SourceFile, verbose_name="Source files")
     size = models.IntegerField(default=0)
 
@@ -179,7 +180,7 @@ class Kernel(EntityWithMetadata):
             'params': ParameterSet.from_metadata(metadata, vp=vp, owner=owner),
             'software': Software.from_metadata(metadata, owner=owner),
             'format': DataFormat.from_metadata(metadata, owner=owner),
-            'datafile': datafile.relative_path,
+            'datafile': datafile.path.relative_to(settings.MEDIA_ROOT).as_posix(),
             'size': datafile.size,
             'owner': owner,
         }
