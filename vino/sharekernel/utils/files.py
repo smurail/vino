@@ -25,7 +25,8 @@ def as_django_file(f: IO[AnyStr]):
 def store_files(path: AnyPath, *files: IO[AnyStr], storage: Storage = default_storage) -> Path:
     if not isinstance(path, PathLike):
         path = Path(path)
-    return [store_one_file(path / f.name, f, storage) for f in files]
+    # NOTE f.name is in fact the path of f file object
+    return [store_one_file(path / Path(f.name).name, f, storage) for f in files]
 
 
 def store_one_file(filepath: AnyPath, content: IO[AnyStr], storage: Storage = default_storage) -> Path:
