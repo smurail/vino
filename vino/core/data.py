@@ -86,7 +86,7 @@ def parse_metadata(data: DataFlow) -> DataFlow:
     for datum in data:
         if datum.section == Datum.META:
             key, value = datum.data
-            if Metadata.has_field(key):
+            if Metadata.is_defined_field(key):
                 parsed = Metadata.parse_field(key, value)
                 if parsed is not None:
                     yield Datum(datum.section, (key, parsed))
@@ -214,7 +214,7 @@ def write_csv(data: DataFlow, target: str, metadata: Metadata) -> DataFlow:
         for datum in data:
             if datum.section == Datum.META:
                 key, value = datum.data
-                if Metadata.has_field(key):
+                if Metadata.is_defined_field(key):
                     unparsed = Metadata.unparse_field(key, value)
                     out.write(f'#{key}: {unparsed}\n')
 

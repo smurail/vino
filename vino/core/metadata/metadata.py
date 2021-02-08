@@ -9,7 +9,7 @@ class BaseMetadata(Dict[str, Any]):
     FIELDS: Dict[str, Field] = {}
 
     @classmethod
-    def has_field(cls, field: str) -> bool:
+    def is_defined_field(cls, field: str) -> bool:
         return field in cls.FIELDS
 
     @classmethod
