@@ -8,7 +8,7 @@ class FieldMeta(ABCMeta):
     _instances: Dict[Tuple[type, Tuple[Any, ...], Tuple[Tuple[str, Any], ...]], 'Field'] = {}
 
     # Inspired by https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python#6798042
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args: Any, **kwargs: Any) -> 'Field':
         # Build a dict of all default values of constructor parameters for
         # this class and its ancestors
         defaults = {}
@@ -29,7 +29,7 @@ class FieldMeta(ABCMeta):
 
 
 class Field(metaclass=FieldMeta):
-    def __init__(self, *args, optional=True, **kwargs):
+    def __init__(self, *args: Any, optional: bool = True, **kwargs: Any):
         self.optional = optional
 
     def parse(self, inp: str) -> Any:

@@ -5,7 +5,8 @@ import re
 
 import Equation  # type: ignore
 
-from typing import Iterable, List, Tuple, Union, Optional, Pattern
+from typing import Any, Iterable, List, Tuple, Dict, Union, Optional, Pattern
+from enum import Enum
 from itertools import chain
 
 
@@ -17,7 +18,7 @@ Equation.core.nmatch = re.compile("\\s*([a-zA-Z_][a-zA-Z0-9_']*)")
 
 
 class Expression(Equation.Expression):
-    def __init__(self, expression, argorder=[], *args, **kwargs):
+    def __init__(self, expression: str, argorder: List[str] = [], *args: Any, **kwargs: Any):
         self.value = expression
         super().__init__(expression, argorder, *args, **kwargs)
 
@@ -29,30 +30,37 @@ StatementLiteral = Tuple[Expression, str, Expression]
 ManyStatementLiterals = Iterable[StatementLiteral]
 
 
-class DynamicsLeftExpression(Expression):
+class DynamicsType(Enum):
+    UNKNOWN = 0
     DISCRETE = 1
     CONTINUOUS = 2
+
+
+class DynamicsLeftExpression(Expression):
+    dynamics_type: DynamicsType
+    variables: List[str]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.dynamics_type = None
+        self.dynamics_type = DynamicsType.UNKNOWN
         self.variables = []
 
         for name in super().__iter__():
             if name.endswith("'"):
                 self.variables.append(name[:-1])
-                new_dynamics_type = self.CONTINUOUS
+                new_dynamics_type = DynamicsType.CONTINUOUS
             elif name.startswith('next_'):
                 self.variables.append(name[5:])
-                new_dynamics_type = self.DISCRETE
+                new_dynamics_type = DynamicsType.DISCRETE
             else:
                 raise StatementsError(
                     "Invalid dynamics left expression: %(name)s.",
                     {'name': name})
-            if self.dynamics_type is not None and self.dynamics_type != new_dynamics_type:
+            if self.dynamics_type == DynamicsType.UNKNOWN:
+                self.dynamics_type = new_dynamics_type
+            elif self.dynamics_type != new_dynamics_type:
                 raise StatementsError("Can't mix different dynamics types.")
-            self.dynamics_type = new_dynamics_type
 
     def __iter__(self):
         return iter(self.variables)
@@ -140,7 +148,7 @@ class Statements:
     def __iter__(self):
         return iter(self.statements)
 
-    def __setitem__(self, index: int, value: StatementLiteral):
+    def __setitem__(self, index: int, value: StatementLiteral):  # type: ignore[no-untyped-def]
         assert 0 <= index < len(self.statements)
         self.statements[index] = value
 
@@ -148,7 +156,7 @@ class Statements:
         assert 0 <= index < len(self.statements)
         return self.statements[index]
 
-    def __eq__(self, other: object):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Statements):
             return NotImplemented
         return self.statements == other.statements
@@ -166,17 +174,19 @@ class Statements:
 class Equations(Statements):
     RELATIONS = ('=',)
     LEFT = DynamicsLeftExpression
-    DYNAMICS_TYPE_NAME = {
-        DynamicsLeftExpression.DISCRETE: 'discrete',
-        DynamicsLeftExpression.CONTINUOUS: 'continuous',
+    DYNAMICS_TYPE_NAME: Dict[DynamicsType, str] = {
+        DynamicsType.DISCRETE: 'discrete',
+        DynamicsType.CONTINUOUS: 'continuous',
     }
 
     _variables: Optional[Pattern] = None
 
+    dynamics_type: DynamicsType
+
     def __init__(
             self,
             statements: Union[str, ManyStatementLiterals],
-            dynamics_type: Optional[int] = None):
+            dynamics_type: DynamicsType = DynamicsType.UNKNOWN):
         self.dynamics_type = dynamics_type
         super().__init__(statements)
 
@@ -186,10 +196,10 @@ class Equations(Statements):
 
     def parse(self, value):
         statements = super().parse(value)
-        self.dynamics_type = None
+        self.dynamics_type = DynamicsType.UNKNOWN
 
         for i, (left, op, right) in enumerate(statements):
-            if self.dynamics_type is None:
+            if self.dynamics_type == DynamicsType.UNKNOWN:
                 self.dynamics_type = left.dynamics_type
             elif self.dynamics_type != left.dynamics_type:
                 raise StatementsError("Can't mix different dynamics types.")
@@ -200,6 +210,8 @@ class Equations(Statements):
         return statements
 
     def _unparse(self, statement, show=False):
+        assert self._variables is not None, "Equations.parse method MUST be called before unparsing"
+
         left, op, right = statement
 
         if show and left.dynamics_type == left.DISCRETE:

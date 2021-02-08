@@ -1,51 +1,57 @@
 from ast import literal_eval
-from typing import Type, Optional
+from typing import Type, Optional, Any, Tuple
 from django.utils.dateparse import parse_datetime
+from datetime import datetime
 
 from ...utils import cast
 from .field import Field
 
 
 class TupleField(Field):
-    def __init__(self, typ, sep=',', **kwargs):
+    def __init__(self, typ: Type, sep: str = ',', **kwargs: Any):
         self.type = typ
         self.separator = sep
         super().__init__(**kwargs)
 
-    def do_parse(self, inp):
+    def do_parse(self, inp: str) -> Tuple:
         typ, sep = self.type, self.separator
         tokens = inp.strip().split(sep)
-        return [cast(item.strip(), typ) for item in tokens if item.strip()]
+        return tuple(cast(typ, item.strip()) for item in tokens if item.strip())
 
-    def do_unparse(self, value):
+    def do_unparse(self, value: Any) -> str:
         return self.separator.join((str(x) for x in value))
 
 
 class LiteralField(Field):
-    def do_parse(self, inp):
+    def do_parse(self, inp: str) -> Any:
         return literal_eval(inp)
 
-    def do_unparse(self, value):
+    def do_unparse(self, value: Any) -> str:
         return repr(value)
 
 
 class DateTimeField(Field):
-    def do_parse(self, inp):
+    def do_parse(self, inp: str) -> Optional[datetime]:
         return parse_datetime(inp)
 
-    def do_unparse(self, value):
-        return value.isoformat()
+    def do_unparse(self, value: Optional[datetime]) -> str:
+        return '' if value is None else value.isoformat()
 
 
 class BuiltinTypeField(Field):
-    TYPE: Optional[Type] = None
+    TYPE: Type
+
+    def __new__(cls, *args: Any, **kwargs: Any) -> Any:
+        if cls is BuiltinTypeField:
+            raise TypeError(f"Can't instantiate abstract class {cls.__name__} directly")
+        return super().__new__(cls)
 
     @classmethod
-    def do_parse(cls, inp):
-        return cast(inp, cls.TYPE)
+    def do_parse(cls, inp: str) -> Any:
+        return cast(cls.TYPE, inp)
 
     @classmethod
-    def do_unparse(cls, value):
+    def do_unparse(cls, value: Any) -> str:
         return str(value)
 
 

@@ -1,23 +1,23 @@
-from typing import Dict
+from typing import Dict, Any
 
 from .fields import (
     Field, TupleField, IntegerField, StringField, DateTimeField, LiteralField
 )
 
 
-class BaseMetadata(dict):
+class BaseMetadata(Dict[str, Any]):
     FIELDS: Dict[str, Field] = {}
 
     @classmethod
-    def has_field(cls, field):
+    def has_field(cls, field: str) -> bool:
         return field in cls.FIELDS
 
     @classmethod
-    def parse_field(cls, field, value):
+    def parse_field(cls, field: str, value: str) -> Any:
         return cls.FIELDS[field].parse(value)
 
     @classmethod
-    def unparse_field(cls, field, value):
+    def unparse_field(cls, field: str, value: Any) -> str:
         return cls.FIELDS[field].unparse(value)
 
 
