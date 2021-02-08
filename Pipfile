@@ -9,6 +9,7 @@ mypy = "*"
 django-debug-toolbar = "*"
 django-debug-toolbar-force = "*"
 django-stubs = "*"
+data-science-types = "*"
 
 [packages]
 numpy = "*"
@@ -20,6 +21,7 @@ django = "==2.2.*"
 django-fieldsignals = "*"
 pillow = "*"
 django-currentuser = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.7"
