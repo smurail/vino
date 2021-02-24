@@ -2,7 +2,7 @@ from .metadataparser import MetadataParser
 from .csvparser import CSVParser
 from .datafileparser import DataFileParser
 from .pspparser import PSPParser
-from .sourcefilehelpers import sourcefile_parse
+from .helpers import sourcefile_parse
 
 
 __all__ = [
