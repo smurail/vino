@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/dev/howto/deployment/asgi/
 
 import os
 
-from django.core.asgi import get_asgi_application  # type: ignore
+from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vino.site.settings')
 
