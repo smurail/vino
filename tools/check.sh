@@ -1,7 +1,7 @@
 #!/bin/sh
 
 FLAKE8="flake8 vino"
-MYPY="mypy vino"
+MYPY="mypy --show-error-codes vino"
 
 GREEN='\033[0;32m'
 NC='\033[0m'
