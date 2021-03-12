@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
 from django.contrib.auth.models import User
 
-from ...models import Kernel
+from vino.sharekernel.models import Kernel
 
 
 class Command(BaseCommand):
@@ -54,8 +54,8 @@ class Command(BaseCommand):
             k = Kernel.from_files(mf.open('rb'), df.open('rb'), owner=owner)
             # Setup ViabilityProblem image if needed
             vp = k.params.vp
-            if not vp.image:
-                srcpath = Path(self.SAMPLES_PATH) / Path(images.get(vp.title))
+            if not vp.image and vp.title in images:
+                srcpath = Path(self.SAMPLES_PATH) / Path(images[vp.title])
                 self.stdout.write(f"Setup image {str(srcpath)!r} for {vp}...")
                 with open(srcpath, 'rb') as fp:
                     vp.image.save(srcpath.name, File(fp))

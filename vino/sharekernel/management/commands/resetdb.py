@@ -5,7 +5,7 @@ from django.apps import apps
 class Command(BaseCommand):
     help = 'Clear all data from sharekernel database'
 
-    def confirm(self, msg, default=True):
+    def confirm(self, msg: str, default: bool = True) -> bool:
         default_response = 'Y/n' if default else 'y/N'
         response = input(f"{msg} ({default_response})? ")
         r = response.lower()

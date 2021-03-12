@@ -8,7 +8,8 @@ from django.utils.html import conditional_escape
 
 # For pluck filter
 from django.template import VariableDoesNotExist, TemplateSyntaxError
-from django.template.defaultfilters import _property_resolver
+from django.template.defaultfilters import _property_resolver  # type: ignore
+from django.template.base import FilterExpression
 
 
 register = template.Library()
@@ -33,7 +34,7 @@ def visualize(context, kernels=None):
 class KernelURLNode(template.Node):
     VIEW_NAME = 'viabilityproblem'
 
-    def __init__(self, kernel):
+    def __init__(self, kernel: FilterExpression):
         self.arg = kernel
 
     def render(self, context):

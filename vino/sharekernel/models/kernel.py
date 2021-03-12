@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np  # type: ignore
 
-from typing import List, Optional, Iterable, Tuple, Dict
+from typing import List, Optional, Iterable, Tuple, Dict, IO, AnyStr
 from sortedcontainers import SortedList  # type: ignore
 from itertools import chain, product
 from operator import itemgetter
@@ -13,6 +13,7 @@ from django.db.models import QuerySet, Count, Q
 from django.db.models.query import ModelIterable
 from django.conf import settings
 from django.utils.functional import cached_property
+from django.contrib.auth.models import User
 
 from vino.core.data import parse_datafile, iter_datafile, Metadata
 from vino.core.datafile import DataFile
@@ -169,7 +170,7 @@ class Kernel(EntityWithMetadata):
         return None
 
     @classmethod
-    def from_files(cls, *files, owner=None):
+    def from_files(cls, *files: IO[AnyStr], owner: User | None = None) -> Kernel:
         sourcefiles = SourceFile.from_files(*files)
         datafile = KernelDataFile([sf.file for sf in sourcefiles])
         metadata = datafile.metadata
