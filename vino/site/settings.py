@@ -39,6 +39,7 @@ SECRET_KEY = settings.get('SECRET_KEY')
 DEBUG = settings.get('DEBUG', True)
 
 ALLOWED_HOSTS: List[str] = settings.get('ALLOWED_HOSTS', [])
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
