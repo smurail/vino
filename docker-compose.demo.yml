@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  frontend:
+    environment:
+      VIRTUAL_HOST: demo.vino.openmole.org
+      LETSENCRYPT_HOST: demo.vino.openmole.org
+      LETSENCRYPT_EMAIL: romain@openmole.org
+  backend:
+    volumes:
+      - ./settings.yaml:/home/vino/settings.yaml
+      - ./data:/home/vino/data
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
