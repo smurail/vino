@@ -1,3 +1,5 @@
+DOCKER_COMPOSE_DEMO=docker-compose -f docker-compose.yml -f docker-compose.demo.yml
+
 ifeq ("$(ENV)", "prod")
 PIPENV_ARGS=
 else
@@ -45,4 +47,20 @@ check:
 test:
 	@echo "• pytest -vv"
 	@pipenv run pytest -vv
+	@echo
+
+.PHONY: demo-start demo-stop demo-restart
+demo-start:
+	@echo "• Start demo server..."
+	$(DOCKER_COMPOSE_DEMO) up -d --build
+	@echo
+
+demo-stop:
+	@echo "• Stop demo server..."
+	$(DOCKER_COMPOSE_DEMO) down
+	@echo
+
+demo-restart:
+	@echo "• Restart demo server..."
+	$(DOCKER_COMPOSE_DEMO) restart
 	@echo
