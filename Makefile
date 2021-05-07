@@ -49,7 +49,7 @@ test:
 	@pipenv run pytest -vv
 	@echo
 
-.PHONY: demo-start demo-stop demo-restart
+.PHONY: demo-start demo-stop demo-restart demo-update
 demo-start:
 	@echo "• Start demo server..."
 	$(DOCKER_COMPOSE_DEMO) up -d --build
@@ -63,4 +63,10 @@ demo-stop:
 demo-restart:
 	@echo "• Restart demo server..."
 	$(DOCKER_COMPOSE_DEMO) restart
+	@echo
+
+demo-update:
+	@echo "• Update demo server..."
+	git pull --rebase
+	$(DOCKER_COMPOSE_DEMO) up -d --no-deps --build
 	@echo
