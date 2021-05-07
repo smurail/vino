@@ -214,7 +214,7 @@ class Equations(Statements):
 
         left, op, right = statement
 
-        if show and left.dynamics_type == left.DISCRETE:
+        if show and left.dynamics_type == DynamicsType.DISCRETE:
             left = left.variables[0] + '_{n+1}'
             right = self._variables.sub(r'\1_n', str(right))
         else:
