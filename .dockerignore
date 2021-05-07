@@ -1,3 +1,10 @@
-*
-!vino-py/pip-requires.txt
-!vinosite/pip-requires.txt
+.git
+.gitignore
+.mypy_cache
+.secrets.yaml
+settings.yaml
+docker-compose.yml
+README.md
+vino-py
+vinosite
+samples
