@@ -14,7 +14,7 @@ def compose(*functions):
 NO_DEFAULT = object()
 
 
-def cast(value, to_type, default=NO_DEFAULT):
+def cast(to_type, value, default=NO_DEFAULT):
     try:
         if isinstance(value, to_type):
             return value
@@ -29,4 +29,4 @@ DIGITS = re.compile(r'\d+|$')
 def to_int(value: str):
     # XXX DIGITS regex match digits or empty string (because of |$ part)
     match = DIGITS.search(value).group()  # type: ignore
-    return cast(match, int)
+    return cast(int, match)

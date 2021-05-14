@@ -72,12 +72,12 @@ def parse_lines(inp: Iterable[str]) -> DataFlow:
 
         elif section == Datum.DATA:
             values = SPACES.split(line.strip())
-            typed_values = (cast(x, int) for x in values)
+            typed_values = (cast(int, x) for x in values)
             yield Datum(section, typed_values)
 
     if csv_reader:
         for row in csv_reader:
-            typed_values = ((k, cast(v, float)) for k, v in row.items())
+            typed_values = ((k, cast(float, v)) for k, v in row.items())
             yield Datum(section, typed_values)
 
 
