@@ -24,6 +24,7 @@ MEDIA_URL = '/media/'
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 
+DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
