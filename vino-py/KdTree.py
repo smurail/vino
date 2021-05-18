@@ -3,7 +3,6 @@ from BarGridKernel import BarGridKernel
 from Kernel import Kernel
 import METADATA
 import numpy as np
-from overrides import overrides
 from sortedcontainers import SortedListWithKey
 
 class KdTree(Kernel):
@@ -67,11 +66,9 @@ class KdTree(Kernel):
         return list(self.oppositeCoords)
     
     @staticmethod   
-    @overrides
     def getFormatCode():
         return "kdtree"
 
-    @overrides
     def getDataAttributes(self):
         da = super(KdTree, self).getDataAttributes()
         da['origin'] = self.originCoords
@@ -84,14 +81,12 @@ class KdTree(Kernel):
         return data
 
     @classmethod
-    @overrides
     def initFromHDF5(cls, metadata, attrs, data):
         '''
       Create an object of class KdTree from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
       '''
         return cls(cells=data.tolist(), metadata=metadata,origin=attrs['origin'], opposite=attrs['opposite'], )
 
-    @overrides
     def getData(self):
         return np.array(list(self.cells), dtype='float')
 
@@ -115,7 +110,6 @@ class KdTree(Kernel):
         with open(filename, 'r') as f:
             return cls.readViabilitreeFile(f, metadata,origin,opposite)
 
-    @overrides
     def isInSet(self, point):
         '''
         Returns if point belongs to the BarGridKernel.
@@ -135,7 +129,6 @@ class KdTree(Kernel):
                 return True
         return False
   
-    @overrides
     def toBarGridKernel(self, newOriginCoords, newOppositeCoords, intervalNumberperaxis):
         '''
         Convert to a BarGridKernel with another underlying grid, with a given number of intervals per axis.

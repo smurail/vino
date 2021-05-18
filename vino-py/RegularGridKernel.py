@@ -2,7 +2,6 @@
 
 import numpy as np
 from Kernel import Kernel
-from overrides import overrides
 
 class RegularGridKernel(Kernel):
   def __init__(self, originCoords, dimensionsSteps, dimensionsExtents=None, data=None, metadata = {}):
@@ -16,19 +15,16 @@ class RegularGridKernel(Kernel):
       self.grid = np.zeros(dimensionsExtents, dtype='bool')
     
   @staticmethod   
-  @overrides
   def getFormatCode():
     return "grid"
        
   @classmethod
-  @overrides
   def initFromHDF5(cls, metadata, dataAttributes, data):
     '''
     Create an object of class BarGridKernel from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
     '''
     return cls(dataAttributes['origin'], dataAttributes['steps'], data=data, metadata=metadata)
     
-  @overrides
   def getData(self):
     return self.grid
     
@@ -42,7 +38,6 @@ class RegularGridKernel(Kernel):
   def get(self, coords):
     return self.grid[coords]
   
-  @overrides
   def isInSet(self, point):
     # TODO
     raise NotImplementedError

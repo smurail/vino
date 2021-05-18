@@ -43,7 +43,6 @@ class FileFormatLoader(object):
         with open(filename, 'r') as f:
             return self.readFile(f)
 
-from overrides import overrides
 from BarGridKernel import BarGridKernel
 from KdTree import KdTree
 from hdf5common import HDF5Manager
@@ -56,7 +55,6 @@ class Hdf5Loader(FileFormatLoader):
     def __init__(self, strategies=[BarGridKernel, KdTree]):
         self.hdf5manager = HDF5Manager(strategies)
 
-    @overrides
     def read(self, filename):
         return self.hdf5manager.readKernel(filename)
 
@@ -74,7 +72,6 @@ class ViabilitreeLoader(FileFormatLoader):
     The metadata 'viabilityproblem.statedimension' is mandatory for loading the file.
     '''
 
-    @overrides
     def read(self, filename):
         metadata = {}
 #        myre = re.compile('^#(.*):(.*)$')
@@ -95,7 +92,6 @@ class PspLoader(FileFormatLoader):
     '''
     Reader for the raw output format of the software of Patrick Saint-Pierre.
     '''
-    @overrides
     def readFile(self, f):
         metadata={}
         bgk = None
@@ -140,7 +136,6 @@ class PspModifiedLoader(FileFormatLoader):
     By "modified", it means that the raw output file has been modified for give easy access to metadata at the begin of the file.
     '''
 
-    @overrides
     def readFile(self, f):
         '''
         Returns an object of class BarGridKernel loaded from an output file from the software of Patrick Saint-Pierre.

@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 import numpy as np
-from overrides import overrides
 from sortedcontainers import SortedList
 import math
 from Kernel import Kernel
@@ -40,11 +39,9 @@ class BarGridKernel(Kernel):
         self.metadata.update(self.getDataAttributes())
 
     @staticmethod   
-    @overrides
     def getFormatCode():
         return "bars"
 
-    @overrides
     def getDataAttributes(self):
         da = super(BarGridKernel, self).getDataAttributes()
         da['origin'] = self.originCoords
@@ -56,14 +53,12 @@ class BarGridKernel(Kernel):
         return da  
        
     @classmethod
-    @overrides
     def initFromHDF5(cls, metadata, attrs, data):
         '''
       Create an object of class BarGridKernel from attributes and data loaded from an HDF5 file. This method is intended to be used by the method hdf5common.readKernel
       '''
         return cls(originCoords=attrs['origin'], oppositeCoords=attrs['opposite'], intervalNumberperaxis=attrs['intervals'],permutation=attrs['permutation'],kernelMinPoint=attrs['minPoint'],kernelMaxPoint=attrs['maxPoint'], data=data.tolist(), metadata=metadata)
 
-    @overrides
     def getData(self):
         return np.array(list(self.bars), dtype='int64')
 
@@ -432,7 +427,6 @@ class BarGridKernel(Kernel):
         return grid                             
 
     
-    @overrides
     def toBarGridKernel(self, newOriginCoords, newOppositeCoords, newIntervalNumberperaxis):
         '''
         Convert a BarGridKernel to another BarGridKernel with another underlying grid.
@@ -550,7 +544,6 @@ class BarGridKernel(Kernel):
     def getBars(self):
         return self.bars
 
-    @overrides
     def isInSet(self, point):
         '''
         Returns if point belongs to the BarGridKernel.
