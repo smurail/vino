@@ -1,23 +1,25 @@
 import re
 import unicodedata
 
+from typing import Type, TypeVar, Any
 
-NO_DEFAULT = object()
+
+T = TypeVar('T', bound=int)
 
 
-def cast(to_type, value, default=NO_DEFAULT):
+def cast(to_type: Type[T], value: Any) -> T:
     try:
         if isinstance(value, to_type):
             return value
         return to_type(value)
     except (ValueError, TypeError):
-        return to_type() if default is NO_DEFAULT else default
+        return to_type()
 
 
 DIGITS = re.compile(r'\d+|$')
 
 
-def to_int(value: str):
+def to_int(value: str) -> int:
     # XXX DIGITS regex match digits or empty string (because of |$ part)
     match = DIGITS.search(value).group()  # type: ignore
     return cast(int, match)
