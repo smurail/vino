@@ -9,9 +9,19 @@ from itertools import chain
 from typing import Tuple, Iterable, Optional, Any, List
 from collections import OrderedDict
 
-from vino.core.utils import cast, to_int, compose
+from vino.core.utils import cast, to_int
 from vino.core.metadata import Metadata
 from vino.core.files import AnyPath
+
+from functools import reduce
+
+
+def compose(*functions):
+    functions = [f for f in functions if callable(f)]
+
+    def inner(arg):
+        return reduce(lambda arg, func: func(arg), functions, arg)
+    return inner
 
 
 @dataclass(frozen=True)
