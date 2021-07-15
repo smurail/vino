@@ -20,6 +20,9 @@ class BaseMetadata(Dict[str, Any]):
     def unparse_field(cls, field: str, value: Any) -> str:
         return cls.FIELDS[field].unparse(value)
 
+    def __repr__(self):
+        return f'{type(self).__name__}({dict.__repr__(self)})'
+
 
 class Metadata(BaseMetadata):
     FIELDS = {
