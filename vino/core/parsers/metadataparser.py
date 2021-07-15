@@ -10,7 +10,7 @@ from ..metadata import Metadata
 
 
 class MetadataParserMixin:
-    METADATA_LINE = re.compile(r'^#\s*([^:]+?)\s*:\s*(.+?)\s*?$')
+    METADATA_LINE = re.compile(r'^#\s*([^:]+?)\s*:\s*(.*?)\s*?$')
 
     def __init__(self) -> None:
         super().__init__()
