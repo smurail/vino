@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import re
 import pandas as pd
 import numpy as np
 
 from pandas.errors import ParserError as PandasParseError  # type: ignore
-from typing import TextIO, Union, Optional
+from typing import TextIO
 
 from .parser import Parser
 from .exceptions import ParseError
@@ -18,7 +20,7 @@ class CSVParserMixin:
             cls,
             stream: TextIO,
             skiprows: int = 0,
-            dtype: Optional[Union[str, type]] = None) -> np.ndarray:
+            dtype: str | type | None = None) -> np.ndarray:
 
         try:
             df = pd.read_csv(

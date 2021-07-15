@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import re
 
-from typing import Tuple, Optional, TextIO
+from typing import TextIO
 
 from .parser import Parser
 from .exceptions import InvalidFormatError
@@ -25,7 +27,7 @@ class MetadataParserMixin:
         return line[:2] == '//'
 
     @classmethod
-    def parse_metadatum(cls, line: str) -> Tuple[Optional[str], Optional[str]]:
+    def parse_metadatum(cls, line: str) -> tuple[str, str] | tuple[None, None]:
         match = cls.METADATA_LINE.match(line)
         return (match.group(1), match.group(2)) if match else (None, None)
 
