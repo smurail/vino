@@ -20,12 +20,14 @@ class CSVParserMixin:
             cls,
             stream: TextIO,
             skiprows: int = 0,
+            usecols: list[int] | None = None,
             dtype: str | type | None = None) -> np.ndarray:
 
         try:
             df = pd.read_csv(
                 stream,
                 skiprows=skiprows,
+                usecols=usecols,
                 dtype=dtype,
                 na_filter=False,
                 delim_whitespace=True,

@@ -40,7 +40,7 @@ class MetadataParserMixin:
         interrupted = False
 
         for line in stream:
-            line_size = len(line.encode(stream.encoding))
+            line_size = len(line)
             self.lineno += 1
             byte_count += line_size
 
@@ -57,7 +57,8 @@ class MetadataParserMixin:
                 metadata[key] = value
 
         if interrupted:
-            stream.seek(byte_count - line_size)
+            stream.seek(0)
+            stream.read(byte_count - line_size)
         else:
             self.at_eof = True
 

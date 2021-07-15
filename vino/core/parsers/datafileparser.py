@@ -13,12 +13,8 @@ DataFile = Tuple[Metadata, np.ndarray]
 
 class DataFileParser(MetadataParserMixin, CSVParserMixin, Parser[DataFile]):
     @classmethod
-    def parse_data(cls, stream: TextIO, skiprows: int = 0) -> np.ndarray:
-        return cls.parse_csv_to_numpy(
-            stream,
-            dtype=np.float64,
-            skiprows=skiprows
-        )
+    def parse_data(cls, stream: TextIO) -> np.ndarray:
+        return cls.parse_csv_to_numpy(stream)
 
     def parse(self, stream: TextIO) -> DataFile:
         # Parse optional metadata header
