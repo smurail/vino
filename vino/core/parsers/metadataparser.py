@@ -54,7 +54,7 @@ class MetadataParserMixin:
                 break
 
             if metadata.is_defined_field(key):
-                metadata.set_field(key, value)
+                metadata[key] = value
 
         if interrupted:
             stream.seek(byte_count - line_size)
