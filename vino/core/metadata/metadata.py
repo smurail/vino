@@ -20,6 +20,10 @@ class BaseMetadata(Dict[str, Any]):
     def unparse_field(cls, field: str, value: Any) -> str:
         return cls.FIELDS[field].unparse(value)
 
+    def __setitem__(self, field: str, value: Any) -> None:
+        parsed_value = self.parse_field(field, value)
+        super().__setitem__(field, parsed_value)
+
     def __repr__(self):
         return f'{type(self).__name__}({dict.__repr__(self)})'
 
