@@ -87,7 +87,7 @@ _mathjax_indice = re.compile("([a-zA-Z_][a-zA-Z0-9_']*)_([a-zA-Z0-9']{2,})")
 
 
 @register.filter
-def mathjax(value):
+def mathjax(value: str) -> str:
     value = _mathjax_indice.sub(r'\1_{\2}', value)
     return r'\(' + str(value).replace('\\', '\\\\') + r'\)'
 
