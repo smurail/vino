@@ -10,6 +10,7 @@ django-debug-toolbar = "*"
 django-debug-toolbar-force = "*"
 django-stubs = "*"
 data-science-types = "*"
+pandas-stubs = "*"
 
 [packages]
 numpy = "*"
