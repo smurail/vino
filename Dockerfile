@@ -17,7 +17,8 @@ WORKDIR /home/vino
 
 COPY --chown=vino . .
 
-RUN make init && \
+RUN python -m pip install --user --upgrade pip && \
+    make init && \
     rm -fr data/static/ && \
     pipenv run ./manage.py collectstatic --no-input
 
