@@ -39,22 +39,26 @@ class MetadataParserMixin:
         byte_count = 0
         interrupted = False
 
-        for line in stream:
-            line_size = len(line)
-            self.lineno += 1
-            byte_count += line_size
+        try:
+            for line in stream:
+                line_size = len(line)
+                self.lineno += 1
+                byte_count += line_size
 
-            if self.is_blank(line) or self.is_comment(line):
-                continue
+                if self.is_blank(line) or self.is_comment(line):
+                    continue
 
-            key, value = self.parse_metadatum(line)
+                key, value = self.parse_metadatum(line)
 
-            if key is None or value is None:
-                interrupted = True
-                break
+                if key is None or value is None:
+                    interrupted = True
+                    break
 
-            if metadata.is_defined_field(key):
-                metadata[key] = value
+                if metadata.is_defined_field(key):
+                    metadata[key] = value
+
+        except UnicodeDecodeError as e:
+            self.handle_unicode_decode_error(stream, e, "Metadata parse error: ")
 
         if interrupted:
             stream.seek(0)

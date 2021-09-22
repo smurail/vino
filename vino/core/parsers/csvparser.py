@@ -43,6 +43,9 @@ class CSVParserMixin:
                 msg = match.group(1)
             raise ParseError(f"CSV parse error: {msg}") from e
 
+        except UnicodeDecodeError as e:
+            cls.handle_unicode_decode_error(stream, e, "CSV parse error: ")
+
         except ValueError as e:
             raise ParseError(f"CSV parse error: {e.args[0]}") from e
 
