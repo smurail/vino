@@ -27,7 +27,8 @@ class PSPParser(DataFileParser):
             return cls.parse_csv_to_numpy(
                 stream,
                 dtype=cls.DTYPE,
-                usecols=columns
+                usecols=columns,
+                header=False,
             )
 
         raise InvalidFormatError("Couldn't find PSP header")

@@ -21,6 +21,7 @@ class CSVParserMixin:
             stream: TextIO,
             skiprows: int = 0,
             usecols: list[int] | None = None,
+            header: bool = True,
             dtype: str | type | None = None) -> np.ndarray:
 
         try:
@@ -32,6 +33,7 @@ class CSVParserMixin:
                 na_filter=False,
                 delim_whitespace=True,
                 low_memory=True,
+                header=0 if header else None,
             )
 
         except PandasParseError as e:
