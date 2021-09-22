@@ -5,11 +5,12 @@ import re
 from typing import TextIO
 
 from .parser import Parser
+from .textparser import TextParserMixin
 from .exceptions import InvalidFormatError
 from ..metadata import Metadata
 
 
-class MetadataParserMixin:
+class MetadataParserMixin(TextParserMixin):
     METADATA_LINE = re.compile(r'^#\s*([^:]+?)\s*:\s*(.*?)\s*?$')
 
     def __init__(self) -> None:

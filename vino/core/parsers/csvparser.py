@@ -4,17 +4,18 @@ import re
 import pandas as pd
 import numpy as np
 
-from pandas.errors import ParserError as PandasParseError  # type: ignore
+from pandas.errors import ParserError as PandasParseError
 from typing import TextIO
 
 from .parser import Parser
+from .textparser import TextParserMixin
 from .exceptions import ParseError
 
 
 C_ERROR_PATTERN = re.compile('C error: (.*)')
 
 
-class CSVParserMixin:
+class CSVParserMixin(TextParserMixin):
     @classmethod
     def parse_csv_to_numpy(
             cls,
