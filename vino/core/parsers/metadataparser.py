@@ -70,8 +70,9 @@ class MetadataParser(MetadataParserMixin, Parser[Metadata]):
         metadata = self.parse_metadata(stream)
         if not self.at_eof:
             line = next(stream)
+            name = getattr(stream, 'name', '<unknown>')
             raise InvalidFormatError(
                 "Couldn't recognize metadata",
-                (stream.name, self.lineno, self.offset, line)
+                (name, self.lineno, self.offset, line)
             )
         return metadata
