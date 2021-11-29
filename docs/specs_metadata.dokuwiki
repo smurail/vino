@@ -1,0 +1,186 @@
+====== Metadata Specification ======
+
+<note important>This document is part of the new ViNO specification, designed over 2021.
+This is a work in progress.</note>
+
+===== Current version (2021) =====
+
+==== Metadata ====
+
+  * **Semantic:** has a semantic meaning, ie. necessary to interpret and visualize data
+  * **Generated:** computed programatically at loading, should be removed from metadata?
+
+^ Key                ^ Type              ^ Description                      ^ Semantic ^ Generated ^
+| dataformat.name    | String            | Name of format (eg. ''bargrid'') | ✔        |           |
+| dataformat.axes    | List of integers  | Axes for each column             | ✔        | ✔         |
+| dataformat.columns | List of strings   | Column names                     | ✔        |           |
+| grid.ppa           | List of integers  | PPA for each dimension           | ✔        |           |
+| grid.origin        | List of floats    | Origin point of the grid         | ✔        |           |
+| grid.opposite      | List of floats    | Opposite point of the grid       | ✔        |           |
+| bargrid.baraxis    | Integer           | ''dataformat.axes[-1]''          | ✔        | ✔         |
+| viabilityproblem.statevariables | List of symbols | Axes (ie. variables) of the viability problem state space | | |
+==== Data formats ====
+
+^ Long name    ^ Format name ^ Class name candidates ^
+| Bar grid     | bars        | BarGrid               |
+| Regular grid | regulargrid | RegularGrid           |
+| //k//-d tree | kdtree      | Kdtree, Viabilitree   |
+| Polygon 2D   | polygon2d   | Polygon2d             |
+===== Future version (draft) =====
+
+Versioning (with ''vino'' key)? Optional and mandatory entries? Example values?
+
+==== Scalar values: integers, floats, strings ====
+
+  * Integers are made of digits and optionally a minus or plus sign
+  * Floats are made of digits, a dot as decimal separator, and optionally a minus or plus sign
+  * Floats can also be written with scientific notation as in ''5.9736e24''
+  * Strings are optionally quoted with double-quotes (''"'')
+  * Spaces before and after strings are trimmed
+
+==== Lists ====
+
+  * List items are space-separated
+  * Nested lists are enclosed in square brackets
+  * Nested lists items are comma-separated
+
+  #parameters.state: 0.5 1e13 42
+  #vino.software.parameters: 0.3 42 "This contains spaces" [1, 2, 3]
+
+==== Symbols ====
+
+In ViNO terminology, //symbol// is a generic term for variable or parameter definition.
+A symbol is a list with at most 3 items: a short name, an optional long name and an optional physical unit.
+
+  #viabilityproblem.state.dynamic: L'=u P'=-b*P+L+r*P^q/(m^q+P^q)
+  #viabilityproblem.state.variables: [L, Phosphorus Inputs, kg ha^-1 year^-1] [P, Phosphorus Concentration]
+  #viabilityproblem.state.parameters: b r q m u_min u_max
+  #viabilityproblem.control.variables: [u, Phosphorus Inputs Variation]
+
+==== Intervals ====
+
+To denote a mathematical interval, use a two-item list.
+
+  #vino.dataformat: bargrid
+  #vino.bargrid.bounds: [0.1,1] [0,1.4]
+
+==== Metadata table ====
+
+^ Legacy key                                    ^ New key                                      ^ Type                     ^
+| n/a                                           | vino                                         | String                   |
+| viabilityproblem.title                        | viabilityproblem.title                       | String                   |
+| viabilityproblem.description                  | viabilityproblem.description                 | String                   |
+| viabilityproblem.statedimension               | //state variables count//                    | Integer                  |
+| viabilityproblem.statevariables               | viabilityproblem.state.variables             | List of symbols          |
+| viabilityproblem.dynamicsparameters           | viabilityproblem.state.parameters            | List of symbols          |
+| viabilityproblem.dynamicsdescription          | viabilityproblem.state.dynamic               | List of equations        |
+| viabilityproblem.statedefinitiondomain        | viabilityproblem.state.domain                | List of inequations      |
+| viabilityproblem.controlvariables             | viabilityproblem.control.variables           | List of symbols          |
+| viabilityproblem.admissiblecontroldescription | viabilityproblem.control.admissibledomain    | List of inequations      |
+| viabilityproblem.stateconstraintdescription   | viabilityproblem.constraint.definition       | List of inequations      |
+| viabilityproblem.stateconstraintparameters    | viabilityproblem.constraint.parameters       | List of symbols          |
+| viabilityproblem.targetdescription            | viabilityproblem.target.definition           | List of inequations      |
+| viabilityproblem.targetparameters             | viabilityproblem.target.parameters           | List of symbols          |
+| n/a                                           | viabilityproblem.perturbation... ?           | ?                        |
+| parameters.dynamicsparametervalues            | parameters.state                             | List of floats           |
+| parameters.stateconstraintparametervalues     | parameters.constraint                        | List of floats           |
+| parameters.targetparametervalues              | parameters.target                            | List of floats           |
+| software.title                                | software.title                               | String                   |
+| software.author                               | software.author.name                         | String                   |
+| software.contact                              | software.author.email                        | String                   |
+| software.version                              | software.version                             | String                   |
+| software.publication                          | software.publication                         | String                   |
+| software.website                              | software.website                             | String                   |
+| software.parameters                           | software.parameters                          | List of parameter names  |
+| resultformat.title                            | dataformat.name                              | String                   |
+| resultformat.description                      | dataformat.description                       | String                   |
+| resultformat.parameterlist                    | dataformat.parameters                        | List of parameter names  |
+| results.title                                 | vino.title                                   | String                   |
+| results.author                                | vino.author.name                             | String                   |
+| results.contact                               | vino.author.email                            | String                   |
+| results.submissiondate                        | vino.submission                              | Datetime                 |
+| results.softwareparametervalues               | vino.software.parameters                     | List of parameter values |
+| results.formatparametervalues                 | n/a                                          | n/a                      |
+| n/a                                           | vino.dataformat                              | String                   |
+| MinimalValues, MaximalValues                  | vino.bargrid.bounds                          | List of intervals  |
+| PointsNumberPerAxis                           | vino.bargrid.size                            | List of integers         |
+
+===== Legacy version =====
+
+==== Common metadata entries ====
+
+Regardless of its type or format, any metadata entry can be marked as empty by setting its value to ''none''.
+
+Left-side and right-side of equations and inequations are parsed with [[https://pypi.org/project/Equation/|Equation]] package (WHICH FORMAT?).
+An equation must contain an equal (''='') sign that separates the left and right sides.
+An inequation must contain a less-than or equal to sign or a greater-than or equal to
+sign (''%%<=%%'' or ''>='') for the same purpose. Equations and inequations are displayed
+on the website using [[https://www.mathjax.org/|MathJax]] that understands
+[[https://en.wikipedia.org/wiki/Help:Displaying_a_formula|TeX format]]. 
+
+{{tablelayout?colwidth="300px,230px,380px"}}
+^ Key                                           ^ Type and format                                        ^ Example                                                                    ^
+| viabilityproblem.title                        | String                                                 | Lake eutrophication                                                        |
+| viabilityproblem.description                  | String                                                 | Many lake have experienced sudden shift...                                 |
+| viabilityproblem.statedimension               | Integer                                                | 2                                                                          |
+| viabilityproblem.statevariables               | List of lists as Python literal                        | %%[["L","Phosphorus Inputs",""],["P","Phosphorus Concentration",""]]%%     |
+| viabilityproblem.controlvariables             | List of lists as Python literal                        | %%[["u","Phosphorus Inputs Variation",""]]%%                               |
+| viabilityproblem.dynamicsdescription          | Comma-separated equations                              | %%L'=u,P'=-b*P+L+r*P^q/(m^q+P^q)%%                                         |
+| viabilityproblem.admissiblecontroldescription | Comma-separated inequations                            | %%u>=min,u<=umax%%                                                         |
+| viabilityproblem.dynamicsparameters           | List of lists as Python literal                        | %%[["b"],["r"],["q"],["m"],["unin"],["unax"]]%%                            |
+| viabilityproblem.stateconstraintdescription   | Comma-separated inequations                            | %%L>=Lmin,L<=Lmax,P<=Pmax%%                                                |
+| viabilityproblem.statedefinitiondomain        | Comma-separated inequations                            | %%P>=0%%                                                                   |
+| viabilityproblem.stateconstraintparameters    | List of lists as Python literal                        | %%[["Lmin"],["Lmax"],["Pmax"]]%%                                           |
+| viabilityproblem.targetdescription            | Comma-separated inequations                            | %%none%%                                                                   |
+| viabilityproblem.targetparameters             | List of lists as Python literal                        | %%[]%%                                                                     |
+| parameters.dynamicsparametervalues            | Comma-separated floats                                 | %%0.8,1,8,1,-0.09,0.09%%                                                   |
+| parameters.stateconstraintparametervalues     | Comma-separated floats                                 | %%0.1,1,1.4%%                                                              |
+| parameters.targetparametervalues              | Comma-separated floats                                 | %%none%%                                                                   |
+| software.title                                | String                                                 | Patrick Saint-Pierre Software                                              |
+| software.author                               | String                                                 | Patrick Saint-Pierre                                                       |
+| software.version                              | String                                                 | %%none%%                                                                   |
+| software.publication                          | String                                                 | Saint-Pierre (1994) Approximation of the viability kernel...               |
+| software.website                              | String                                                 | %%none%%                                                                   |
+| software.contact                              | String                                                 | %%none%%                                                                   |
+| software.parameters                           | Comma-separated parameter names                        | %%none%%                                                                   |
+| resultformat.title                            | String                                                 | bars                                                                       |
+| resultformat.description                      | String                                                 | Each file line contains a given number of integers...                      |
+| resultformat.parameterlist                    | Comma-separated parameter names                        | MinimalValues,MaximalValues,PointNumberPerAxis,PointSize,ColumnDescription |
+| results.title                                 | String                                                 | 2D-lake-PSP-65536ppa                                                       |
+| results.author                                | String                                                 | Sophie Martin                                                              |
+| results.submissiondate                        | Datetime                                               | %%2015-09-09T00:00:00+00:00%%                                              |
+| results.contact                               | String                                                 | sophie.martin@irstea.fr                                                    |
+| results.softwareparametervalues               | List of unspecified values with unspecified separators | %%none%%                                                                   |
+| results.formatparametervalues                 | List of unspecified values with unspecified separators | %%0.1,0/1,1.4/65537,65537/1/vide,vide,y,xmin,xmax%%                        |
+
+==== Data attributes ====
+
+Accessible through ''getDataAttributes'' method of ''Kernel'' class and its subclasses, and stored in the [[https://docs.h5py.org/en/stable/quick.html#attributes|attributes]] of [[https://fr.wikipedia.org/wiki/Hierarchical_Data_Format|HDF5]] file ''data'' [[https://docs.h5py.org/en/stable/quick.html#groups-and-hierarchical-organization|group]].
+
+{{tablelayout?colwidth="140px,140px"}}
+^ Key                 ^ Type               ^ Description                                              ^
+^ Common attributes                                                                                 |||
+| resultsformat.title | String             | Identifier of the Kernel format: ''bars'' or ''kdtree''  |
+^ KdTree attributes                                                                                 |||
+| origin              | Array of floats    | Coordinates of the lowest point of the KdTree            |
+| opposite            | Array of floats    | Coordinates of the highest point of the KdTree           |
+^ BarGrid attributes                                                                           |||
+| origin              | Array of floats    | Coordinates of the center of the lowest grid cell        |
+| opposite            | Array of floats    | Coordinates of the center of the highest grid cell       |
+| intervals           | Array of integers  | Integer coordinates of the highest point of the grid, ie. total number of grid cells/intervals for each axis |
+| permutation         | Matrix of integers | Permutation matrix to be applied to origin, opposite, intervals and minPoint of maxPoint to get coordinates in actual data order |
+| minPoint            | Array of integers  | Integer coordinates of the lowest point of the BarGrid |
+| maxPoint            | Array of integers  | Integer coordinates of the highest point of the BarGrid |
+
+==== Bar-grid metadata ====
+
+<note warning>PointNumberPerAxis is a very misleading name, in fact it refers to the number of intervals,
+which is the number of grid cells on a given axis **MINUS ONE**. Everywhere else Points Per Axis (PPA) should be read  as it stand for: the number of grid cells on a given axis, period.</note>
+
+^ Key                ^ Value                        ^ Example                    ^
+| MinimalValues      | Space-separated floats       | 0.1 0                      |
+| MaximalValues      | Space-separated floats       | 1 1.4                      |
+| PointNumberPerAxis | Comma-separated integers     | 65536,65536                |
+| PointSize          | Integer                      | 4                          |
+| ColumnDescription  | Comma-separated column names | empty,empty,x2,x1min,x1max |
+

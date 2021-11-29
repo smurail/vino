@@ -1,0 +1,91 @@
+====== Data Model Specification ======
+
+<note important>This document is part of the new ViNO specification, designed over 2021. This is a work in progress.</note>
+
+===== Viability Problem ====
+
+  * State space
+  * Control space
+  * Target : subset of the state space
+  * Controls : control space
+  * Perturbations : direct impact on dynamics
+  * Cost : //epigraphic// kernels or basins have a //cost function// in one of the state dimension (eg. time)
+
+===== Parameter Set =====
+
+//To be specified.//
+
+===== Data Format =====
+
+//To be specified.//
+
+===== Software =====
+
+//To be specified.//
+
+===== Symbol =====
+
+//To be specified.//
+
+===== Vino =====
+
+==== Vino Kinds ====
+
+Vino's kind depends on the properties of its viability problem.
+
+^ Name                                    ^  Target  ^  Controls  ^  Perturbations  ^  Cost  ^
+| Viability Kernel                        |          |  ✔         |                 |        |
+| Invariance Kernel                       |          |            |  ✔              |        |
+| Guaranteed Viability Kernel             |          |  ✔         |  ✔              |        |
+| Capture Basin                           |  ✔       |  ✔         |                 |        |
+| Absorption Basin                        |  ✔       |            |  ✔              |        |
+| Guaranteed Basin                        |  ✔       |  ✔         |  ✔              |        |
+| Epigraphic Viability Kernel             |          |  ✔         |                 |  ✔     |
+| Epigraphic Invariance Kernel            |          |            |  ✔              |  ✔     |
+| Epigraphic Guaranteed Viability Kernel  |          |  ✔         |  ✔              |  ✔     |
+| Epigraphic Capture Basin                |  ✔       |  ✔         |                 |  ✔     |
+| Epigraphic Absorption Basin             |  ✔       |            |  ✔              |  ✔     |
+| Epigraphic Guaranteed Basin             |  ✔       |  ✔         |  ✔              |  ✔     |
+
+==== Vino Formats ====
+{{tablelayout?rowsHeaderSource=Auto}}
+^ Name         ^ Low-level values type                              ^
+| BarGrid      | 32-bit unsigned integer (from 0 to 4,294,967,295)  |
+| RegularGrid  | Boolean                                            |
+| KdTree       | 64-bit double-precision float                      |
+| Polygon2d    | 64-bit double-precision float                      |
+
+==== Vino Properties ====
+
+^ Name                ^ Model    ^ Value                                                                                      ^ Data source  ^ Used by  ^
+^ Main properties                                                                                                                                   |||||
+| data                | Vino     | np.ndarray(shape=(size, dimension))                                                        | datafile     |          |
+| metadata            | Vino     | Metadata(...)                                                                              | datafile     |          |
+^ Vino properties                                                                                                                                   |||||
+| dimension           | Vino     | int(default=2)                                                                             | data         |          |
+| size                | Vino     | int(default=0)                                                                             | data         |          |
+^ BarGrid properties                                                                                                                                |||||
+| ppa                 | BarGrid  | (np.array(metadata['PointNumberPerAxis'], dtype=int) / metadata['PointSize']).astype(int)  |              |          |
+| grid_bounds         | BarGrid  | np.array([metadata['MinimalValues'], metadata['MaximalValues']])                           |              |          |
+| origin              | BarGrid  | grid_bounds[0]                                                                             |              |          |
+| opposite            | BarGrid  | grid_bounds[1]                                                                             |              |          |
+| unit                | BarGrid  | (opposite - origin) / (ppa - 1)                                                            |              |          |
+| bounds              | BarGrid  | np.array([origin - unit / 2, opposite + unit / 2])                                         |              |          |
+| baraxis             | BarGrid  | int(default=0)                                                                             |              |          |
+| pos_axes            | BarGrid  | (a for a in axes if a != baraxis)                                                          |              |          |
+| pos_unit            | BarGrid  | np.delete(unit, baraxis)                                                                   |              |          |
+| axes_order          | BarGrid  | list(chain(range(0, baraxis), range(baraxis+1, dimension), [baraxis, baraxis]))            |              |          |
+| permutation         | BarGrid  | np.ndarray(shape=(dimension+1, dimension+1))                                               |              |          |
+| bar_order           | BarGrid  | list(chain(range(0, baraxis+1), range(baraxis, dimension)))                                |              |          |
+| bar_unit            | BarGrid  | np.array([unit[a] for a in bar_order])                                                     |              |          |
+| bars                | BarGrid  |                                                                                            |              |          |
+| rectangles          | BarGrid  |                                                                                            |              |          |
+^ KdTree properties                                                                                                                                 |||||
+| cells               | KdTree   |                                                                                            |              |          |
+^ Polygon properties                                                                                                                                |||||
+| lines               | Polygon  |                                                                                            |              |          |
+^ Exact solution properties                                                                                                                         |||||
+| //Unspecified//                                                                                                                                   |||||
+^ Epigraphic properties                                                                                                                             |||||
+| //Unspecified//                                                                                                                                   |||||
+

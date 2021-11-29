@@ -1,0 +1,71 @@
+====== File Formats Specifications ======
+
+<note important>This document is part of the new ViNO specification, designed over 2021. This is a work in progress.</note> 
+
+This specification provides a description of each file format that ViNO API can read and/or write.
+
+===== Common Structure =====
+
+Each file can include one or both of the two following sections:
+
+  * **Metadata**: an unordered set of key-value pairs
+  * **Data**: an ordered sequence of fixed length numerical vectors (either integers or floats)
+
+In general one can distinguish two kinds of //metadatum// (ie. a key-value pair):
+
+  - Either it has a semantic value and is //needed// to interpret data (eg. to show a graphical representation of data)
+  - Either it has //no// semantic value from application point of view, and is just used for display (eg. in Viability Problem description section of the website)
+
+===== File Formats =====
+
+==== Text File Formats ====
+
+=== Format: Metadata ===
+
+<note>As far as we know this metadata format is an ad-hoc format that is not based on any existing standard. [[https://json.org|JSON]] or [[https://yaml.org|YAML]] could be better choices, but for now we stick to this ad-hoc format because in the context of CSV-like data where each line contains one and only one data record, it is a lot simpler to handle manually by ViNO users.</note>
+
+Metadata can be stored as a standalone file, or as data header, at the beginning of data file (assuming data is stored in a textual format). This specification only covers the general syntax of ViNO metadata, and gives no details about defined keys and value types. For further details see the [[specs:metadata|metadata semantic specification]].
+
+Each line can be either:
+
+  * An empty line or blank line with any number of spaces
+  * A commentary line that begins with two slashes (''%%//%%'')
+  * A //metadatum// line consisting of the following elements
+    - ''#'' character
+    - Optional spaces
+    - **Key** containing any character except '':''
+    - Optional spaces
+    - '':'' character
+    - Optional spaces
+    - **Value** containing any character
+    - //Trailing spaces are trimmed//
+
+See implementation: [[https://sourcesup.renater.fr/scm/browser.php?group_id=1730&scm_plugin=scmgit&path=/anonscm/gitweb?p=vino/vino.git;a=blob;f=vino/core/parsers/metadataparser.py;h=db8d2a6a5d4f3ca12efcb329752a1edb6e36e1db;hb=refs/heads/simon-models-fix|vino/core/parsers/metadataparser.py]]
+
+=== Format: ViNO File ===
+
+To be specified.
+
+=== Format: Patrick Saint-Pierre ===
+
+To be specified.
+
+See implementation: [[https://sourcesup.renater.fr/scm/browser.php?group_id=1730&scm_plugin=scmgit&path=/anonscm/gitweb?p=vino/vino.git;a=blob;f=vino/core/parsers/pspparser.py;h=6f6f9a1bf82f7642a0b46de8e1ada1776e76d4ac;hb=refs/heads/simon-models-fix|vino/core/parsers/pspparser.py]]
+
+=== Format: Viabilitree ===
+
+To be specified.
+
+See implementation: [[https://sourcesup.renater.fr/scm/browser.php?group_id=1730&scm_plugin=scmgit&path=/anonscm/gitweb?p=vino/vino.git;a=blob;f=vino/core/parsers/viabilitreeparser.py;h=aba0f8352e808c2783f505908e7f1f4a93e33be5;hb=refs/heads/simon-models-fix|vino/core/parsers/viabilitreeparser.py]]
+
+=== Format: Polygon 2D ===
+
+To be specified.
+
+=== Format: Exact Solution ===
+
+To be specified.
+
+==== Binary File Formats ====
+
+There are no binary file formats for now. In legacy version of ViNO, [[https://en.wikipedia.org/wiki/Hierarchical_Data_Format|HDF5]] was used as the main file format.
