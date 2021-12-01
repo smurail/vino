@@ -29,6 +29,10 @@ footer a:hover {
     font-size: 0.875rem;
 }
 
+abbr {
+    text-decoration-thickness: 0;
+}
+
 /* Visualization styles */
 
 body.loading {
