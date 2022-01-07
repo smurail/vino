@@ -29,7 +29,7 @@ footer a:hover {
     font-size: 0.875rem;
 }
 
-abbr {
+abbr, abbr[data-original-title], abbr[title] {
     text-decoration-thickness: 0;
 }
 
