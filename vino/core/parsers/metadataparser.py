@@ -51,7 +51,8 @@ class MetadataParserMixin(TextParserMixin):
 
                 key, value = self.parse_metadatum(line)
 
-                if key is None or value is None:
+                if key is value is None:
+                    # We probably reached the end of metadata
                     interrupted = True
                     break
 
@@ -62,6 +63,7 @@ class MetadataParserMixin(TextParserMixin):
             self.handle_unicode_decode_error(stream, e, "Metadata parse error: ")
 
         if interrupted:
+            # Rewind the file pointer to the beginning of the previous line
             stream.seek(0)
             stream.read(byte_count - line_size)
         else:
