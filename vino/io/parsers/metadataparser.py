@@ -7,7 +7,8 @@ from typing import TextIO
 from .parser import Parser
 from .textparser import TextParserMixin
 from .exceptions import InvalidFormatError
-from ..metadata import Metadata
+
+from ...core.metadata import Metadata
 
 
 class MetadataParserMixin(TextParserMixin):

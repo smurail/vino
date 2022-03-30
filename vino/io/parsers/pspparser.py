@@ -5,10 +5,12 @@ import numpy as np
 from typing import TextIO
 
 from .exceptions import InvalidFormatError
-from .datafileparser import DataFileParser, DataFile
+from .richcsvparser import RichCSVParser
+
+from ...core.vino import Vino
 
 
-class PSPParser(DataFileParser):
+class PSPParser(RichCSVParser):
     PSP_HEADER = 'Initxx'
     DTYPE = np.uint32
 
@@ -33,7 +35,7 @@ class PSPParser(DataFileParser):
 
         raise InvalidFormatError("Couldn't find PSP header")
 
-    def parse(self, stream: TextIO) -> DataFile:
+    def parse(self, stream: TextIO) -> Vino:
         # Parse metadata
         metadata = self.parse_metadata(stream)
 
@@ -48,4 +50,4 @@ class PSPParser(DataFileParser):
         # Parse PSP data keeping only specified columns
         data = self.parse_data(stream, columns=columns)
 
-        return metadata, data
+        return Vino(data, metadata)

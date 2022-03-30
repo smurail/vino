@@ -6,12 +6,13 @@ from .exceptions import InvalidFormatError
 from .metadataparser import MetadataParser
 from .pspparser import PSPParser
 from .viabilitreeparser import ViabilitreeParser
-from .datafileparser import DataFileParser, DataFile
+from .richcsvparser import RichCSVParser
 
-from ..metadata import Metadata
+from ...core.metadata import Metadata
+from ...core.vino import Vino
 
 
-def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, DataFile]:
+def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, Vino]:
     assert stream.seekable()
 
     # XXX Don't factorize following code blocks to let mypy correctly
@@ -36,4 +37,4 @@ def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, DataFile]:
         stream.seek(0)
 
     # 4. Otherwise, we expect vino datafile
-    return DataFileParser().parse(stream)
+    return RichCSVParser().parse(stream)

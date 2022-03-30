@@ -5,22 +5,20 @@ from typing import Tuple, TextIO
 from .parser import Parser
 from .csvparser import CSVParserMixin
 from .metadataparser import MetadataParserMixin
-from ..metadata import Metadata
+
+from ...core.vino import Vino
 
 
-DataFile = Tuple[Metadata, np.ndarray]
-
-
-class DataFileParser(MetadataParserMixin, CSVParserMixin, Parser[DataFile]):
+class RichCSVParser(MetadataParserMixin, CSVParserMixin, Parser[Vino]):
     @classmethod
     def parse_data(cls, stream: TextIO) -> np.ndarray:
         return cls.parse_csv_to_numpy(stream)
 
-    def parse(self, stream: TextIO) -> DataFile:
+    def parse(self, stream: TextIO) -> Vino:
         # Parse optional metadata header
         metadata = self.parse_metadata(stream)
 
         # Parse data
         data = self.parse_data(stream)
 
-        return metadata, data
+        return Vino(data, metadata)
