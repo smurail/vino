@@ -11,8 +11,11 @@ from .parser import Parser
 from .textparser import TextParserMixin
 from .exceptions import ParseError
 
+from ...core.utils import to_int
+
 
 C_ERROR_PATTERN = re.compile('C error: (.*)')
+C_ERROR_LINENO_PATTERN = re.compile(r' (?:in line|at row) (\d+)')
 
 
 class CSVParserMixin(TextParserMixin):
@@ -38,11 +41,19 @@ class CSVParserMixin(TextParserMixin):
             )
 
         except PandasParseError as e:
-            msg = e.args[0]
+            # Try to extract error message from pandas exception
+            msg, args = e.args[0], ()
             match = C_ERROR_PATTERN.search(msg)
             if match:
+                # Look for a line number in the pandas error message
                 msg = match.group(1)
-            raise ParseError(f"CSV parse error: {msg}") from e
+                match = C_ERROR_LINENO_PATTERN.search(msg)
+                if match:
+                    # If a line number is found, pass it to our ParseError
+                    name = getattr(stream, 'name', '<unknown>')
+                    lineno = to_int(match.group(1))
+                    args = ((name, lineno, None, None),)
+            raise ParseError(f"CSV parse error: {msg}", *args) from e
 
         except UnicodeDecodeError as e:
             cls.handle_unicode_decode_error(stream, e, "CSV parse error: ")
