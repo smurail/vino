@@ -3,15 +3,17 @@ from __future__ import annotations
 import re
 import pandas as pd
 import numpy as np
+import numpy.typing as npt
 
+from pandas.core.arrays import ExtensionArray
 from pandas.errors import ParserError as PandasParseError
-from typing import TextIO
+from typing import TextIO, Sequence, cast
+
+from ...core.utils import to_int
 
 from .parser import Parser
 from .textparser import TextParserMixin
 from .exceptions import ParseError
-
-from ...core.utils import to_int
 
 
 C_ERROR_PATTERN = re.compile('C error: (.*)')
@@ -26,23 +28,29 @@ class CSVParserMixin(TextParserMixin):
             skiprows: int = 0,
             usecols: list[int] | None = None,
             header: bool = True,
-            dtype: str | type | None = None) -> np.ndarray:
+            dtype: str | type | None = None) -> npt.NDArray:
 
         try:
+            # XXX usecols is NOT an ExtensionArray but pandas-stubs does not
+            #     correctly declare usecols parameter type, so hack it!
             df = pd.read_csv(
                 stream,
                 skiprows=skiprows,
-                usecols=usecols,
+                usecols=cast(ExtensionArray, usecols),
                 dtype=dtype,
                 na_filter=False,
                 delim_whitespace=True,
                 low_memory=True,
                 header=0 if header else None,
             )
+            # XXX pandas-stubs does not correctly declare return type for
+            #     to_numpy method
+            return cast(npt.NDArray, df.to_numpy())
 
         except PandasParseError as e:
             # Try to extract error message from pandas exception
-            msg, args = e.args[0], ()
+            msg = e.args[0]
+            args: Sequence = ()
             match = C_ERROR_PATTERN.search(msg)
             if match:
                 # Look for a line number in the pandas error message
@@ -61,9 +69,7 @@ class CSVParserMixin(TextParserMixin):
         except ValueError as e:
             raise ParseError(f"CSV parse error: {e.args[0]}") from e
 
-        return df.to_numpy()
 
-
-class CSVParser(CSVParserMixin, Parser[np.ndarray]):
-    def parse(self, stream: TextIO) -> np.ndarray:
+class CSVParser(CSVParserMixin, Parser[npt.NDArray]):
+    def parse(self, stream: TextIO) -> npt.NDArray:
         return self.parse_csv_to_numpy(stream)

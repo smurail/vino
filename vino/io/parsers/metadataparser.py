@@ -52,7 +52,9 @@ class MetadataParserMixin(TextParserMixin):
 
                 key, value = self.parse_metadatum(line)
 
-                if key is value is None:
+                # XXX Don't change this line! Let static type checking
+                #     understand that `key` can't be None after this block
+                if key is None:
                     # We probably reached the end of metadata
                     interrupted = True
                     break
