@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 import pandas as pd
-import numpy as np
 import numpy.typing as npt
 
 from pandas.core.arrays import ExtensionArray
