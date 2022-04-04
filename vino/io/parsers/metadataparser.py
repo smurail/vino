@@ -4,11 +4,11 @@ import re
 
 from typing import TextIO
 
+from ...core.metadata import Metadata
+
 from .parser import Parser
 from .textparser import TextParserMixin
-from .exceptions import InvalidFormatError
-
-from ...core.metadata import Metadata
+from .exceptions import WrongFormatError
 
 
 class MetadataParserMixin(TextParserMixin):
@@ -81,7 +81,7 @@ class MetadataParser(MetadataParserMixin, Parser[Metadata]):
         if not self.at_eof:
             line = next(stream)
             name = getattr(stream, 'name', '<unknown>')
-            raise InvalidFormatError(
+            raise WrongFormatError(
                 "Couldn't recognize metadata",
                 (name, self.lineno, self.offset, line)
             )

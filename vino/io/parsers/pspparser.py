@@ -4,7 +4,7 @@ import numpy as np
 
 from typing import TextIO
 
-from .exceptions import InvalidFormatError
+from .exceptions import WrongFormatError
 from .richcsvparser import RichCSVParser
 
 from ...core.vino import Vino
@@ -33,7 +33,7 @@ class PSPParser(RichCSVParser):
                 header=False,
             )
 
-        raise InvalidFormatError("Couldn't find PSP header")
+        raise WrongFormatError("Couldn't find PSP header")
 
     def parse(self, stream: TextIO) -> Vino:
         # Parse metadata
@@ -42,7 +42,7 @@ class PSPParser(RichCSVParser):
         # Read ColumnDescription metadatum
         coldesc = metadata.get('ColumnDescription')
         if not coldesc:
-            raise InvalidFormatError("ColumnDescription metadata not found")
+            raise WrongFormatError("ColumnDescription metadata not found")
 
         # Generate integer indices list of columns to be kept
         columns = [i for i, c in enumerate(coldesc) if c != 'empty']

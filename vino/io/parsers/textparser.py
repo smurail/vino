@@ -1,6 +1,6 @@
 from typing import TextIO, NoReturn
 
-from .exceptions import InvalidFormatError
+from .exceptions import WrongFormatError
 
 
 class TextParserMixin:
@@ -8,4 +8,4 @@ class TextParserMixin:
     def handle_unicode_decode_error(stream: TextIO, e: UnicodeDecodeError, prefix: str = "") -> NoReturn:
         name = getattr(stream, 'name', '<unknown>')
         msg = f'Input stream {name!r} seems to be binary and cannot be opened as text'
-        raise InvalidFormatError(prefix + msg) from e
+        raise WrongFormatError(prefix + msg) from e

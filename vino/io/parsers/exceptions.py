@@ -2,5 +2,5 @@ class ParseError(SyntaxError):
     pass
 
 
-class InvalidFormatError(ParseError):
+class WrongFormatError(ParseError):
     pass

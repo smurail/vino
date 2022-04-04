@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import TextIO, Union
 
-from .exceptions import InvalidFormatError
+from .exceptions import WrongFormatError
 from .metadataparser import MetadataParser
 from .pspparser import PSPParser
 from .viabilitreeparser import ViabilitreeParser
@@ -21,19 +21,19 @@ def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, Vino]:
     # 1. Is it a metadata file?
     try:
         return MetadataParser().parse(stream)
-    except InvalidFormatError:
+    except WrongFormatError:
         stream.seek(0)
 
     # 2. Is it a PSP file?
     try:
         return PSPParser().parse(stream)
-    except InvalidFormatError:
+    except WrongFormatError:
         stream.seek(0)
 
     # 3. Is it a Viabilitree file?
     try:
         return ViabilitreeParser().parse(stream)
-    except InvalidFormatError:
+    except WrongFormatError:
         stream.seek(0)
 
     # 4. Otherwise, we expect vino datafile
