@@ -2,17 +2,17 @@ import numpy as np
 
 from typing import TextIO, Union
 
+from ...core.metadata import Metadata
+from ...core.numo import Numo
+
 from .exceptions import WrongFormatError
 from .metadataparser import MetadataParser
 from .pspparser import PSPParser
 from .viabilitreeparser import ViabilitreeParser
 from .richcsvparser import RichCSVParser
 
-from ...core.metadata import Metadata
-from ...core.vino import Vino
 
-
-def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, Vino]:
+def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, Numo]:
     assert stream.seekable()
 
     # XXX Don't factorize following code blocks to let mypy correctly

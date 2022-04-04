@@ -4,10 +4,10 @@ import numpy as np
 
 from typing import TextIO
 
+from ...core.numo import Numo
+
 from .exceptions import WrongFormatError
 from .richcsvparser import RichCSVParser
-
-from ...core.vino import Vino
 
 
 class PSPParser(RichCSVParser):
@@ -35,7 +35,7 @@ class PSPParser(RichCSVParser):
 
         raise WrongFormatError("Couldn't find PSP header")
 
-    def parse(self, stream: TextIO) -> Vino:
+    def parse(self, stream: TextIO) -> Numo:
         # Parse metadata
         metadata = self.parse_metadata(stream)
 
@@ -50,4 +50,4 @@ class PSPParser(RichCSVParser):
         # Parse PSP data keeping only specified columns
         data = self.parse_data(stream, columns=columns)
 
-        return Vino(data, metadata)
+        return Numo(data, metadata)
