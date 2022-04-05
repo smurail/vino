@@ -20,12 +20,12 @@ class MetadataParserMixin(TextParserMixin):
         self.lineno = 0
         self.offset = 0
 
-    @classmethod
-    def is_blank(cls, line: str) -> bool:
+    @staticmethod
+    def is_blank(line: str) -> bool:
         return not line.strip()
 
-    @classmethod
-    def is_comment(cls, line: str) -> bool:
+    @staticmethod
+    def is_comment(line: str) -> bool:
         return line[:2] == '//'
 
     @classmethod
