@@ -1,3 +1,4 @@
+from .parser import Parser
 from .metadataparser import MetadataParser
 from .csvparser import CSVParser
 from .richcsvparser import RichCSVParser
@@ -7,7 +8,7 @@ from .helpers import sourcefile_parse
 
 
 __all__ = [
-    'MetadataParser', 'CSVParser', 'RichCSVParser', 'PSPParser',
+    'Parser', 'MetadataParser', 'CSVParser', 'RichCSVParser', 'PSPParser',
     'ParseError', 'WrongFormatError',
     'sourcefile_parse',
 ]
