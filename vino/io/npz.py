@@ -18,4 +18,4 @@ def load_npz(file: BinaryIO | AnyPath) -> Vino:
     except Exception as e:
         raise ValueError(f'Failed to load `.npz` file {file!r}') from e
 
-    return Vino(npz['data'], npz['metadata'])
+    return Vino(npz['data'], npz['metadata'].item())
