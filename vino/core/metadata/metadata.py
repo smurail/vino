@@ -21,7 +21,7 @@ class BaseMetadata(Dict[str, Any]):
         return cls.FIELDS[field].unparse(value)
 
     def __setitem__(self, field: str, value: Any) -> None:
-        parsed_value = self.parse_field(field, value)
+        parsed_value = self.parse_field(field, value) if isinstance(value, str) else value
         super().__setitem__(field, parsed_value)
 
     def __repr__(self):
