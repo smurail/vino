@@ -11,6 +11,7 @@ from os import PathLike
 from vino import Metadata, Numo, Vino
 from vino.typing import AnyPath
 
+from .npz import load_npz
 from .npy import load_npy
 from .parsers.helpers import sourcefile_parse
 
@@ -24,6 +25,14 @@ def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
         dt_chunks: list[Numo | NDArray] = []
 
         for file in files:
+            try:
+                vino = load_npz(file)  # type: ignore
+                if len(files) > 1:
+                    raise ValueError("Please provide only one NPZ file")
+                return vino
+            except ValueError:
+                pass
+
             # Try to open file as NPY
             try:
                 # If file is a text stream an exception will be raised
