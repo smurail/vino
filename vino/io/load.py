@@ -15,6 +15,9 @@ from .npy import load_npy
 from .parsers.helpers import sourcefile_parse
 
 
+ENCODING = "utf-8"
+
+
 def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
     with contextlib.ExitStack() as stack:
         md_chunks: list[Metadata] = []
@@ -29,12 +32,13 @@ def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
             except (ValueError, TypeError):
                 pass
 
-            # Try to open file as text stream
+            # If file is a binary stream try to decode it as text
             if isinstance(file, (RawIOBase, BufferedIOBase)):  # type: ignore
                 # See https://github.com/python/typeshed/issues/6077
-                file = TextIOWrapper(cast(BinaryIO, file))
+                file = TextIOWrapper(cast(BinaryIO, file), encoding=ENCODING)
+            # If file is a path, open it as text
             elif isinstance(file, (str, bytes, PathLike)):
-                file = stack.enter_context(open(file))
+                file = stack.enter_context(open(file, encoding=ENCODING))
 
             # Assume file is a text stream
             file = cast(TextIO, file)
