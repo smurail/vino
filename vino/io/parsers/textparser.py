@@ -1,9 +1,10 @@
 from typing import TextIO, NoReturn
 
+from .parser import ParserMixin
 from .exceptions import WrongFormatError
 
 
-class TextParserMixin:
+class TextParserMixin(ParserMixin):
     @staticmethod
     def handle_unicode_decode_error(stream: TextIO, e: UnicodeDecodeError, prefix: str = "") -> NoReturn:
         name = getattr(stream, 'name', '<unknown>')
