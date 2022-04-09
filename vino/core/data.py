@@ -11,7 +11,7 @@ from collections import OrderedDict
 
 from vino.core.utils import cast, to_int
 from vino.core.metadata import Metadata
-from vino.core.files import AnyPath
+from vino.typing import AnyPath
 
 from functools import reduce
 

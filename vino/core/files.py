@@ -1,5 +1,2 @@
-from os import PathLike
-from typing import Union
-
-
-AnyPath = Union[str, PathLike]
+# FIXME File to be removed eventually!
+from vino.typing import AnyPath  # noqa:F401

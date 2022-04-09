@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage, default_storage
 
-from vino.core.files import AnyPath
+from vino.typing import AnyPath
 
 
 def interpolate_path(path: AnyPath):
