@@ -1,7 +1,10 @@
-from typing import Generic, TypeVar, TextIO
+from typing import TypeVar, Union, Generic, TextIO
+from numpy.typing import NDArray
+
+from vino import Metadata, Numo
 
 
-T = TypeVar('T')
+T = TypeVar('T', bound=Union[Metadata, NDArray, Numo])
 
 
 class Parser(Generic[T]):
