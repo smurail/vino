@@ -3,26 +3,41 @@ from __future__ import annotations
 import contextlib
 import numpy as np
 
-from typing import TextIO
+from typing import TextIO, BinaryIO, cast
+from io import RawIOBase, BufferedIOBase, TextIOWrapper
 from numpy.typing import NDArray
 from os import PathLike
 
 from vino import Metadata, Numo, Vino
 from vino.typing import AnyPath
 
+from .npy import load_npy
 from .parsers.helpers import sourcefile_parse
 
 
-def load(*files: TextIO | AnyPath) -> Vino:
+def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
     with contextlib.ExitStack() as stack:
         md_chunks: list[Metadata] = []
         dt_chunks: list[Numo | NDArray] = []
 
         for file in files:
-            # Open `file` if it's a path
-            # XXX Keep this isinstance to make static type checker happy
-            if isinstance(file, (str, bytes, PathLike)):
+            # Try to open file as NPY
+            try:
+                # If file is a text stream an exception will be raised
+                dt_chunks.append(load_npy(file))  # type: ignore
+                continue
+            except (ValueError, TypeError):
+                pass
+
+            # Try to open file as text stream
+            if isinstance(file, (RawIOBase, BufferedIOBase)):  # type: ignore
+                # See https://github.com/python/typeshed/issues/6077
+                file = TextIOWrapper(cast(BinaryIO, file))
+            elif isinstance(file, (str, bytes, PathLike)):
                 file = stack.enter_context(open(file))
+
+            # Assume file is a text stream
+            file = cast(TextIO, file)
 
             # Parse text stream
             r = sourcefile_parse(file)
