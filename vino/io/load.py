@@ -28,7 +28,8 @@ def load(*files: TextIO | AnyPath) -> Vino:
             r = sourcefile_parse(file)
 
             if isinstance(r, Numo):
-                md_chunks.append(r.metadata)
+                if r.metadata:
+                    md_chunks.append(r.metadata)
                 dt_chunks.append(r)
             elif isinstance(r, Metadata):
                 md_chunks.append(r)
