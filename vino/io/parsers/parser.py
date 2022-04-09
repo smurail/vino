@@ -4,7 +4,8 @@ from numpy.typing import NDArray
 from vino import Metadata, Numo
 
 
-T = TypeVar('T', bound=Union[Metadata, NDArray, Numo])
+ParserOutput = Union[Metadata, NDArray, Numo]
+T = TypeVar('T', bound=ParserOutput)
 
 
 class ParserMixin:

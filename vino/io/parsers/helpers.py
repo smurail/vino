@@ -1,17 +1,15 @@
-import numpy as np
+from __future__ import annotations
 
-from typing import TextIO, Union
+from typing import TextIO
 
-from ...core.metadata import Metadata
-from ...core.numo import Numo
-
+from .parser import ParserOutput
 from .exceptions import WrongFormatError
 from .metadataparser import MetadataParser
 from .pspparser import PSPParser
 from .richcsvparser import RichCSVParser
 
 
-def sourcefile_parse(stream: TextIO) -> Union[Metadata, np.ndarray, Numo]:
+def sourcefile_parse(stream: TextIO) -> ParserOutput:
     assert stream.seekable()
 
     # XXX Don't factorize following code blocks to let mypy correctly
