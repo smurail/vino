@@ -1,0 +1,41 @@
+#viabilityproblem.title:4D_cylinder
+#viabilityproblem.description:Another classical mathematical problem.
+#viabilityproblem.statedimension:4
+#viabilityproblem.statevariables:[["x","",""],["y","",""],["z","",""],["t","",""]]
+#viabilityproblem.controlvariables:[["u_x","",""],["u_y","",""],["u_z","",""]]
+#viabilityproblem.dynamicsdescription:x'=x+a*u_x,y'=y+a*u_y,z'=z+a*u_z,t'=0
+#viabilityproblem.admissiblecontroldescription:u_x^2+u_y^2+u_z^2<=1
+#viabilityproblem.dynamicsparameters:[["a"]]
+#viabilityproblem.stateconstraintdescription:x^2+y^2+z^2<=r
+#viabilityproblem.stateconstraintparameters:[["r"]]
+#viabilityproblem.targetdescription:none
+#viabilityproblem.targetparameters:[]
+
+#parameters.dynamicsparametervalues:1
+#parameters.stateconstraintparametervalues:1.5
+#parameters.targetparametervalues:none
+
+//Metadata describing the software used to compute the result described by the output file
+
+#software.title:ViabLab
+#software.author:Anya Desilles
+#software.version:none
+#software.publication:none
+#software.website:none
+#software.contact:none
+#software.parameters:none
+
+//Metadata describing the software output file
+#resultformat.title:bars
+#resultformat.description:Each file line contains a given number of integers ranging from 0 to PointNumberPerAxis corresponding to a segment. The result is the union of all these segments. If (4,6,46,57) is written on a line, that means that the problem is 3-dimensional and that points (4,6,46), (4,6,47), ... ,(4,6,57) belong to the result set. Moreover, all real-valued points whose sup-distance is smaller than PointSize/2 also belong to the result set. ColumnDescription corresponds to identity matrix if the file columns correspond to the order according to which variables appear in the model description. Again in dimension 3 for instance, (0,0,0) corresponds to MinimalValues (possibly interchanged according to ColumnDescription) and (PointNumberPerAxis,PointNumberPerAxis,PointNumberPerAxis) to MaximalValues.
+#resultformat.parameterlist:MinimalValues,MaximalValues,PointNumberPerAxis,PointSize,ColumnDescription
+
+
+
+//Metadata describing the computation of the result described by the output file
+#results.title:4D-cylinder-Viablab-81ppa
+#results.author:Sophie Martin
+#results.submissiondate:2015-09-09T00:00:00+00:00
+#results.contact:sophie.martin@irstea.fr
+#results.softwareparametervalues:none
+#results.formatparametervalues:-1.5,-1.5,-1.5,0/1.5,1.5,1.5,5/80,80,80,5/1/x4,x2,x3,x1min,x1max

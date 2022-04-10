@@ -1,0 +1,41 @@
+//Metadata describing the viability problem
+#viabilityproblem.title:Prey-predator model
+#viabilityproblem.description:We consider the classical Lotka-Volterra prey-predator model, where a control can act on the predators in terms of a mortality term. The objective is to protect the preys, maintaining their density above a given threshold with the help of the control.
+#viabilityproblem.statevariables:[["x","preys",""],["y","predators",""]]
+#viabilityproblem.controlvariables:[["u","mortality term of the predators",""]]
+#viabilityproblem.dynamicsdescription:x'=x*(r-y),y'=y*(x-m-u)
+#viabilityproblem.admissiblecontroldescription:u>=0,u<=umax
+#viabilityproblem.dynamicsparameters:[["r"],["m"],["umax"]]
+#viabilityproblem.stateconstraintdescription:x>=xbar
+#viabilityproblem.statedefinitiondomain:x>0,y>0
+#viabilityproblem.stateconstraintparameters:[["xbar"]]
+#viabilityproblem.targetdescription:none
+#viabilityproblem.targetparameters:[]
+
+//Metadata describing the parameter values
+#parameters.dynamicsparametervalues:1,1,0.5
+#parameters.stateconstraintparametervalues:0.8
+#parameters.targetparametervalues:none
+
+//Metadata describing the software used to compute the result described by the output file
+
+#software.title:none
+#software.author:none
+#software.version:none
+#software.publication:none
+#software.website:none
+#software.contact:none
+#software.parameters:none
+
+//Metadata describing the software output file
+#resultformat.title:2D_polygon
+#resultformat.description:Two vecteurs : one containing the values of the first coodinates of the vertices and the second the values of the second coordinates of the vertices.
+#resultformat.parameterlist:
+
+//Metadata describing the computation of the result described by the output file
+#results.title:LV
+#results.author:Alain Rapaport
+#results.submissiondate:2021-02-22T00:00:00+00:00
+#results.contact:alain.rapaport@irstea.fr
+#results.softwareparametervalues:none
+#results.formatparametervalues:none
