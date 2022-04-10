@@ -13,6 +13,7 @@ SAMPLES_PATH = "samples"
 
 
 class Expect(NamedTuple):
+    cls: type[vn.Vino] | None = None
     dtype: npt.DTypeLike | None = None
     count: int | None = None
     first: list[int | float] | None = None
@@ -23,6 +24,7 @@ samples = [
     pytest.param(
         ("lake", "2D.txt", "2D_metadata.txt"),
         Expect(
+            cls=vn.BarGrid,
             dtype=np.uint32,
             count=65537,
             first=[0, 0, 53241],
@@ -33,6 +35,7 @@ samples = [
     pytest.param(
         ("lake", "2D_light.txt", "2D_light_metadata.txt"),
         Expect(
+            cls=vn.BarGrid,
             dtype=np.uint32,
             count=16385,
             first=[0, 0, 53400],
@@ -43,6 +46,7 @@ samples = [
     pytest.param(
         ("lake", "lake_Isa_R1.dat", "lake_Isa_R1.txt"),
         Expect(
+            cls=vn.KdTree,
             dtype=np.float64,
             count=6335,
             first=[0.10043945312500001, 6.8359375e-4, 0.1, 0.10087890625000001, 0.0, 0.0013671875, 3.469446951953614e-18],
@@ -53,6 +57,7 @@ samples = [
     pytest.param(
         ("bilingual-viabilitree", "bilingual21dil0control0.1ustep0.01WC.dat", "bilingual21dil0control0.1ustep0.01WC.txt"),
         Expect(
+            cls=vn.KdTree,
             dtype=np.float64,
             count=43259
         ),
@@ -61,6 +66,7 @@ samples = [
     pytest.param(
         ("bilingual-viabilitree", "Bilingual21TS05dil3.dat", "Bilingual21TS05dil3.txt"),
         Expect(
+            cls=vn.KdTree,
             dtype=np.float64,
             count=50763
         ),
@@ -69,6 +75,7 @@ samples = [
     pytest.param(
         ("rangeland", "3D_rangeland.txt", "3D_rangeland_metadata.txt"),
         Expect(
+            vn.BarGrid,
             dtype=np.uint32,
             count=292379,
         ),
@@ -77,6 +84,7 @@ samples = [
     pytest.param(
         ("4d", "4d_cylinder_data.txt", "4d_cylinder_metadata.txt"),
         Expect(
+            cls=vn.BarGrid,
             dtype=np.uint32,
             count=17430,
         ),
@@ -85,6 +93,7 @@ samples = [
     pytest.param(
         ("4d", "lake4D16.dat", "lake4D16.txt"),
         Expect(
+            cls=vn.KdTree,
             dtype=np.float64,
             count=25552,
         ),
@@ -93,6 +102,7 @@ samples = [
     pytest.param(
         ("polygon", "lake_polygon.dat", "lake_polygon_metadata.txt"),
         Expect(
+            cls=vn.Polygon,
             dtype=np.float64,
             count=721,
         ),
@@ -101,6 +111,7 @@ samples = [
     pytest.param(
         ("polygon", "LV.dat", "LV_metadata.txt"),
         Expect(
+            cls=vn.Polygon,
             dtype=np.float64,
             count=213,
         ),
@@ -116,6 +127,7 @@ def test_load(location, expect):
     vino = vn.load(*sources)
 
     assert isinstance(vino, vn.Vino)
+    assert expect.cls   is None or isinstance(vino, expect.cls)
     assert expect.dtype is None or vino.dtype == expect.dtype
     assert expect.count is None or len(vino) == expect.count
     assert expect.first is None or np.all(vino[0] == expect.first)
