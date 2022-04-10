@@ -28,7 +28,7 @@
 #software.parameters:none
 
 //Metadata describing the software output file
-#resultformat.title:2D_polygon
+#resultformat.title:polygon
 #resultformat.description:Two vecteurs : one containing the values of the first coodinates of the vertices and the second the values of the second coordinates of the vertices.
 #resultformat.parameterlist:
 
