@@ -8,6 +8,8 @@ NC='\033[0m'
 
 echo "∙ $FLAKE8"
 $FLAKE8 && echo "${GREEN}OK!${NC}"
+echo
 
 echo "∙ $MYPY"
 $MYPY && echo "${GREEN}OK!${NC}"
+echo
