@@ -32,6 +32,8 @@ class CSVParserMixin(TextParserMixin):
         try:
             # XXX usecols is NOT an ExtensionArray but pandas-stubs does not
             #     correctly declare usecols parameter type, so hack it!
+            # XXX float_precision='round_trip' should resolve accuracy issues,
+            #     see https://stackoverflow.com/a/36909497
             df = pd.read_csv(
                 stream,
                 skiprows=skiprows,
@@ -41,6 +43,7 @@ class CSVParserMixin(TextParserMixin):
                 delim_whitespace=True,
                 low_memory=True,
                 header=0 if header else None,
+                float_precision='round_trip',
             )
             # XXX pandas-stubs does not correctly declare return type for
             #     to_numpy method
