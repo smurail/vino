@@ -39,3 +39,8 @@ migrate:
 .PHONY: check
 check:
 	pipenv run ./tools/check.sh
+
+
+.PHONY: test
+test:
+	pipenv run pytest -vv
