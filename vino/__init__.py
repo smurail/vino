@@ -4,6 +4,10 @@ from vino.core import (
     Metadata,
     Numo,
     Vino,
+    RegularGrid,
+    BarGrid,
+    KdTree,
+    Polygon,
 )
 from vino.io import (
     load,
@@ -15,6 +19,6 @@ from vino.io import (
 
 
 __all__ = [
-    'Metadata', 'Numo', 'Vino',
+    'Metadata', 'Numo', 'Vino', 'RegularGrid', 'BarGrid', 'KdTree', 'Polygon',
     'load', 'save_csv', 'load_npy', 'load_npz', 'save_npz'
 ]
