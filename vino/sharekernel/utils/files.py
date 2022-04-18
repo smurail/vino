@@ -12,9 +12,7 @@ from vino.typing import AnyPath
 
 
 def interpolate_path(path: AnyPath):
-    if isinstance(path, PathLike):
-        path = path.as_posix()
-    interpolated_path = datetime.datetime.now().strftime(path)
+    interpolated_path = datetime.datetime.now().strftime(os.fspath(path))
     return Path(settings.MEDIA_ROOT) / interpolated_path
 
 
@@ -23,10 +21,11 @@ def as_django_file(f: IO[AnyStr]):
 
 
 def store_files(path: AnyPath, *files: IO[AnyStr], storage: Storage = default_storage) -> Path:
-    if not isinstance(path, PathLike):
-        path = Path(path)
     # NOTE f.name is in fact the path of f file object
-    return [store_one_file(path / Path(f.name).name, f, storage) for f in files]
+    return [
+        store_one_file(Path(path) / Path(f.name).name, f, storage)
+        for f in files
+    ]
 
 
 def store_one_file(filepath: AnyPath, content: IO[AnyStr], storage: Storage = default_storage) -> Path:
