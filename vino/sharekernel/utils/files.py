@@ -33,7 +33,8 @@ def store_files(path: StringPath, *files: IO[AnyStr], storage: Storage = default
 
 def store_one_file(filepath: StringPath, content: IO[AnyStr], storage: Storage = default_storage) -> Path:
     path = interpolate_path(filepath).as_posix()
-    return Path(storage.save(path, as_django_file(content)))
+    name = storage.save(path, as_django_file(content))
+    return Path(storage.path(name))
 
 
 def sorted_by_size(files: Iterable[StringPath]) -> list[StringPath]:
