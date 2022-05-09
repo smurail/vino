@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 flake8 = "*"
 mypy = "*"
-django-debug-toolbar = "*"
+django-debug-toolbar = "<3.3"
 django-debug-toolbar-force = "*"
 django-stubs = "*"
 pandas-stubs = "*"
