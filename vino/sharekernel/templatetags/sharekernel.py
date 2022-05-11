@@ -49,7 +49,7 @@ class KernelURLNode(template.Node):
         kernel = self.arg.resolve(context)
         args = [kernel.vp.pk]
         url = reverse(self.VIEW_NAME, args=args, current_app=current_app)
-        url += f'#kernel/{kernel.pk}'
+        url += f'#kernel/{kernel.pk}/'
 
         if context.autoescape:
             url = conditional_escape(url)
