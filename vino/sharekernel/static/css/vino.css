@@ -33,6 +33,11 @@ abbr, abbr[data-original-title], abbr[title] {
     text-decoration-thickness: 0;
 }
 
+/** Restore bootstrap 4.5 color for tbody top border */
+.table>:not(:first-child) {
+    border-top-color: inherit;
+}
+
 /* Visualization styles */
 
 body.loading {
@@ -98,6 +103,10 @@ img.vino-right {
 
 .card-body p:last-child {
     margin-bottom: 0;
+}
+
+.card-title a {
+    text-decoration: none;
 }
 
 .vp.card-group .card {

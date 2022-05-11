@@ -1,51 +1,50 @@
 <div class="vz-container card" data-id="{{ id }}">
     <div class="card-header px-3 py-2">
-        <form>
-            <div class="form-inline">
-                {% if kernels %}
-                <div class="form-group mr-2" title="ViNO">
-                    <label for="kernel-{{ id }}" class="fas fa-chart-bar"></label>
-                    <div class="input-group mx-2">
-                        <select id="kernel-{{ id }}" name="kernel" class="custom-select custom-select-sm">
-                            {% for k in kernels %}
-                            <option value="{{ k.pk }}">{{ k.title }} ({{ k.size_with_unit }})</option>
-                            {% endfor %}
-                        </select>
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-sm btn-primary">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                        </div>
-                    </div>
+        <form class="row g-3 align-items-center">
+            {% if kernels %}
+            <div class="col-auto ms-1 gx-2" title="ViNO">
+                <label for="kernel-{{ id }}" class="col-form-label fas fa-chart-bar"></label>
+            </div>
+            <div class="col-auto" title="ViNO">
+                <div class="input-group">
+                    <select id="kernel-{{ id }}" name="kernel" class="form-select form-select-sm">
+                        {% for k in kernels %}
+                        <option value="{{ k.pk }}">{{ k.title }} ({{ k.size_with_unit }})</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
-                {% else %}
-                <input type="hidden" name="kernel" value="">
-                {% endif %}
-                <div class="form-group mr-3" title="Points per axis">
-                    <label for="ppa-{{ id }}">
-                        <i class="fas fa-ruler"></i>
-                    </label>
-                    <input id="ppa-{{ id }}" name="ppa" type="number" size="5"
-                        placeholder="PPA" class="form-control form-control-sm ml-2">
+            </div>
+            {% else %}
+            <input type="hidden" name="kernel" value="">
+            {% endif %}
+            <div class="col-auto ms-1 gx-2" title="Points per axis">
+                <label for="ppa-{{ id }}" class="col-form-label fas fa-ruler"></label>
+            </div>
+            <div class="col-auto" title="Points per axis">
+                <input id="ppa-{{ id }}" name="ppa" type="number" size="5" placeholder="PPA" class="form-control form-control-sm ml-2">
+            </div>
+            <div class="col-auto">
+                <div class="form-check" title="Show rectangles">
+                    <input id="show-shapes-{{ id }}" type="checkbox" class="form-check-input" checked>
+                    <label class="form-check-label fas fa-object-ungroup" for="show-shapes-{{ id }}"></label>
                 </div>
-                <div class="custom-control custom-checkbox mr-3" title="Show rectangles">
-                    <input id="show-shapes-{{ id }}" type="checkbox" class="custom-control-input" checked>
-                    <label class="custom-control-label" for="show-shapes-{{ id }}">
-                        <i class="fas fa-object-ungroup"></i>
-                        &nbsp;<!-- This non-breaking space fixes vertical align -->
-                    </label>
+            </div>
+            <div class="col-auto">
+                <div class="form-check" title="Show distances">
+                    <input id="show-distances-{{ id }}" type="checkbox" class="form-check-input">
+                    <label class="form-check-label fas fa-drafting-compass" for="show-distances-{{ id }}"></label>
                 </div>
-                <div class="custom-control custom-checkbox mr-3" title="Show distances">
-                    <input id="show-distances-{{ id }}" type="checkbox" class="custom-control-input">
-                    <label class="custom-control-label" for="show-distances-{{ id }}">
-                        <i class="fas fa-drafting-compass"></i>
-                        &nbsp;<!-- This non-breaking space fixes vertical align -->
-                    </label>
-                </div>
+            </div>
+            <div class="col-auto me-auto">
                 <button id="fullscreen-{{ id }}" type="button" class="btn btn-sm btn-primary" title="Fullscreen">
                     <i class="fas fa-expand" aria-hidden="true"></i>
                 </button>
-                <div class="vz-loader spinner-grow spinner-grow-sm ml-auto" role="status">
+            </div>
+            <div class="col-auto">
+                <div class="vz-loader spinner-grow spinner-grow-sm" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>

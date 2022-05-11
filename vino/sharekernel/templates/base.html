@@ -5,37 +5,38 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>{% block metatitle %}Vino{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-5.1.3.min.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/css/fontawesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/css/fontawesome-solid.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/vino.css' %}">
     <script src="{% static 'vendor/js/jquery-3.4.1.slim.min.js' %}"></script>
-    <script src="{% static 'vendor/js/popper-1.16.0.min.js' %}"></script>
-    <script src="{% static 'vendor/js/bootstrap-4.5.0.min.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap-5.1.3.bundle.min.js' %}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="{% url 'home' %}">Vino</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarText">
-                <ul class="navbar-nav mr-auto">
-                {% with active=request.resolver_match.url_name %}
-                    <li class="nav-item{% if active == 'home' %} active{% endif %}">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item{% if active == 'explore' or active == 'viabilityproblem' %} active{% endif %}">
-                        <a class="nav-link" href="{% url 'explore' %}">Explore</a>
-                    </li>
-                    <li class="nav-item{% if active == 'about' %} active{% endif %}">
-                        <a class="nav-link" href="{% url 'about' %}">About</a>
-                    </li>
-                {% endwith %}
-                </ul>
-                <a class="btn btn-outline-warning" href="{% url 'admin:index' %}">Admin</a>
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarToggler">
+                    <a class="navbar-brand" href="{% url 'home' %}">Vino</a>
+                    <ul class="navbar-nav me-auto">
+                    {% with active=request.resolver_match.url_name %}
+                        <li class="nav-item">
+                            <a class="nav-link{% if active == 'home' %} active{% endif %}" href="{% url 'home' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if active == 'explore' or active == 'viabilityproblem' %} active{% endif %}" href="{% url 'explore' %}">Explore</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if active == 'about' %} active{% endif %}" href="{% url 'about' %}">About</a>
+                        </li>
+                    {% endwith %}
+                    </ul>
+                    <a class="btn btn-outline-warning" href="{% url 'admin:index' %}">Admin</a>
+                </div>
             </div>
         </nav>
     </header>

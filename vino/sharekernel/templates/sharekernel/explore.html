@@ -15,7 +15,7 @@
             {% include 'pagination.html' %}
         </div>
         <div class="table-responsive">
-            <table class="table table-sm table-hover table-bordered">
+            <table class="table table-sm table-hover table-bordered small">
                 <thead>
                     <tr>
                         <th scope="col">Title</th>
@@ -47,12 +47,12 @@
                         <td>{{ k.date_created }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
                         <td>
-                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="software:{{ k.software.pk }}">
+                            <abbr title="Click to read more" data-bs-toggle="modal" data-bs-target="#modal" data-subject="software:{{ k.software.pk }}">
                                 {{ k.software }}
                             </attr>
                         </td>
                         <td>
-                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="dataformat:{{ k.format.pk }}">
+                            <abbr title="Click to read more" data-bs-toggle="modal" data-bs-target="#modal" data-subject="dataformat:{{ k.format.pk }}">
                                 {{ k.format }}
                             </abbr>
                         </td>

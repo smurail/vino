@@ -2,9 +2,9 @@
 {% load staticfiles %}
 {% load sharekernel %}
 {% block body %}
-    <div class="jumbotron pb-0 pb-md-3 text-center text-md-left">
+    <div class="bg-light mb-4 p-5 pb-0 pb-md-3 text-center text-md-start">
         <div class="container-xl">
-            <h1 class="jumbotron-head text-primary display-3">ViNO</h1>
+            <h1 class="fw-normal text-primary display-3">ViNO</h1>
             <p class="lead">
                 <span class="text-primary">Vi</span>able <span class="text-primary">N</span>umericable <span class="text-primary">O</span>bject repository
             </p>
@@ -33,17 +33,17 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <b>Data</b>
-                            <span class="badge badge-warning">{{ vp.parametersets.count }} parameter set{{ vp.parametersets.count|pluralize }}</span>
-                            <span class="badge badge-warning">{{ vp.kernels.count }} ViNO{{ vp.kernels.count|pluralize }}</span>
+                            <span class="badge bg-warning">{{ vp.parametersets.count }} parameter set{{ vp.parametersets.count|pluralize }}</span>
+                            <span class="badge bg-warning">{{ vp.kernels.count }} ViNO{{ vp.kernels.count|pluralize }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-end align-items-center">
                             <b>Dimensions</b>
-                            <span class="badge badge-primary">{{ vp.state_dimension }}D state</span>
-                            <span class="badge badge-primary">{{ vp.control_dimension }}D control</span>
+                            <span class="badge bg-primary">{{ vp.state_dimension }}D state</span>
+                            <span class="badge bg-primary">{{ vp.control_dimension }}D control</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <b>Dynamics type</b>
-                            <span class="badge badge-secondary">{{ vp.dynamics_type }}</span>
+                            <span class="badge bg-secondary">{{ vp.dynamics_type }}</span>
                         </li>
                     </ul>
                     <div class="card-body text-right">
@@ -55,7 +55,7 @@
         </div>
         <h2 class="mt-3">Last uploaded kernels</h2>
         <div class="table-responsive">
-            <table class="table table-sm table-hover table-bordered">
+            <table class="table table-sm table-hover table-bordered small">
                 <thead>
                     <tr>
                         <th scope="col">ViNO title</th>
@@ -79,12 +79,12 @@
                         <td>{{ k.date_created|date:"DATE_FORMAT" }}</td>
                         <td>{{ k.owner.get_full_name }}</td>
                         <td>
-                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="software:{{ k.software.pk }}">
+                            <abbr title="Click to read more" data-bs-toggle="modal" data-bs-target="#modal" data-subject="software:{{ k.software.pk }}">
                                 {{ k.software }}
                             </attr>
                         </td>
                         <td>
-                            <abbr title="Click to read more" data-toggle="modal" data-target="#modal" data-subject="dataformat:{{ k.format.pk }}">
+                            <abbr title="Click to read more" data-bs-toggle="modal" data-bs-target="#modal" data-subject="dataformat:{{ k.format.pk }}">
                                 {{ k.format }}
                             </abbr>
                         </td>
