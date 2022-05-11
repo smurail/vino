@@ -53,6 +53,7 @@ body.vz-fullscreen .vz-container {
 
 body.vz-fullscreen .vz-container.card {
     border: 0;
+    border-radius: 0;
 }
 
 body.vz-fullscreen .vz-view {
