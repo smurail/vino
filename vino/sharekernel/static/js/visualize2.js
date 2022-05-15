@@ -340,7 +340,7 @@ function hookVisualization(element) {
             range.max = ppa[a.order]-1;
 
             range.addEventListener('change', e => {
-                updateVino();
+                updateVino(info);
             });
 
             container.parentNode.insertBefore(node, null);
@@ -442,7 +442,9 @@ function hookVisualization(element) {
     });
     fields.vino.addEventListener('change', showVino);
     fields.shapes.addEventListener('change', showVino);
-    showVino();
+
+    // Show vino while allowing opportunity to change selected vino
+    setTimeout(showVino, 1);
 }
 
 //          _____                          ______     _____
