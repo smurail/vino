@@ -2,58 +2,60 @@
     <div class="card-header p-2">
         <form>
             <fieldset class="row g-2 align-items-center small">
-            {% if kernels %}
-            <div class="col-auto" title="ViNO">
+                {% if kernels %}
+                <div class="col-auto" title="ViNO">
                     <select id="kernel-{{ id }}" name="kernel" class="form-select form-select-sm">
                         {% for k in kernels %}
                         <option value="{{ k.pk }}">#{{ k.id }} {{ k.title }} ({{ k.size_with_unit }})</option>
                         {% endfor %}
                     </select>
-            </div>
-            {% else %}
-            <input type="hidden" name="kernel" value="">
-            {% endif %}
-            <div class="col-auto">
-                <label for="format-{{ id }}" class="col-form-label col-form-label-sm">as</label>
-            </div>
-            <div class="col-auto">
-                <select id="format-{{ id }}" name="format" class="form-select form-select-sm">
-                    <option value="bars" selected>BarGrid</option>
-                    <option value="regulargrid">RegularGrid</option>
-                    <option value="">Original</option>
-                </select>
-            </div>
-            <div class="col-auto" title="Points per axis">
-                <div class="input-group input-group-sm">
-                    <input id="ppa-{{ id }}" name="ppa" type="text" size="12" pattern="[-,0-9]*" placeholder="PPA" class="form-control form-control-sm ml-2">
-                    <label for="ppa-{{ id }}" class="input-group-text">PPA</label>
                 </div>
-            </div>
-            <div class="col-auto">
-                <input type="checkbox" class="btn-check" name="show-shapes" id="show-shapes-{{ id }}" autocomplete="off" checked>
-                <label class="btn btn-sm btn-outline-info" for="show-shapes-{{ id }}" title="Show rectangles">
-                    <i class="fas fa-object-ungroup"></i>
-                </label>
-            </div>
-            <div class="col-auto">
-                <input type="checkbox" class="btn-check" name="show-section" id="show-section-{{ id }}" autocomplete="off" data-bs-toggle="collapse" data-bs-target="#section-chooser-{{ id }}">
-                <label class="btn btn-sm btn-outline-danger" for="show-section-{{ id }}" title="Show cross-section">
-                    <i class="fas fa-bread-slice"></i>
-                </label>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-sm btn-primary">Show</button>
-            </div>
-            <div class="col-auto ms-3 me-auto">
-                <button id="fullscreen-{{ id }}" type="button" class="btn btn-sm btn-secondary" title="Fullscreen">
-                    <i class="fas fa-expand" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="col-auto me-1">
-                <div class="vz-loader spinner-grow spinner-grow-sm" role="status">
-                    <span class="sr-only">Loading...</span>
+                {% else %}
+                <input type="hidden" name="kernel" value="">
+                {% endif %}
+                <div class="col-auto">
+                    <label for="format-{{ id }}" class="col-form-label col-form-label-sm">as</label>
                 </div>
-            </div>
+                <div class="col-auto">
+                    <select id="format-{{ id }}" name="format" class="form-select form-select-sm">
+                        <option value="bars" selected>BarGrid</option>
+                        <option value="regulargrid">RegularGrid</option>
+                        <option value="">Original</option>
+                    </select>
+                </div>
+                <div class="col-auto" title="Points per axis">
+                    <div class="input-group input-group-sm">
+                        <input id="ppa-{{ id }}" name="ppa" type="text" size="12" pattern="[-,0-9]*"
+                               placeholder="PPA" class="form-control form-control-sm ml-2">
+                        <label for="ppa-{{ id }}" class="input-group-text">PPA</label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <input type="checkbox" class="btn-check" name="show-shapes" id="show-shapes-{{ id }}" autocomplete="off" checked>
+                    <label class="btn btn-sm btn-outline-info" for="show-shapes-{{ id }}" title="Show rectangles">
+                        <i class="fas fa-object-ungroup"></i>
+                    </label>
+                </div>
+                <div class="col-auto">
+                    <input type="checkbox" class="btn-check" name="show-section" id="show-section-{{ id }}" autocomplete="off"
+                           data-bs-toggle="collapse" data-bs-target="#section-chooser-{{ id }}">
+                    <label class="btn btn-sm btn-outline-danger" for="show-section-{{ id }}" title="Show cross-section">
+                        <i class="fas fa-bread-slice"></i>
+                    </label>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-primary">Show</button>
+                </div>
+                <div class="col-auto ms-3 me-auto">
+                    <button id="fullscreen-{{ id }}" type="button" class="btn btn-sm btn-secondary" title="Fullscreen">
+                        <i class="fas fa-expand" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="col-auto me-1">
+                    <div class="vz-loader spinner-grow spinner-grow-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
             </fieldset>
         </form>
     </div>
@@ -62,27 +64,29 @@
     </div>
     <div id="section-chooser-{{ id }}" class="collapse card-footer px-3 py-2">
         <form>
-            <div class="row g-3 align-items-center">
-                <div class="col-2 text-end">
-                    <label class="col-form-label col-form-label-sm mr-2" for="plane-{{ id }}">Cutting plane</label>
+            <fieldset>
+                <div class="row g-3 align-items-center">
+                    <div class="col-2 text-end">
+                        <label class="col-form-label col-form-label-sm mr-2" for="plane-{{ id }}">Cutting plane</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="plane-{{ id }}" name="plane" class="form-select form-select-sm"></select>
+                    </div>
+                    <div class="col-auto">
+                        <button id="switch-plane-{{ id }}" type="button" class="btn btn-sm btn-primary" title="Switch axes">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="col-auto">
-                    <select id="plane-{{ id }}" name="plane" class="form-select form-select-sm"></select>
+                <div id="axis-container-{{ id }}" class="row g-3 align-items-center d-none">
+                    <div class="col-2 text-end">
+                        <label class="col-form-label col-form-label-sm mr-2">axis</label>
+                    </div>
+                    <div class="col mt-4">
+                        <input class="form-range" type="range" value="0" step="1" min="0" max="100">
+                    </div>
                 </div>
-                <div class="col-auto">
-                    <button id="switch-plane-{{ id }}" type="button" class="btn btn-sm btn-primary" title="Switch axes">
-                        <i class="fas fa-exchange-alt"></i>
-                    </button>
-                </div>
-            </div>
-            <div id="axis-container-{{ id }}" class="row g-3 align-items-center d-none">
-                <div class="col-2 text-end">
-                    <label class="col-form-label col-form-label-sm mr-2">axis</label>
-                </div>
-                <div class="col mt-4">
-                    <input class="form-range" type="range" value="0" step="1" min="0" max="100">
-                </div>
-            </div>
+            </fieldset>
         </form>
     </div>
 </div>

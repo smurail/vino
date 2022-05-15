@@ -492,9 +492,18 @@ class VinoPlot {
     loading(isLoading) {
         document.body.classList.toggle('loading', isLoading);
         this.loader.classList.toggle('visible', isLoading);
-        // XXX Ugly HACK
-        const fieldset = this.element.parentNode.parentNode.querySelector('fieldset');
-        if (fieldset) fieldset.disabled = isLoading;
+        // XXX BEGIN UGLY HACK [
+        const fieldsets = this.element.querySelectorAll('fieldset');
+        if (isLoading) {
+            this._focus = document.activeElement
+        } else if (this._focus && document.activeElement == document.body) {
+            setTimeout(() => {
+                this._focus.focus();
+                this._focus = null;
+            }, 1);
+        }
+        fieldsets.forEach(f => f.disabled = isLoading);
+        // XXX ] END UGLY HACK
     }
 
     toTrace(data) {
