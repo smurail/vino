@@ -566,15 +566,14 @@ class VinoPlot {
     }
 
     show() {
-        let p;
-
         this.loading(true);
-        p = Promise.all(this.promises)
+        Promise.all(this.promises)
             .then(results => Promise.all(results.map(r => r.json())))
             .then(chunks => this.plot(chunks).keepInfo(chunks))
             .then(data => this.postprocess.forEach(fn => fn.call(this, data)))
             .catch(error => console.log('ERROR FETCHING:', error))
             .finally(() => this.loading(false));
+        this.promises = [];
 
         return this;
     }
