@@ -97,9 +97,12 @@ class RegularGrid(Vino):
         assert len(at) == self.dim - 2
 
         sections = np.moveaxis(self, plane, range(-len(plane), 0))
+
+        return sections[tuple(at)]
+
+    def section_coordinates(self, plane: Sequence[int], at: Sequence[int]) -> NDArrayFloat:
         grid_coordinates = self.grid_coordinates(plane)
-        section = sections[tuple(at)]
-        points = grid_coordinates[section.ravel()]
+        points = grid_coordinates[self.section(plane, at).ravel()]
 
         return cast(NDArrayFloat, points)
 

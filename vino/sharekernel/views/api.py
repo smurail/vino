@@ -169,7 +169,7 @@ class VinoSection(VinoDetailView):
             if a not in range(len(axes)):
                 return error(f"Cutting plane axes must be between 0 and {len(axes)-1}")
 
-        section = vno.section(plane, at)
+        section = vno.section_coordinates(plane, at)
 
         return dict(info, values=[
             np.ascontiguousarray(section[:, a]) for a in range(len(plane))
