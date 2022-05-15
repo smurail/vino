@@ -7,7 +7,7 @@ from typing import cast, TYPE_CHECKING, Sequence
 
 from ..metadata import Metadata
 from .vino import Vino
-from .typing import NDArrayInt, NDArrayFloat
+from .typing import NDArrayInt, NDArrayFloat, NDArrayBool
 
 if TYPE_CHECKING:
     from .bargrid import BarGrid
@@ -92,13 +92,13 @@ class RegularGrid(Vino):
 
         return cast(NDArrayFloat, points)
 
-    def section(self, plane: Sequence[int], at: Sequence[int]) -> npt.NDArray:
+    def section(self, plane: Sequence[int], at: Sequence[int]) -> NDArrayBool:
         assert len(plane) == 2
         assert len(at) == self.dim - 2
 
         sections = np.moveaxis(self, plane, range(-len(plane), 0))
 
-        return sections[tuple(at)]
+        return cast(NDArrayBool, sections[tuple(at)])
 
     def section_coordinates(self, plane: Sequence[int], at: Sequence[int]) -> NDArrayFloat:
         grid_coordinates = self.grid_coordinates(plane)
