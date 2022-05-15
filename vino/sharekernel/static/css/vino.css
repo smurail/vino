@@ -80,20 +80,21 @@ body.vz-fullscreen {
     overflow: hidden;
 }
 
-body.vz-fullscreen .vz-container {
+body.vz-fullscreen .vz-container.vz-fullscreen {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
+    z-index: 1000;
 }
 
-body.vz-fullscreen .vz-container.card {
+body.vz-fullscreen .vz-container.vz-fullscreen.card {
     border: 0;
     border-radius: 0;
 }
 
-body.vz-fullscreen .vz-view {
+body.vz-fullscreen .vz-container.vz-fullscreen .vz-view {
     width: 100%;
     height: 100%;
 }

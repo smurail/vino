@@ -173,6 +173,8 @@ function hookFullscreen(element) {
 
         // Toggle fullscreen class on body
         document.body.classList.toggle(cls);
+        // Toggle fullscreen class on container
+        element.classList.toggle(cls);
 
         // Update fullscreen button icon
         btn.querySelector('.fas').classList.replace(oldIcon, newIcon);
@@ -297,7 +299,7 @@ function hookVisualization(element) {
 
             console.log('SHOW', id, conv, fields.shapes.checked && hasShapes ? 'with shapes' : 'without shapes');
 
-            let plot = vinoPlot();
+            let plot = vinoPlot(element);
 
             if (fields.shapes.checked && hasShapes)
                 plot = plot.trace(`/api/vino/${id}${conv}/shapes/`);
@@ -471,7 +473,7 @@ const INFO_PROPERTIES = [
 ];
 
 class VinoPlot {
-    constructor(element, config) {
+    constructor(container, config) {
         if (config == null)
             config = PLOTLY_DEFAULT_CONFIG;
 
@@ -480,9 +482,9 @@ class VinoPlot {
         this.config = config;
         this.info = {};
 
-        this.element = getElement(element);
-        this.view = getElement('.vz-view');
-        this.loader = getElement('.vz-loader');
+        this.element = getElement(container);
+        this.view = this.element.querySelector('.vz-view');
+        this.loader = this.element.querySelector('.vz-loader');
     }
 
     error(msg) {
@@ -579,8 +581,8 @@ class VinoPlot {
     }
 }
 
-function vinoPlot(view) {
-    return new VinoPlot(view == null ? '.vz-view' : view);
+function vinoPlot(container) {
+    return new VinoPlot(container == null ? '.vz-container' : container);
 }
 
 //               _____
