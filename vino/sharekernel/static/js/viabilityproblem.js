@@ -22,7 +22,7 @@ function selectKernel(id, ppa=null) {
 $(function() {
     var kernels = $('#kernels-table tr[data-kernel-id]'),
         checkboxes = $('#kernels-table input[type=checkbox]'),
-        currentKernel = $('.vz-container *[name=kernel]'),
+        currentKernel = $('.vz-container *[name=kernel]').first(),
         doc = $('html, body'),
         ppa = null,
         args, kernelId;
