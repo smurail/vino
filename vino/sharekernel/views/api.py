@@ -165,6 +165,10 @@ class VinoSection(VinoDetailView):
             return error(
                 f"Please provide {m} ax{'i' if m == 1 else 'e'}s to specify section position")
 
+        for a in plane:
+            if a not in range(len(axes)):
+                return error(f"Cutting plane axes must be between 0 and {len(axes)-1}")
+
         section = vno.section(plane, at)
 
         return dict(info, values=[
