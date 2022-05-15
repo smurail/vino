@@ -367,11 +367,6 @@ function hookVisualization(element) {
 
         console.log('updateForm', state, getRequestedState());
 
-        if (fields.vino.value != state.id) {
-            fields.format.value = defaultFormat;
-            fields.ppa.value = defaultPPA;
-        }
-
         fields.section.disabled = info.dim <= 2 || info.dim > 3;
         if (info.dim > 3) {
             fields.section.checked = true;
