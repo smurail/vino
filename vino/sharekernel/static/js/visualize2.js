@@ -7,54 +7,56 @@
 //   _  .___//_/  \____/\__/ /_/  _\__, /      \__/ \____/\____//_/  /____/
 //   /_/                          /____/
 
-function marker(color) {
+function marker(color, size) {
     return {
-        size: 2,
+        size: size || 2,
         color: color == null ? null : color,
         colorscale: 'Viridis',
         reversescale: true
     }
 }
 
-function line(color) {
+function line(color, width) {
     return {
-        width: 1,
+        width: width || 1,
         color: color == null ? null : color
     };
 }
 
-function points2d(x, y, color) {
+function points2d(x, y, color, size) {
     return {
         type: 'scattergl',
         mode: 'markers',
-        marker: marker(color),
+        marker: marker(color, size),
         x: x,
         y: y
     }
 }
 
-function points3d(x, y, z, color) {
+function points3d(x, y, z, color, size) {
     return {
         type: 'scatter3d',
         mode: 'markers',
-        marker: marker(color),
+        marker: marker(color, size),
         x: x,
         y: y,
         z: z
     }
 }
 
-function points(x, y, z, color) {
-    return z == null ? points2d(x, y, color) : points3d(x, y, z, color);
+function points(x, y, z, color, size) {
+    return z == null ?
+           points2d(x, y, color, size) :
+           points3d(x, y, z, color, size);
 }
 
-function shapes(x, y, color) {
+function shapes(x, y, color, width) {
     return {
         type: 'scattergl',
         mode: 'lines',
         hoverinfo: 'skip',
         connectgaps: false,
-        line: line(color),
+        line: line(color, width),
         x: x,
         y: y
     };
@@ -496,11 +498,14 @@ class VinoPlot {
     }
 
     toTrace(data) {
-        const color = '#80d0d0';
+        const color = '#80d0d0',
+              size = data.format == FORMAT_REGULARGRID ? 3 : null;
         let V, trace;
 
-        if ((V = data.shapes)) trace = shapes(V[0], V[1], color);
-        else if ((V = data.values)) trace = points(V[0], V[1], V[2], V[2] || V[1]);
+        if ((V = data.shapes))
+            trace = shapes(V[0], V[1], color);
+        else if ((V = data.values))
+            trace = points(V[0], V[1], V[2], V[2] || V[1], size);
 
         if (data.format == FORMAT_POLYGON) {
             trace.mode = 'lines+markers';
