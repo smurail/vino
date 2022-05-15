@@ -389,7 +389,7 @@ function hookVisualization(element) {
             if (currentFormat == FORMAT_BARGRID)
                 fields.ppa.value = info.dim == 2 ? 1000 : 50;
             else if (currentFormat == FORMAT_REGULARGRID)
-                fields.ppa.value = info.dim == 2 ? 300 : 30;
+                fields.ppa.value = info.dim == 2 ? 300 : 50;
         }
 
         fields.shapes.disabled = info.dim != 2 || ![FORMAT_BARGRID, FORMAT_KDTREE].includes(currentFormat || info.format);
