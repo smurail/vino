@@ -334,6 +334,7 @@ function hookVisualization(element) {
                   range = node.querySelector('input[type="range"]'),
                   input = node.querySelector('input[type="number"]');
 
+            node.removeAttribute('id');
             node.classList.remove('d-none');
             node.classList.add('axis-container');
             label.textContent = a.name;
