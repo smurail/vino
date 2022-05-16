@@ -166,7 +166,6 @@ class VinoSection(VinoDetailView):
         original = vino_from_kernel(kernel)
         vno = original.to_regulargrid(ppa=self.ppa)
         info = info_from_vino(kernel, vno, original, plane)
-        axes = info['axes']
 
         m = vno.dim - len(plane)
         if len(at) != m:
@@ -174,8 +173,8 @@ class VinoSection(VinoDetailView):
                 f"Please provide {m} ax{'i' if m == 1 else 'e'}s to specify section position")
 
         for a in plane:
-            if a not in range(len(axes)):
-                return error(f"Cutting plane axes must be between 0 and {len(axes)-1}")
+            if a not in range(vno.dim):
+                return error(f"Cutting plane axes must be between 0 and {vno.dim-1}")
 
         section = vno.section_coordinates(plane, at)
 
