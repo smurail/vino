@@ -229,7 +229,7 @@ function hookVisualization(element) {
               ppa: form.elements['ppa'],
               plane: document.getElementById('plane-' + vzId),
               section: form.elements['show-section'],
-              distances: form.elements['show-distances'],
+              distance: form.elements['show-distance'],
               shapes: form.elements['show-shapes']
           },
           switchPlaneButton = document.getElementById('switch-plane-' + vzId),
@@ -252,6 +252,7 @@ function hookVisualization(element) {
             section: fields.section.checked,
             plane: fields.plane.value,
             at: at,
+            distance: fields.distance.checked,
             shapes: fields.shapes.checked
         };
     }
@@ -291,7 +292,10 @@ function hookVisualization(element) {
                   ppa = fields.ppa.value,
                   format = fields.format.value,
                   currentFormat = format || info.format,
-                  apiFormat = ({'bars': 'bargrid', 'regulargrid': 'regulargrid'})[format] || null,
+                  apiFormat = ({
+                      'bars': 'bargrid',
+                      'regulargrid': `regulargrid${fields.distance.checked?'[distance]':''}`
+                  })[format] || null,
                   hasShapes = info.dim == 2 && [FORMAT_BARGRID, FORMAT_KDTREE].indexOf(currentFormat) >= 0,
                   conv = apiFormat ? `/${apiFormat}/${ppa}` : '',
                   plane = state.plane,
@@ -321,13 +325,9 @@ function hookVisualization(element) {
               _ppa = parsePPA(fields.ppa.value),
               ppa = Array.isArray(_ppa) ? _ppa : Array(info.dim).fill(_ppa),
               container = document.getElementById('axis-container-' + vzId),
-              oldContainers = container.parentNode.querySelectorAll('.axis-container');
+              oldAxes = container.parentNode.querySelectorAll('.axis-container');
 
-        console.log('updateAxes', info.grid, axes, ppa, container, container.parentNode, oldContainers);
-
-        for (let old of oldContainers)
-            container.parentNode.removeChild(old);
-
+        oldAxes.forEach(old => container.parentNode.removeChild(old))
         axes.forEach(a => {
             const node = container.cloneNode(true),
                   label = node.querySelector('label'),
@@ -373,9 +373,15 @@ function hookVisualization(element) {
             fields.section.checked = true;
             bootstrap.Collapse.getOrCreateInstance('#section-chooser-' + vzId).show();
         }
-        if (info.dim > 2 && fields.section.checked != state.section) {
-            fields.format.value = fields.section.checked ? FORMAT_REGULARGRID : defaultFormat;
-            fields.format.disabled = fields.section.checked;
+        if (info.dim >= 3) {
+            fields.distance.disabled = !fields.section.checked;
+            if (!fields.section.checked)
+                fields.distance.checked = false;
+        }
+        if (fields.section.checked != state.section || fields.distance.checked != state.distance) {
+            const lock = fields.section.checked || fields.distance.checked;
+            fields.format.value = lock ? FORMAT_REGULARGRID : defaultFormat;
+            fields.format.disabled = lock;
         }
 
         const currentFormat = fields.format.value;
@@ -431,6 +437,7 @@ function hookVisualization(element) {
     fields.format.addEventListener('change', showVino);
     fields.section.addEventListener('change', showVino);
     fields.plane.addEventListener('change', showVino);
+    fields.distance.addEventListener('change', showVino);
 
     form.addEventListener('submit', e => {
         e.preventDefault();
@@ -514,7 +521,7 @@ class VinoPlot {
         if ((V = data.shapes))
             trace = shapes(V[0], V[1], color);
         else if ((V = data.values))
-            trace = points(V[0], V[1], V[2], V[2] || V[1], size);
+            trace = points(V[0], V[1], V[2], data.distances || V[2] || V[1], size);
 
         if (data.format == FORMAT_POLYGON) {
             trace.mode = 'lines+markers';
