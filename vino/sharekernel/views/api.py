@@ -178,12 +178,16 @@ class VinoSection(VinoDetailView):
         vno = original.to_regulargrid(ppa=self.ppa)
         info = info_from_vino(kernel, vno, original, plane)
 
-        section = vno.section(plane, at)
+        if self.weight == 'distance':
+            vno = vno.with_distance()
+
+        section = vno.section(plane, at).ravel()
+        mask = section if self.weight is None else (section > 0)
         coordinates = vno.grid_coordinates(plane)
-        points = coordinates[section.ravel()]
+        points = coordinates[mask]
 
         if self.weight == 'distance':
-            info['distances'] = section.distances()
+            info['distances'] = np.asarray(section[mask])
 
         return dict(info, values=[
             np.ascontiguousarray(points[:, a]) for a in range(len(plane))
