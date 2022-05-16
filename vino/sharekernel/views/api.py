@@ -96,6 +96,7 @@ class VinoDetailView(JsonDetailView):
 class VinoData(VinoDetailView):
     info_only = False
     format = None
+    weight = None
 
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
@@ -122,6 +123,9 @@ class VinoData(VinoDetailView):
             vno = vno.hull()
 
         data = vno.points_coordinates()
+
+        if type(vno) is vn.RegularGrid and self.weight == 'distance':
+            info['distances'] = vno.distances()
 
         return dict(info, values=[
             np.ascontiguousarray(data[:, v.order]) for v in vno.variables
@@ -150,6 +154,8 @@ class VinoShapes(VinoDetailView):
 
 
 class VinoSection(VinoDetailView):
+    weight = None
+
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
 
@@ -176,8 +182,13 @@ class VinoSection(VinoDetailView):
             if a not in range(vno.dim):
                 return error(f"Cutting plane axes must be between 0 and {vno.dim-1}")
 
-        section = vno.section_coordinates(plane, at)
+        section = vno.section(plane, at)
+        coordinates = vno.grid_coordinates(plane)
+        points = coordinates[section.ravel()]
+
+        if self.weight == 'distance':
+            info['distances'] = section.distances()
 
         return dict(info, values=[
-            np.ascontiguousarray(section[:, a]) for a in range(len(plane))
+            np.ascontiguousarray(points[:, a]) for a in range(len(plane))
         ])
