@@ -41,10 +41,7 @@ def info_from_vino(kernel, vno, original=None, axes_subset=None):
 
     if original is not None:
         info.update(
-            format=vno.DATAFORMAT,
-            size=vno.size,
-            original=dict(format=original.DATAFORMAT, size=original.size),
-        )
+            original=dict(format=original.DATAFORMAT, size=len(original)))
 
     if isinstance(vno, vn.RegularGrid):
         if axes_subset is None:
