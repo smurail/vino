@@ -127,7 +127,7 @@ class RegularGrid(Vino):
 
         nonzero_distances = self.with_distance(domain)[self]
 
-        return cast(NDArrayFloat, nonzero_distances.ravel())
+        return cast(NDArrayFloat, np.asarray(nonzero_distances.ravel()))
 
     def to_bargrid(self, ppa: int | npt.ArrayLike = -1, baraxis: int = -1) -> BarGrid:
         from .bargrid import BarGrid
