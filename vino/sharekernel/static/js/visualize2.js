@@ -269,7 +269,7 @@ function hookVisualization(element) {
         const info = infos.get(state.id),
               ppa = parsePPA(fields.ppa.value);
 
-        if (!fields.format.value || (Array.isArray(ppa) ? ppa.length == info.dim : ppa)) {
+        if (!fields.format.value || (Array.isArray(ppa) ? ppa.length == info.dim && !ppa.some(isNaN) : !isNaN(ppa))) {
             fields.ppa.classList.remove('is-invalid');
         } else {
             fields.ppa.classList.add('is-invalid');
@@ -283,7 +283,7 @@ function hookVisualization(element) {
         if (!info)
             info = infos.get(parseInt(fields.vino.value));
 
-        if (info && isDirty() && isValid()) {
+        if (info && isValid() && isDirty()) {
             commitRequestedState();
 
             console.log('PLOT', state);
