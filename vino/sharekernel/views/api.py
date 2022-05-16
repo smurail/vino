@@ -29,15 +29,14 @@ def info_from_vino(kernel, vno, original=None, axes_subset=None):
 
     dim = vno.dim if axes_subset is None else len(axes_subset)
     axes = axes_from_vino(vno)
-    info = {
-        'id': kernel.id,
-        'vp': kernel.vp.id,
-        'title': kernel.title,
-        'dim': dim,
-        'format': vno.DATAFORMAT,
-        'size': len(vno),
-        'axes': axes if axes_subset is None else [axes[a] for a in axes_subset],
-    }
+    info = dict(
+        id=kernel.id,
+        vp=kernel.vp.id,
+        title=kernel.title,
+        dim=dim,
+        format=vno.DATAFORMAT,
+        size=len(vno),
+        axes=axes if axes_subset is None else [axes[a] for a in axes_subset])
 
     if original is not None:
         info.update(
@@ -166,18 +165,18 @@ class VinoSection(VinoDetailView):
         if len(plane) != 2:
             return error("Please provide 2 axes to define the cutting plane")
 
-        original = vino_from_kernel(kernel)
-        vno = original.to_regulargrid(ppa=self.ppa)
-        info = info_from_vino(kernel, vno, original, plane)
-
-        m = vno.dim - len(plane)
+        m = dim - len(plane)
         if len(at) != m:
             return error(
                 f"Please provide {m} ax{'i' if m == 1 else 'e'}s to specify section position")
 
         for a in plane:
-            if a not in range(vno.dim):
-                return error(f"Cutting plane axes must be between 0 and {vno.dim-1}")
+            if a not in range(dim):
+                return error(f"Cutting plane axes must be between 0 and {dim-1}")
+
+        original = vino_from_kernel(kernel)
+        vno = original.to_regulargrid(ppa=self.ppa)
+        info = info_from_vino(kernel, vno, original, plane)
 
         section = vno.section(plane, at)
         coordinates = vno.grid_coordinates(plane)
