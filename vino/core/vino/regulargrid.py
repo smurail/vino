@@ -4,6 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from typing import cast, TYPE_CHECKING, Sequence
+from scipy import ndimage  # type: ignore
 
 from ..metadata import Metadata
 from .vino import Vino
@@ -105,6 +106,28 @@ class RegularGrid(Vino):
         points = grid_coordinates[self.section(plane, at).ravel()]
 
         return cast(NDArrayFloat, points)
+
+    def with_distance(self, domain: str | None = None) -> RegularGrid:
+        assert domain is None
+        assert np.issubdtype(self.dtype, np.bool_)
+
+        # Add border of False around data
+        padded = np.pad(self, 1, mode='constant', constant_values=False)  # type: ignore
+
+        # Compute euclidian distance to closest border
+        result = ndimage.distance_transform_edt(padded)
+
+        # Extract distances without 0 border
+        distances = result[tuple(slice(1, -1) for _ in range(result.ndim))]
+
+        return RegularGrid(distances, self.metadata)
+
+    def distances(self, domain: str | None = None) -> NDArrayFloat:
+        assert np.issubdtype(self.dtype, np.bool_)
+
+        nonzero_distances = self.with_distance(domain)[self]
+
+        return cast(NDArrayFloat, nonzero_distances.ravel())
 
     def to_bargrid(self, ppa: int | npt.ArrayLike = -1, baraxis: int = -1) -> BarGrid:
         from .bargrid import BarGrid

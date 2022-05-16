@@ -25,6 +25,7 @@ pillow = "*"
 django-currentuser = "*"
 pandas = "*"
 orjson = "*"
+scipy = "*"
 
 [requires]
 python_version = "3.7"
