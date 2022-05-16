@@ -79,7 +79,18 @@ class VinoDetailView(JsonDetailView):
 
     def get_ppa(self):
         ppa = self.kwargs.get('ppa')
-        return None if not ppa else ppa[0] if len(ppa) == 1 else ppa
+
+        if ppa is None:
+            return None
+
+        if all(x <= 0 for x in ppa):
+            return -1
+
+        return ppa[0] if len(ppa) == 1 else ppa
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.ppa = self.get_ppa()
 
 
 class VinoData(VinoDetailView):
@@ -95,14 +106,13 @@ class VinoData(VinoDetailView):
             return error(
                 f"Can't visualize {vno.dim}-dimensional vino, use sections")
 
-        ppa = self.get_ppa()
-        if ppa is not None:
+        if self.ppa is not None:
             original = vno
 
             if self.format == 'regulargrid':
-                vno = vno.to_regulargrid(ppa=ppa)
+                vno = vno.to_regulargrid(ppa=self.ppa)
             else:
-                vno = vno.to_bargrid(ppa=ppa)
+                vno = vno.to_bargrid(ppa=self.ppa)
 
         info = info_from_vino(kernel, vno, original)
         if self.info_only:
@@ -128,10 +138,9 @@ class VinoShapes(VinoDetailView):
         vno = vino_from_kernel(kernel)
         original = None
 
-        ppa = self.get_ppa()
-        if ppa is not None:
+        if self.ppa is not None:
             original = vno
-            vno = vno.to_bargrid(ppa=ppa)
+            vno = vno.to_bargrid(ppa=self.ppa)
 
         rectangles = vno.rectangles_coordinates()
 
@@ -148,7 +157,6 @@ class VinoSection(VinoDetailView):
         if dim < 3:
             return error(f"Can't make sections from a {dim}-dimensional vino")
 
-        ppa = self.get_ppa()
         plane = self.kwargs.get('plane')
         at = self.kwargs.get('at')
 
@@ -156,7 +164,7 @@ class VinoSection(VinoDetailView):
             return error("Please provide 2 axes to define the cutting plane")
 
         original = vino_from_kernel(kernel)
-        vno = original.to_regulargrid(ppa=ppa or -1)
+        vno = original.to_regulargrid(ppa=self.ppa)
         info = info_from_vino(kernel, vno, original, plane)
         axes = info['axes']
 
