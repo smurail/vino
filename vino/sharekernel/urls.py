@@ -2,13 +2,13 @@ from django.urls import path, include, register_converter
 from django.conf import settings
 from django.views.generic import TemplateView
 
-from .converters import IntTupleConverter
+from .converters import PositiveIntTupleConverter
 from .views import (HomeView, ExploreView, ViabilityProblemView,
                     VisualizationDemoView, KernelData, VinoData, VinoShapes,
                     VinoSection)
 
 
-register_converter(IntTupleConverter, 'ints')
+register_converter(PositiveIntTupleConverter, 'ints')
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),

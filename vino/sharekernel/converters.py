@@ -2,10 +2,10 @@ from __future__ import annotations
 from typing import Sequence
 
 
-class IntTupleConverter:
+class PositiveIntTupleConverter:
     LIMIT = 100
 
-    regex = '[-,0-9]+'
+    regex = '[0-9][,0-9]*'
 
     def to_python(self, value: str) -> tuple[int]:
         return tuple(int(x) for x in value.split(',', self.LIMIT))
