@@ -515,17 +515,21 @@ class VinoPlot {
 
     toTrace(data) {
         const color = '#80d0d0',
-              size = data.format == FORMAT_REGULARGRID ? 3 : null;
+              size = data.format == FORMAT_REGULARGRID ? 3 : null,
+              distances = data.distances ? data.distances.values : null;
         let V, trace;
 
         if ((V = data.shapes))
             trace = shapes(V[0], V[1], color);
         else if ((V = data.values))
-            trace = points(V[0], V[1], V[2], data.distances || V[2] || V[1], size);
+            trace = points(V[0], V[1], V[2], distances || V[2] || V[1], size);
 
         if (data.format == FORMAT_POLYGON) {
             trace.mode = 'lines+markers';
             trace.line = {width: 1, dash: "dash"};
+        } else if (data.distances && data.distances.range && trace.marker) {
+            trace.marker.cmin = data.distances.range[0];
+            trace.marker.cmax = data.distances.range[1];
         }
 
         return trace;

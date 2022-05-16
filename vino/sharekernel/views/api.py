@@ -121,7 +121,9 @@ class VinoData(VinoDetailView):
         data = vno.points_coordinates()
 
         if type(vno) is vn.RegularGrid and self.weight == 'distance':
-            info['distances'] = vno.distances()
+            info['distances'] = dict(
+                values=vno.distances(),
+            )
 
         return dict(info, values=[
             np.ascontiguousarray(data[:, v.order]) for v in vno.variables
@@ -187,7 +189,10 @@ class VinoSection(VinoDetailView):
         points = coordinates[mask]
 
         if self.weight == 'distance':
-            info['distances'] = np.asarray(section[mask])
+            info['distances'] = dict(
+                range=[np.min(vno.ravel()).item(), np.max(vno.ravel()).item()],
+                values=np.asarray(section[mask]),
+            )
 
         return dict(info, values=[
             np.ascontiguousarray(points[:, a]) for a in range(len(plane))
