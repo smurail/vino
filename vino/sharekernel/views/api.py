@@ -36,11 +36,14 @@ def info_from_vino(kernel, vno, original=None, axes_subset=None):
         dim=dim,
         format=vno.DATAFORMAT,
         size=len(vno),
-        axes=axes if axes_subset is None else [axes[a] for a in axes_subset])
+        axes=axes if axes_subset is None else [axes[a] for a in axes_subset],
+    )
 
     if original is not None:
-        info.update(
-            original=dict(format=original.DATAFORMAT, size=len(original)))
+        info['original'] = dict(
+            format=original.DATAFORMAT,
+            size=len(original),
+        )
 
     if isinstance(vno, vn.RegularGrid):
         if axes_subset is None:
@@ -53,13 +56,14 @@ def info_from_vino(kernel, vno, original=None, axes_subset=None):
             opposite = vno.opposite[a]
             unit = vno.unit[a]
             bounds = np.ascontiguousarray(vno.bounds.T[a].T)
-        info.update(
-            grid=dict(
-                ppa=ppa,
-                origin=origin,
-                opposite=opposite,
-                unit=unit,
-                bounds=bounds))
+
+        info['grid'] = dict(
+            ppa=ppa,
+            origin=origin,
+            opposite=opposite,
+            unit=unit,
+            bounds=bounds
+        )
 
     return info
 
