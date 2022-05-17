@@ -279,6 +279,22 @@ function hookVisualization(element) {
         return true;
     }
 
+    function vinoURL(state, shapes) {
+        const format = ({
+                  'bars': 'bargrid',
+                  'regulargrid': `regulargrid${state.distance?'[distance]':''}`
+              })[state.format] || null,
+              conv = format ? `/${format}/${state.ppa}` : '',
+              base = `/api/vino/${state.id}${conv}/`;
+
+        if (shapes && state.shapes)
+            return `${base}shapes/`;
+        else if (state.section)
+            return `${base}section/${state.plane}/${state.at}/`;
+
+        return base;
+    }
+
     function updateVino(info) {
         if (!info)
             info = infos.get(parseInt(fields.vino.value));
@@ -286,34 +302,22 @@ function hookVisualization(element) {
         if (info && isValid() && isDirty()) {
             commitRequestedState();
 
-            console.log('PLOT', state);
+            const url = vinoURL(state),
+                  currentFormat = state.format || info.format,
+                  hasShapes = info.axes.length == 2 && [FORMAT_BARGRID, FORMAT_KDTREE].indexOf(currentFormat) >= 0,
+                  urlShapes = hasShapes ? vinoURL(state, true) : '';
 
-            const id = info.id,
-                  ppa = fields.ppa.value,
-                  format = fields.format.value,
-                  currentFormat = format || info.format,
-                  apiFormat = ({
-                      'bars': 'bargrid',
-                      'regulargrid': `regulargrid${fields.distance.checked?'[distance]':''}`
-                  })[format] || null,
-                  hasShapes = info.dim == 2 && [FORMAT_BARGRID, FORMAT_KDTREE].indexOf(currentFormat) >= 0,
-                  conv = apiFormat ? `/${apiFormat}/${ppa}` : '',
-                  plane = state.plane,
-                  at = state.at;
-
-            console.log('SHOW', id, conv, fields.shapes.checked && hasShapes ? 'with shapes' : 'without shapes');
+            console.log('SHOW', url, urlShapes);
 
             let plot = vinoPlot(element);
 
-            if (fields.shapes.checked && hasShapes)
-                plot = plot.trace(`/api/vino/${id}${conv}/shapes/`);
+            if (urlShapes)
+                plot = plot.trace(urlShapes);
 
-            if (fields.section.checked) {
-                plot = plot.trace(`/api/vino/${id}${conv}/section/${plane}/${at}/`)
-                           .relayout(layoutRanges);
-            } else {
-                plot = plot.trace(`/api/vino/${id}${conv}/`)
-            }
+            plot = plot.trace(url);
+
+            if (state.section)
+                plot = plot.relayout(layoutRanges);
 
             plot.show();
         }
