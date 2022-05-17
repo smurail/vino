@@ -237,13 +237,15 @@ function hookVisualization(element) {
 
     let state = {};
 
+    function getRanges() {
+        return sectionForm.querySelectorAll('.axis-container input[type="range"]');
+    }
+
     function getRequestedState() {
         let at = null;
 
-        if (fields.section.checked) {
-            const inputs = sectionForm.querySelectorAll('.axis-container input[type="range"]');
-            at = Array.from(inputs).map(input => input.value).join(',');
-        }
+        if (fields.section.checked)
+            at = Array.from(getRanges()).map(input => input.value).join(',');
 
         return {
             id: parseInt(fields.vino.value),
@@ -295,6 +297,22 @@ function hookVisualization(element) {
         return base;
     }
 
+    function updateRanges(info) {
+        getRanges().forEach(range => {
+            const axis = range.dataset.axis,
+                  container = range.closest('.axis-container'),
+                  input = container.querySelector('input[type="text"]'),
+                  origin = info.grid.origin[axis],
+                  unit = info.grid.unit[axis];
+
+            range.dataset.origin = origin;
+            range.dataset.unit = unit;
+
+            if (input && input.value == "")
+                input.value = origin;
+        });
+    }
+
     function updateVino(info) {
         if (!info)
             info = infos.get(parseInt(fields.vino.value));
@@ -317,7 +335,8 @@ function hookVisualization(element) {
             plot = plot.trace(url);
 
             if (state.section)
-                plot = plot.relayout(layoutRanges);
+                plot = plot.relayout(layoutRanges)
+                           .after(updateRanges);
 
             plot.show();
         }
@@ -336,16 +355,24 @@ function hookVisualization(element) {
             const node = container.cloneNode(true),
                   label = node.querySelector('label'),
                   range = node.querySelector('input[type="range"]'),
-                  input = node.querySelector('input[type="number"]');
+                  input = node.querySelector('input[type="text"]');
 
             node.removeAttribute('id');
             node.classList.remove('d-none');
             node.classList.add('axis-container');
             label.textContent = a.name;
+            range.value = range.min = 0;
             range.max = ppa[a.order]-1;
+            range.dataset.axis = a.order;
+            input.value = "";
 
             range.addEventListener('change', e => {
                 updateVino(info);
+            });
+            range.addEventListener('input', e => {
+                const origin = parseFloat(range.dataset.origin) || 0,
+                      unit = parseFloat(range.dataset.unit) || 1;
+                input.value = origin + range.value * unit;
             });
 
             container.parentNode.insertBefore(node, null);
@@ -587,7 +614,7 @@ class VinoPlot {
         Promise.all(this.promises)
             .then(results => Promise.all(results.map(r => r.json())))
             .then(chunks => this.plot(chunks).keepInfo(chunks))
-            .then(data => this.postprocess.forEach(fn => fn.call(this, data)))
+            .then(self => this.postprocess.forEach(fn => fn.call(self, self.info)))
             .catch(error => console.log('ERROR FETCHING:', error))
             .finally(() => this.loading(false));
         this.promises = [];
