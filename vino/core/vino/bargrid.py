@@ -235,13 +235,13 @@ class BarGrid(RectanglesMixin, RegularGrid):
         bars = []
 
         # Iterate over indices of the new grid expressed in old grid coordinates
-        for old_pos_rec in old_positions_rec:
+        for new_pos, old_pos_rec in zip(new_positions, old_positions_rec):
             idx = old_bars_positions.searchsorted(old_pos_rec)
             new_batch: list[NDArrayInt] = []
 
             # Iterate over bars at current position
             while idx < len(old_bars) and np.all(old_bars_positions[idx] == old_pos_rec):
-                new_bar = new_bars[idx]
+                new_bar = np.concatenate((new_pos, new_bars[idx][-2:]))
                 idx += 1
 
                 merge = None
