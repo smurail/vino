@@ -241,7 +241,7 @@ class BarGrid(RectanglesMixin, RegularGrid):
 
             # Iterate over bars at current position
             while idx < len(old_bars) and np.all(old_bars_positions[idx] == old_pos_rec):
-                new_bar = np.concatenate((new_pos, new_bars[idx][-2:]))
+                new_bar = np.concatenate((new_pos, new_bars[idx][-2:]))  # type: ignore
                 idx += 1
 
                 merge = None
