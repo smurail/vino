@@ -391,7 +391,7 @@ function hookVisualization(element) {
         const currentFormat = fields.format.value;
 
         elementPPA.style.display = currentFormat ? '' : 'none';
-        if (currentFormat != state.format) {
+        if (currentFormat != state.format && (fields.section.checked == state.section || fields.ppa.value == '')) {
             if (currentFormat == FORMAT_BARGRID)
                 fields.ppa.value = info.dim == 2 ? 1000 : 50;
             else if (currentFormat == FORMAT_REGULARGRID)
