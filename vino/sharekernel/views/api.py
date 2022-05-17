@@ -10,25 +10,9 @@ def vino_from_kernel(kernel=None):
     return vn.load(*files)
 
 
-def axes_from_vino(vno):
+def info_from_vino(kernel, vno, original=None, axes=None):
+    dim = vno.dim
     ranges = vno.bounds.T.tolist()
-    return [
-        {
-            'order': v.order,
-            'axis': v.axis,
-            'name': v.name,
-            'desc': v.desc,
-            'unit': v.unit,
-            'range': ranges[v.order],
-        } for v in vno.variables
-    ]
-
-
-def info_from_vino(kernel, vno, original=None, axes_subset=None):
-    assert axes_subset is None or len(axes_subset) <= vno.dim
-
-    dim = vno.dim if axes_subset is None else len(axes_subset)
-    axes = axes_from_vino(vno)
     info = dict(
         id=kernel.id,
         vp=kernel.vp.id,
@@ -36,7 +20,17 @@ def info_from_vino(kernel, vno, original=None, axes_subset=None):
         dim=dim,
         format=vno.DATAFORMAT,
         size=len(vno),
-        axes=axes if axes_subset is None else [axes[a] for a in axes_subset],
+        axes=axes or list(range(dim)),
+        variables=[
+            dict(
+                order=v.order,
+                axis=v.axis,
+                name=v.name,
+                desc=v.desc,
+                unit=v.unit,
+                range=ranges[v.order],
+            ) for v in vno.variables
+        ]
     )
 
     if original is not None:
@@ -46,23 +40,12 @@ def info_from_vino(kernel, vno, original=None, axes_subset=None):
         )
 
     if isinstance(vno, vn.RegularGrid):
-        if axes_subset is None:
-            ppa, origin, opposite = vno.ppa, vno.origin, vno.opposite
-            unit, bounds = vno.unit, vno.bounds
-        else:
-            a = list(axes_subset)
-            ppa = vno.ppa[a]
-            origin = vno.origin[a]
-            opposite = vno.opposite[a]
-            unit = vno.unit[a]
-            bounds = np.ascontiguousarray(vno.bounds.T[a].T)
-
         info['grid'] = dict(
-            ppa=ppa,
-            origin=origin,
-            opposite=opposite,
-            unit=unit,
-            bounds=bounds
+            ppa=vno.ppa,
+            origin=vno.origin,
+            opposite=vno.opposite,
+            unit=vno.unit,
+            bounds=vno.bounds,
         )
 
     return info
@@ -148,9 +131,10 @@ class VinoShapes(VinoDetailView):
             original = vno
             vno = vno.to_bargrid(ppa=self.ppa)
 
+        info = info_from_vino(kernel, vno, original)
         rectangles = vno.rectangles_coordinates()
 
-        return dict(info_from_vino(kernel, vno, original), shapes=[
+        return dict(info, shapes=[
             rectangles[0], rectangles[1],
         ])
 

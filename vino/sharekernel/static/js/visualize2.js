@@ -80,7 +80,7 @@ function layoutGrid(info) {
 }
 
 function layoutRanges(info) {
-    const axes = info.axes;
+    const axes = info.axes.map(a => info.variables[a]);
 
     if (!Array.isArray(axes))
         return null;
@@ -99,9 +99,9 @@ function layoutRanges(info) {
     }
 }
 
-function layout2d(info) {
+function layout2d(axes) {
     function label(axis) {
-        let a = info.axes[axis];
+        let a = axes[axis];
         return a.name + (a.desc ? ` (${a.desc})` : '');
     }
 
@@ -114,9 +114,9 @@ function layout2d(info) {
     }
 }
 
-function layout3d(info) {
+function layout3d(axes) {
     function label(axis) {
-        let a = info.axes[axis]
+        let a = axes[axis]
         return `[${a.axis}] ${a.name}`;
     }
 
@@ -131,8 +131,8 @@ function layout3d(info) {
     }
 }
 
-function layout(info) {
-    return info.dim == 2 ? layout2d(info) : layout3d(info);
+function layout(axes) {
+    return axes.length == 2 ? layout2d(axes) : layout3d(axes);
 }
 
 //   _____       _____                         __________
@@ -321,7 +321,7 @@ function hookVisualization(element) {
 
     function updateSectionAxes(info) {
         const plane = fields.plane.value.split(',').map(x => parseInt(x)),
-              axes = info.axes.filter(a => !plane.includes(a.order)),
+              axes = info.variables.filter(a => !plane.includes(a.order)),
               _ppa = parsePPA(fields.ppa.value),
               ppa = Array.isArray(_ppa) ? _ppa : Array(info.dim).fill(_ppa),
               container = document.getElementById('axis-container-' + vzId),
@@ -353,7 +353,7 @@ function hookVisualization(element) {
 
         plane.options.length = 0;
 
-        combinations(info.axes, 2).forEach((p, i) => {
+        combinations(info.variables, 2).forEach((p, i) => {
             const label = p.map(a => a.name).join(', '),
                   value = p.map(a => a.order).join(',')
 
@@ -474,7 +474,8 @@ const FORMAT_BARGRID = 'bars',
       FORMAT_KDTREE = 'kdtree';
 
 const INFO_PROPERTIES = [
-    'id', 'vp', 'title', 'dim', 'format', 'size', 'axes', 'original', 'grid'
+    'id', 'vp', 'title', 'dim', 'format', 'size', 'axes', 'variables',
+    'original', 'grid'
 ];
 
 class VinoPlot {
@@ -549,8 +550,9 @@ class VinoPlot {
     }
 
     plot(chunks) {
-        const traces = chunks.map(data => this.toTrace(data));
-        Plotly.react(this.view, traces, layout(chunks[0]), this.config);
+        const traces = chunks.map(data => this.toTrace(data)),
+              axes = chunks[0].axes.map(a => chunks[0].variables[a]);
+        Plotly.react(this.view, traces, layout(axes), this.config);
         return this;
     }
 
