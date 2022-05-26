@@ -11,6 +11,7 @@ django-debug-toolbar-force = "*"
 django-stubs = "*"
 pandas-stubs = "*"
 pytest = "*"
+types-pillow = "*"
 
 [packages]
 numpy = "*"
