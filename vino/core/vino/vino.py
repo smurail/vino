@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy.typing as npt
 
-from typing import Any, cast
+from typing import Any, cast, NamedTuple
 
 from ..numo import Numo
 from ..metadata import Metadata
@@ -17,7 +17,18 @@ class Vino(Numo):
     Base class for ViNO core objects.
     """
     DATAFORMAT_METADATUM = 'resultformat.title'
+    VARIABLES_METADATUM = 'viabilityproblem.statevariables'
     DATAFORMAT: str
+
+    class Variable(NamedTuple):
+        order: int
+        axis: str
+        name: str
+        desc: str | None = None
+        unit: str | None = None
+
+        def __str__(self):
+            return self.name
 
     def __new__(cls, data: npt.ArrayLike, metadata: Metadata) -> Vino:
         if cls is Vino:
@@ -43,6 +54,27 @@ class Vino(Numo):
         super().__init_subclass__(**kwargs)
         assert cls.DATAFORMAT not in _dataformats
         _dataformats[cls.DATAFORMAT] = cls
+
+    def axis_name(self, order: int) -> str:
+        assert order >= 0
+        return 'xyz'[order] if self.dim <= 3 else f'x{order+1}'
+
+    @property
+    def variables(self) -> list[Variable]:
+        state_variables = self.metadata.get(
+            self.VARIABLES_METADATUM,
+            [self.axis_name(a) for a in range(self.dim)]
+        )
+        return [
+            self.Variable(
+                order=i,
+                axis=self.axis_name(i),
+                name=v if isinstance(v, str) else v[0],
+                desc=None if isinstance(v, str) else v[1] or None,
+                unit=None if isinstance(v, str) else v[2] or None,
+            )
+            for i, v in enumerate(state_variables)
+        ]
 
     @property
     def dim(self) -> int:
