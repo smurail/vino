@@ -15,6 +15,8 @@ _dataformats: dict[str, type[Vino]] = {}
 class Vino(Numo):
     """
     Base class for ViNO core objects.
+
+    Set of viable points in a :attr:`dim`-dimensional state space.
     """
     DATAFORMAT_METADATUM = 'resultformat.title'
     VARIABLES_METADATUM = 'viabilityproblem.statevariables'
@@ -80,8 +82,10 @@ class Vino(Numo):
 
     @property
     def dim(self) -> int:
+        """Rank (ie. number of dimensions) of the vino state space"""
         raise NotImplementedError
 
     @property
     def bounds(self) -> NDArrayFloat:
+        """Coordinates of lowest and highest point of the vino state space"""
         raise NotImplementedError

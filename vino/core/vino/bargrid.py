@@ -22,6 +22,17 @@ def _bars_merge(bar_a: NDArrayInt, bar_b: NDArrayInt) -> tuple[int, int] | None:
 
 
 class BarGrid(RectanglesMixin, RegularGrid):
+    """
+    List of non-overlapping *bars* containing the set of viable points.
+
+    Bars are :attr:`dim`-dimensional hyperrectangles defined by a start point
+    and an end coordinate -- along the :attr:`baraxis`-axis of the state space.
+
+    Property :attr:`baraxis` is the zero-based index of the bar axis. For
+    example if :attr:`baraxis` is ``1`` (ie. *y*-axis), a bar defined by the
+    array `[3, 0, 12]` starts at point :math:`\coord{3, 0}` and ends at point
+    :math:`\coord{3, 12}`.
+    """
     DATAFORMAT = 'bars'
     DTYPE = np.uint32
 

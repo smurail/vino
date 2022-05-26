@@ -8,7 +8,7 @@ from .metadata import Metadata
 
 class Numo(np.ndarray):
     """
-    N-dimensional array with a ``metadata`` property.
+    N-dimensional array with a :attr:`metadata` property.
 
     Numo stands for Numerical Object. This class is derived from Numpy_
     ndarray_. Used to represent completely or partially loaded vino core

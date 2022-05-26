@@ -28,6 +28,13 @@ def as_ppa_array(ppa: int | npt.ArrayLike, dim: int) -> NDArrayInt:
 
 
 class RegularGrid(Vino):
+    """
+    A :attr:`dim`-dimensional array where non-zero elements define the set
+    of the regular grid cells containing the viable points.
+
+    Regular grid refers here to the tessellation of :attr:`dim`-dimensional
+    euclidean space by congruent rectangular cuboids.
+    """
     DATAFORMAT = 'regulargrid'
 
     ppa: NDArrayInt

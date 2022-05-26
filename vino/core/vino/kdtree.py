@@ -15,6 +15,13 @@ from .typing import NDArrayFloat
 
 
 class KdTree(RectanglesMixin, Vino):
+    """
+    List of non-overlapping cells containing the set of viable points.
+
+    Cells are :attr:`dim`-dimensional hyperrectangles defined by a value point,
+    a lowest point and a highest point, they are arranged in a k-d tree like
+    manner.
+    """
     DATAFORMAT = 'kdtree'
 
     axes: list[int]

@@ -14,6 +14,10 @@ from .typing import NDArrayFloat
 
 
 class Polygon(Vino):
+    """
+    List of 2-dimensional points defining vertices of the polygon enclosing the
+    set of viable points.
+    """
     DATAFORMAT = 'polygon'
 
     @property
