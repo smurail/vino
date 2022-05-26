@@ -20,6 +20,8 @@ class Vino(Numo):
     VARIABLES_METADATUM = 'viabilityproblem.statevariables'
     DATAFORMAT: str
 
+    columns: list[str]
+
     class Variable(NamedTuple):
         order: int
         axis: str
