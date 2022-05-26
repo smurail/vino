@@ -30,8 +30,8 @@ class BarGrid(RectanglesMixin, RegularGrid):
 
     Property :attr:`baraxis` is the zero-based index of the bar axis. For
     example if :attr:`baraxis` is ``1`` (ie. *y*-axis), a bar defined by the
-    array `[3, 0, 12]` starts at point :math:`\coord{3, 0}` and ends at point
-    :math:`\coord{3, 12}`.
+    array `[3, 0, 12]` starts at point :math:`\\coord{3, 0}` and ends at point
+    :math:`\\coord{3, 12}`.
     """
     DATAFORMAT = 'bars'
     DTYPE = np.uint32
