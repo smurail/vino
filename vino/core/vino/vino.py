@@ -9,7 +9,7 @@ from ..metadata import Metadata
 from .typing import NDArrayFloat
 
 
-_dataformats: dict[str, type] = {}
+_dataformats: dict[str, type[Vino]] = {}
 
 
 class Vino(Numo):
