@@ -32,9 +32,11 @@ class Vino(Numo):
                 raise ValueError(
                     f"Unknown dataformat {dataformat!r} (available formats: "
                     f"{', '.join((repr(k) for k in _dataformats.keys()))})")
-            subclass = _dataformats[dataformat]
+            cls = _dataformats[dataformat]
 
-            return cast(Vino, super().__new__(subclass, data, metadata))
+        metadata = Metadata(metadata)
+        metadata[cls.DATAFORMAT_METADATUM] = cls.DATAFORMAT
+
         return cast(Vino, super().__new__(cls, data, metadata))
 
     def __init_subclass__(cls, **kwargs: Any):
