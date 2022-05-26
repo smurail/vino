@@ -71,7 +71,7 @@ class StatementsError(Exception):
 
 
 class Statements:
-    RELATIONS: Tuple[str, ...] = ('=', '<=', '>=')
+    RELATIONS: Tuple[str, ...] = ('=', '<=', '>=', '<', '>')
     LEFT = Expression
 
     _relation: Optional[Pattern] = None
@@ -224,4 +224,4 @@ class Equations(Statements):
 
 
 class Inequations(Statements):
-    RELATIONS = ('<=', '>=')
+    RELATIONS = ('<=', '>=', '<', '>')
