@@ -585,4 +585,14 @@ class KdTreeKernel(Kernel):
         return bgk
 
 
+class PolygonKernel(Kernel):
+    class Meta:
+        proxy = True
+
+    FORMAT = 'polygon'
+    DATA_UNIT = 'point'
+
+    objects = KernelManager.create('Polygon', FORMAT)()
+
+
 _CUSTOM_KERNELS = {cls.FORMAT: cls for cls in Kernel.__subclasses__()}
