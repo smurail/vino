@@ -1,10 +1,13 @@
-from django.urls import path, include
+from django.urls import path, include, register_converter
 from django.conf import settings
 from django.views.generic import TemplateView
 
+from .converters import IntTupleConverter
 from .views import (HomeView, ExploreView, ViabilityProblemView,
                     VisualizationDemoView, KernelData, VinoData, VinoShapes)
 
+
+register_converter(IntTupleConverter, 'ints')
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -21,12 +24,12 @@ urlpatterns = [
     path('api/vino/<int:pk>/info/', VinoData.as_view(info_only=True), name='vino_data'),
 
     # Coerced vino
-    path('api/vino/<int:pk>/bargrid/<ppa>/', VinoData.as_view(format='bargrid'), name='vino_data'),
-    path('api/vino/<int:pk>/regulargrid/<ppa>/', VinoData.as_view(format='regulargrid'), name='vino_data'),
+    path('api/vino/<int:pk>/bargrid/<ints:ppa>/', VinoData.as_view(format='bargrid'), name='vino_data'),
+    path('api/vino/<int:pk>/regulargrid/<ints:ppa>/', VinoData.as_view(format='regulargrid'), name='vino_data'),
 
     # Shapes of a vino
     path('api/vino/<int:pk>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
-    path('api/vino/<int:pk>/bargrid/<ppa>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
+    path('api/vino/<int:pk>/bargrid/<ints:ppa>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
 ]
 
 

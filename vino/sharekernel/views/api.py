@@ -1,8 +1,6 @@
 import numpy as np
 import vino as vn
 
-from vino.core.utils import to_int
-
 from ..models import Kernel
 from .json import JsonDetailView
 
@@ -47,13 +45,8 @@ class VinoDetailView(JsonDetailView):
     model = Kernel
 
     def get_ppa(self):
-        values = self.kwargs.get('ppa', '').split(',')
-        ppa = [to_int(x.strip()) for x in values if x]
-        if not ppa:
-            return None
-        if len(ppa) == 1:
-            return ppa[0]
-        return ppa
+        ppa = self.kwargs.get('ppa')
+        return None if not ppa else ppa[0] if len(ppa) == 1 else ppa
 
 
 class VinoData(VinoDetailView):
