@@ -24,6 +24,7 @@ django-fieldsignals = "*"
 pillow = "*"
 django-currentuser = "*"
 pandas = "*"
+orjson = "*"
 
 [requires]
 python_version = "3.7"
