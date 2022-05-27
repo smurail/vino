@@ -13,6 +13,7 @@ function selectKernel(id, ppa=null) {
     // Check the checkbox and triggers change event to visualize it
     $('#select-kernel-' + id)
         .prop('checked', true)
+        .prop('disabled', true)
         .trigger('change');
     // Change URL hash
     location.hash = HASH_ROUTE_URL(id, ppa);
@@ -46,7 +47,7 @@ $(function() {
             kernelId = row.data('kernel-id');
 
         // Unselect all rows but changed row
-        checkboxes.not(this).prop('checked', false)
+        checkboxes.not(this).prop('checked', false).prop('disabled', false)
             .closest('tr').removeClass('table-primary');
 
         // Colorize changed row in any case:
