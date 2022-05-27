@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import numpy.typing as npt
 
-from typing import cast, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING, Sequence
 
 from ..metadata import Metadata
 from .vino import Vino
@@ -69,13 +69,37 @@ class RegularGrid(Vino):
     def unit(self) -> NDArrayFloat:
         return cast(NDArrayFloat, (self.opposite - self.origin)) / (self.ppa - 1)
 
-    def points_coordinates(self) -> NDArrayFloat:
+    def grid_coordinates(self, axes: Sequence[int] | None = None) -> NDArrayFloat:
+        if axes is None:
+            origin, opposite, ppa = self.origin, self.opposite, self.ppa
+        else:
+            axes = list(axes)
+            origin = self.origin[axes]
+            opposite = self.opposite[axes]
+            ppa = self.ppa[axes]
+
         slices = tuple(
             slice(start, stop, complex(imag=steps))
-            for start, stop, steps in zip(self.origin, self.opposite, self.ppa)
+            for start, stop, steps in zip(origin, opposite, ppa)
         )
-        coordinates = np.mgrid[slices].reshape(self.dim, -1).T
+        dim = self.dim if axes is None else len(axes)
+
+        return np.mgrid[slices].reshape(dim, -1).T
+
+    def points_coordinates(self) -> NDArrayFloat:
+        coordinates = self.grid_coordinates()
         points = coordinates[self.ravel()]
+
+        return cast(NDArrayFloat, points)
+
+    def section(self, plane: Sequence[int], at: Sequence[int]) -> npt.NDArray:
+        assert len(plane) == 2
+        assert len(at) == self.dim - 2
+
+        sections = np.moveaxis(self, plane, range(-len(plane), 0))
+        grid_coordinates = self.grid_coordinates(plane)
+        section = sections[tuple(at)]
+        points = grid_coordinates[section.ravel()]
 
         return cast(NDArrayFloat, points)
 
