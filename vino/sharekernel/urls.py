@@ -3,7 +3,7 @@ from django.conf import settings
 from django.views.generic import TemplateView
 
 from .views import (HomeView, ExploreView, ViabilityProblemView,
-                    VisualizationDemoView, KernelData)
+                    VisualizationDemoView, KernelData, VinoData, VinoShapes)
 
 
 urlpatterns = [
@@ -15,6 +15,18 @@ urlpatterns = [
     path('kernel/<int:pk>/data/', KernelData.as_view(), name='kernel_data'),
     path('kernel/<int:pk>/data/<int:ppa>/', KernelData.as_view()),
     path('kernel/<int:pk>/data/<int:ppa>/distance/', KernelData.as_view(), {'distance': True}),
+
+    # Original vino
+    path('api/vino/<int:pk>/', VinoData.as_view(), name='vino_data'),
+    path('api/vino/<int:pk>/info/', VinoData.as_view(info_only=True), name='vino_data'),
+
+    # Coerced vino
+    path('api/vino/<int:pk>/bargrid/<ppa>/', VinoData.as_view(format='bargrid'), name='vino_data'),
+    path('api/vino/<int:pk>/regulargrid/<ppa>/', VinoData.as_view(format='regulargrid'), name='vino_data'),
+
+    # Shapes of a vino
+    path('api/vino/<int:pk>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
+    path('api/vino/<int:pk>/bargrid/<ppa>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
 ]
 
 
