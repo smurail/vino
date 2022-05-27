@@ -51,9 +51,3 @@ class ViabilityProblemView(ModalMixin, DetailView):
     context_object_name = 'vp'
     queryset = ViabilityProblem.objects.active().with_dimensions()  # type: ignore
     template_name = 'sharekernel/viabilityproblem.html'
-
-
-class VisualizationDemoView(ListView):
-    context_object_name = 'kernels'
-    queryset = Kernel.objects.active().all()
-    template_name = 'sharekernel/visualization_demo.html'
