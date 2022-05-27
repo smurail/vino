@@ -38,6 +38,38 @@ abbr, abbr[data-original-title], abbr[title] {
     border-top-color: inherit;
 }
 
+/** Make unchecked toggle buttons always unchecked even when hovering */
+input[type="checkbox"].btn-check:not(:checked) + .btn-outline-primary:hover {
+    color: #0d6efd;
+    background-color: transparent;
+    border-color: #0d6efd;
+}
+input[type="checkbox"].btn-check:not(:checked) + .btn-outline-secondary:hover {
+    color: #6c757d;
+    background-color: transparent;
+    border-color: #6c757d;
+}
+input[type="checkbox"].btn-check:not(:checked) + .btn-outline-success:hover {
+    color: #198754;
+    background-color: transparent;
+    border-color: #198754;
+}
+input[type="checkbox"].btn-check:not(:checked) + .btn-outline-danger:hover {
+    color: #dc3545;
+    background-color: transparent;
+    border-color: #dc3545;
+}
+input[type="checkbox"].btn-check:not(:checked) + .btn-outline-warning:hover {
+    color: #ffc107;
+    background-color: transparent;
+    border-color: #ffc107;
+}
+input[type="checkbox"].btn-check:not(:checked) + .btn-outline-info:hover {
+    color: #0dcaf0;
+    background-color: transparent;
+    border-color: #0dcaf0;
+}
+
 /* Visualization styles */
 
 body.loading {

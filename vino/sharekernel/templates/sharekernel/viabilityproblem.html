@@ -4,7 +4,7 @@
 {% block head %}
     {{ block.super }}
     <script src="{% static 'vendor/js/plotly-1.58.4.min.js' %}"></script>
-    <script src="{% static 'js/visualize.js' %}"></script>
+    <script src="{% static 'js/visualize2.js' %}"></script>
     <script src="{% static 'js/viabilityproblem.js' %}"></script>
     <script>
         URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);

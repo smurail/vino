@@ -5,10 +5,10 @@ function selectKernel(id, ppa=null) {
     if (!id) return;
     var currentPPA = $('input[name=ppa]');
     // Setup PPA if any
-    if ((ppa = parseInt(ppa))) {
+    if ((ppa = parsePPA(ppa))) {
         currentPPA.val(ppa);
     } else {
-        ppa = currentPPA.val();
+        ppa = parsePPA(currentPPA.val());
     }
     // Check the checkbox and triggers change event to visualize it
     $('#select-kernel-' + id)
@@ -23,7 +23,6 @@ $(function() {
     var kernels = $('#kernels-table tr[data-kernel-id]'),
         checkboxes = $('#kernels-table input[type=checkbox]'),
         currentKernel = $('.vz-container *[name=kernel]'),
-        visualizations = $('.vz-container'),
         doc = $('html, body'),
         ppa = null,
         args, kernelId;
@@ -31,13 +30,6 @@ $(function() {
     // If there is only one kernel, disable the checkbox
     if (kernels.length == 1) {
         checkboxes.prop('disabled', true);
-    } else {
-        // Visualization loading can't be interrupted for now, as a workaround
-        // disable all checkboxes while a kernel is loading
-        visualizations.each((_, el) => {
-            el.vz.addEventListener('load', () => checkboxes.prop('disabled', true));
-            el.vz.addEventListener('plotend', () => checkboxes.prop('disabled', false));
-        });
     }
 
     // Attach change event to each kernel checkbox
@@ -67,14 +59,6 @@ $(function() {
     // Other way around: attach change event to kernel chooser
     currentKernel.on('change', function() {
         selectKernel(currentKernel.val());
-    });
-
-    // Update hash when user change PPA
-    visualizations[0].vz.addEventListener('load', (e) => {
-        location.hash = HASH_ROUTE_URL(
-            visualizations[0].vz.kernel.value,
-            visualizations[0].vz.ppa.value
-        );
     });
 
     // Select and show kernel in hash or fallback to first
