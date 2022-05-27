@@ -18,18 +18,12 @@
 #parameters.targetparametervalues:none
 
 //Metadata describing the software used to compute the result described by the output file
-
-#software.title:none
-#software.author:none
-#software.version:none
-#software.publication:none
-#software.website:none
-#software.contact:none
-#software.parameters:none
+#software.title:N/A
+#software.description:Handcrafted data
 
 //Metadata describing the software output file
 #resultformat.title:polygon
-#resultformat.description:Two vecteurs : one containing the values of the first coodinates of the vertices and the second the values of the second coordinates of the vertices.
+#resultformat.description:Each file line contains a given number of real numbers separated by a blank describing the coordinates of a vertex of the polygon.
 #resultformat.parameterlist:
 
 //Metadata describing the computation of the result described by the output file
