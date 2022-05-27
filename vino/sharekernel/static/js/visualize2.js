@@ -77,6 +77,26 @@ function layoutGrid(info) {
     }
 }
 
+function layoutRanges(info) {
+    const axes = info.axes;
+
+    if (!Array.isArray(axes))
+        return null;
+
+    if (axes.length == 2) {
+        return {
+            'xaxis.range': axes[0].range,
+            'yaxis.range': axes[1].range
+        }
+    } else {
+        return {
+            'scene.xaxis.range': axes[0].range,
+            'scene.yaxis.range': axes[1].range,
+            'scene.zaxis.range': axes[2].range,
+        }
+    }
+}
+
 function layout2d(info) {
     function label(axis) {
         let a = info.axes[axis];
@@ -176,26 +196,58 @@ function parsePPA(ppa) {
     return NaN;
 }
 
+// Borrowed from https://stackoverflow.com/a/45813619
+function combinations(array, size) {
+    var result = [];
+
+    function p(t, i) {
+        if (t.length === size) {
+            result.push(t);
+            return;
+        }
+        if (i + 1 > array.length)
+            return;
+        p(t.concat(array[i]), i + 1);
+        p(t, i + 1);
+    }
+
+    p([], 0);
+    return result;
+}
+
 function hookVisualization(element) {
     const vzId = element.dataset.id,
           form = element.querySelector('form'),
+          sectionForm = element.querySelectorAll('form')[1],
           fields = {
               vino: form.elements['kernel'],
               format: form.elements['format'],
               ppa: form.elements['ppa'],
+              plane: document.getElementById('plane-' + vzId),
               section: form.elements['show-section'],
               distances: form.elements['show-distances'],
               shapes: form.elements['show-shapes']
           },
+          switchPlaneButton = document.getElementById('switch-plane-' + vzId),
           infos = new Map();
 
     let state = {};
 
     function getRequestedState() {
+        let at = null;
+
+        if (fields.section.checked) {
+            const inputs = sectionForm.querySelectorAll('.axis-container input[type="range"]');
+            at = Array.from(inputs).map(input => input.value).join(',');
+        }
+
         return {
             id: parseInt(fields.vino.value),
             format: fields.format.value,
             ppa: parsePPA(fields.ppa.value),
+            section: fields.section.checked,
+            plane: fields.plane.value,
+            at: at,
             shapes: fields.shapes.checked
         };
     }
@@ -237,17 +289,71 @@ function hookVisualization(element) {
                   currentFormat = format || info.format,
                   apiFormat = ({'bars': 'bargrid', 'regulargrid': 'regulargrid'})[format] || null,
                   hasShapes = info.dim == 2 && [FORMAT_BARGRID, FORMAT_KDTREE].indexOf(currentFormat) >= 0,
-                  conv = apiFormat ? `/${apiFormat}/${ppa}` : '';
-
-            let plot = vinoPlot();
+                  conv = apiFormat ? `/${apiFormat}/${ppa}` : '',
+                  plane = state.plane,
+                  at = state.at;
 
             console.log('SHOW', id, conv, fields.shapes.checked && hasShapes ? 'with shapes' : 'without shapes');
 
-            if (fields.shapes.checked && hasShapes)
-                plot.trace(`/api/vino/${id}${conv}/shapes/`);
+            let plot = vinoPlot();
 
-            plot.trace(`/api/vino/${id}${conv}/`).show();
+            if (fields.shapes.checked && hasShapes)
+                plot = plot.trace(`/api/vino/${id}${conv}/shapes/`);
+
+            if (fields.section.checked) {
+                plot = plot.trace(`/api/vino/${id}${conv}/section/${plane}/${at}/`)
+                           .relayout(layoutRanges);
+            } else {
+                plot = plot.trace(`/api/vino/${id}${conv}/`)
+            }
+
+            plot.show();
         }
+    }
+
+    function updateSectionAxes(info) {
+        const plane = fields.plane.value.split(',').map(x => parseInt(x)),
+              axes = info.axes.filter(a => !plane.includes(a.order)),
+              _ppa = parsePPA(fields.ppa.value),
+              ppa = Array.isArray(_ppa) ? _ppa : Array(info.dim).fill(_ppa),
+              container = document.getElementById('axis-container-' + vzId),
+              oldContainers = container.parentNode.querySelectorAll('.axis-container');
+
+        console.log('updateAxes', info.grid, axes, ppa, container, container.parentNode, oldContainers);
+
+        for (let old of oldContainers)
+            container.parentNode.removeChild(old);
+
+        axes.forEach(a => {
+            const node = container.cloneNode(true),
+                  label = node.querySelector('label'),
+                  range = node.querySelector('input[type="range"]'),
+                  input = node.querySelector('input[type="number"]');
+
+            node.classList.remove('d-none');
+            node.classList.add('axis-container');
+            label.textContent = a.name;
+            range.max = ppa[a.order]-1;
+
+            range.addEventListener('change', e => {
+                updateVino();
+            });
+
+            container.parentNode.insertBefore(node, null);
+        });
+    }
+
+    function updateSectionPlanes(info) {
+        const plane = document.getElementById('plane-' + vzId);
+
+        plane.options.length = 0;
+
+        combinations(info.axes, 2).forEach((p, i) => {
+            const label = p.map(a => a.name).join(', '),
+                  value = p.map(a => a.order).join(',')
+
+            plane.appendChild(new Option(label, value));
+        });
     }
 
     function updateForm(info) {
@@ -262,6 +368,16 @@ function hookVisualization(element) {
             fields.ppa.value = defaultPPA;
         }
 
+        fields.section.disabled = info.dim <= 2 || info.dim > 3;
+        if (info.dim > 3) {
+            fields.section.checked = true;
+            bootstrap.Collapse.getOrCreateInstance('#section-chooser-' + vzId).show();
+        }
+        if (info.dim > 2 && fields.section.checked != state.section) {
+            fields.format.value = fields.section.checked ? FORMAT_REGULARGRID : defaultFormat;
+            fields.format.disabled = fields.section.checked;
+        }
+
         const currentFormat = fields.format.value;
 
         elementPPA.style.display = currentFormat ? '' : 'none';
@@ -273,6 +389,13 @@ function hookVisualization(element) {
         }
 
         fields.shapes.disabled = info.dim != 2 || ![FORMAT_BARGRID, FORMAT_KDTREE].includes(currentFormat || info.format);
+
+        if (fields.section.checked != state.section) {
+            updateSectionPlanes(info);
+            updateSectionAxes(info);
+        } else if (fields.section.checked && (fields.plane.value != state.plane || fields.ppa.value != state.ppa)) {
+            updateSectionAxes(info);
+        }
 
         updateVino(info);
     }
@@ -298,7 +421,16 @@ function hookVisualization(element) {
         }
     }
 
+    switchPlaneButton.addEventListener('click', () => {
+        const opt = fields.plane.options[fields.plane.selectedIndex];
+        opt.value = opt.value.split(',').reverse().join(',');
+        opt.label = opt.label.split(', ').reverse().join(', ');
+        showVino();
+    });
+
     fields.format.addEventListener('change', showVino);
+    fields.section.addEventListener('change', showVino);
+    fields.plane.addEventListener('change', showVino);
 
     form.addEventListener('submit', e => {
         e.preventDefault();

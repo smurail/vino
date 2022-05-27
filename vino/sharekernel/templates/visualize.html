@@ -36,6 +36,12 @@
                 </label>
             </div>
             <div class="col-auto">
+                <input type="checkbox" class="btn-check" name="show-section" id="show-section-{{ id }}" autocomplete="off" data-bs-toggle="collapse" data-bs-target="#section-chooser-{{ id }}">
+                <label class="btn btn-sm btn-outline-danger" for="show-section-{{ id }}" title="Show cross-section">
+                    <i class="fas fa-bread-slice"></i>
+                </label>
+            </div>
+            <div class="col-auto">
                 <button type="submit" class="btn btn-sm btn-primary">Show</button>
             </div>
             <div class="col-auto ms-3 me-auto">
@@ -53,6 +59,31 @@
     </div>
     <div class="card-body p-0">
         <div class="vz-view"></div>
+    </div>
+    <div id="section-chooser-{{ id }}" class="collapse card-footer px-3 py-2">
+        <form>
+            <div class="row g-3 align-items-center">
+                <div class="col-2 text-end">
+                    <label class="col-form-label col-form-label-sm mr-2" for="plane-{{ id }}">Cutting plane</label>
+                </div>
+                <div class="col-auto">
+                    <select id="plane-{{ id }}" name="plane" class="form-select form-select-sm"></select>
+                </div>
+                <div class="col-auto">
+                    <button id="switch-plane-{{ id }}" type="button" class="btn btn-sm btn-primary" title="Switch axes">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="axis-container-{{ id }}" class="row g-3 align-items-center d-none">
+                <div class="col-2 text-end">
+                    <label class="col-form-label col-form-label-sm mr-2">axis</label>
+                </div>
+                <div class="col mt-4">
+                    <input class="form-range" type="range" value="0" step="1" min="0" max="100">
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 <div class="vz-placeholder"></div>
