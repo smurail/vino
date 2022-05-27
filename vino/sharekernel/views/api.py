@@ -12,27 +12,60 @@ def vino_from_kernel(kernel=None):
 
 def axes_from_vino(vno):
     ranges = vno.bounds.T.tolist()
-    return {
-        v.axis: {
+    return [
+        {
             'order': v.order,
+            'axis': v.axis,
             'name': v.name,
             'desc': v.desc,
             'unit': v.unit,
             'range': ranges[v.order],
         } for v in vno.variables
-    }
+    ]
 
 
-def info_from_vino(kernel, vno):
-    return {
+def info_from_vino(kernel, vno, original=None, axes_subset=None):
+    assert axes_subset is None or len(axes_subset) <= vno.dim
+
+    dim = vno.dim if axes_subset is None else len(axes_subset)
+    axes = axes_from_vino(vno)
+    info = {
         'id': kernel.id,
         'vp': kernel.vp.id,
         'title': kernel.title,
-        'dim': vno.dim,
+        'dim': dim,
         'format': vno.DATAFORMAT,
         'size': len(vno),
-        'axes': axes_from_vino(vno),
+        'axes': axes if axes_subset is None else [axes[a] for a in axes_subset],
     }
+
+    if original is not None:
+        info.update(
+            format=vno.DATAFORMAT,
+            size=vno.size,
+            original=dict(format=original.DATAFORMAT, size=original.size),
+        )
+
+    if isinstance(vno, vn.RegularGrid):
+        if axes_subset is None:
+            ppa, origin, opposite = vno.ppa, vno.origin, vno.opposite
+            unit, bounds = vno.unit, vno.bounds
+        else:
+            a = list(axes_subset)
+            ppa = vno.ppa[a]
+            origin = vno.origin[a]
+            opposite = vno.opposite[a]
+            unit = vno.unit[a]
+            bounds = np.ascontiguousarray(vno.bounds.T[a].T)
+        info.update(
+            grid=dict(
+                ppa=ppa,
+                origin=origin,
+                opposite=opposite,
+                unit=unit,
+                bounds=bounds))
+
+    return info
 
 
 def error(msg):
@@ -56,10 +89,11 @@ class VinoData(VinoDetailView):
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
         vno = vino_from_kernel(kernel)
+        original = None
 
-        assert vno.dim <= 3
-
-        info = info_from_vino(kernel, vno)
+        if not self.info_only and vno.dim > 3:
+            return error(
+                f"Can't visualize {vno.dim}-dimensional vino, use sections")
 
         ppa = self.get_ppa()
         if ppa is not None:
@@ -70,21 +104,7 @@ class VinoData(VinoDetailView):
             else:
                 vno = vno.to_bargrid(ppa=ppa)
 
-            info.update(
-                format=vno.DATAFORMAT,
-                size=vno.size,
-                original=dict(format=original.DATAFORMAT, size=original.size),
-            )
-
-        if isinstance(vno, vn.RegularGrid):
-            info.update(
-                grid=dict(
-                    ppa=vno.ppa,
-                    origin=vno.origin,
-                    opposite=vno.opposite,
-                    unit=vno.unit,
-                    bounds=vno.bounds))
-
+        info = info_from_vino(kernel, vno, original)
         if self.info_only:
             return info
 
@@ -93,10 +113,9 @@ class VinoData(VinoDetailView):
 
         data = vno.points_coordinates()
 
-        return dict(info, values={
-            v.axis: np.ascontiguousarray(data[:, v.order])
-            for v in vno.variables
-        })
+        return dict(info, values=[
+            np.ascontiguousarray(data[:, v.order]) for v in vno.variables
+        ])
 
 
 class VinoShapes(VinoDetailView):
@@ -107,14 +126,15 @@ class VinoShapes(VinoDetailView):
             return error("Only 2-dimensional vinos have shapes")
 
         vno = vino_from_kernel(kernel)
+        original = None
 
         ppa = self.get_ppa()
         if ppa is not None:
+            original = vno
             vno = vno.to_bargrid(ppa=ppa)
 
         rectangles = vno.rectangles_coordinates()
 
-        return dict(info_from_vino(kernel, vno), shapes={
-            "x": rectangles[0],
-            "y": rectangles[1],
-        })
+        return dict(info_from_vino(kernel, vno, original), shapes=[
+            rectangles[0], rectangles[1],
+        ])
