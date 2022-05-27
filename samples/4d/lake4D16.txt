@@ -4,8 +4,8 @@
 #viabilityproblem.statevariables:[["L","Phosphorus Inputs",""],["P","Phosphorus Concentration",""],["L2","Phosphorus Inputs",""],["L3","Phosphorus Inputs",""]]
 #viabilityproblem.controlvariables:[["u","Phosphorus Inputs Variation",""]]
 #viabilityproblem.dynamicsdescription:L'=u,P'=-b*P+L+r*P^q/(m^q+P^q),L2'=u,L3'=u
-#viabilityproblem.admissiblecontroldescription:u>=unin,u<=unax
-#viabilityproblem.dynamicsparameters:[["b"],["r"],["q"],["m"],["unin"],["unax"]]
+#viabilityproblem.admissiblecontroldescription:u>=umin,u<=umax
+#viabilityproblem.dynamicsparameters:[["b"],["r"],["q"],["m"],["umin"],["umax"]]
 #viabilityproblem.stateconstraintdescription:L>=Lmin,L<=Lmax,P<=Pmax,L2>=Lmin,L2<=Lmax,L3>=Lmin,L3<=Lmax,
 #viabilityproblem.statedefinitiondomain:P>=0
 #viabilityproblem.stateconstraintparameters:[["Lmin"],["Lmax"],["Pmax"]]
