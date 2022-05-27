@@ -138,3 +138,35 @@ class VinoShapes(VinoDetailView):
         return dict(info_from_vino(kernel, vno, original), shapes=[
             rectangles[0], rectangles[1],
         ])
+
+
+class VinoSection(VinoDetailView):
+    def get_context_data(self, **kwargs):
+        kernel = self.get_object()
+
+        dim = kernel.dimension
+        if dim < 3:
+            return error(f"Can't make sections from a {dim}-dimensional vino")
+
+        ppa = self.get_ppa()
+        plane = self.kwargs.get('plane')
+        at = self.kwargs.get('at')
+
+        if len(plane) != 2:
+            return error("Please provide 2 axes to define the cutting plane")
+
+        original = vino_from_kernel(kernel)
+        vno = original.to_regulargrid(ppa=ppa or -1)
+        info = info_from_vino(kernel, vno, original, plane)
+        axes = info['axes']
+
+        m = vno.dim - len(plane)
+        if len(at) != m:
+            return error(
+                f"Please provide {m} ax{'i' if m == 1 else 'e'}s to specify section position")
+
+        section = vno.section(plane, at)
+
+        return dict(info, values=[
+            np.ascontiguousarray(section[:, a]) for a in range(len(plane))
+        ])

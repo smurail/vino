@@ -4,7 +4,8 @@ from django.views.generic import TemplateView
 
 from .converters import IntTupleConverter
 from .views import (HomeView, ExploreView, ViabilityProblemView,
-                    VisualizationDemoView, KernelData, VinoData, VinoShapes)
+                    VisualizationDemoView, KernelData, VinoData, VinoShapes,
+                    VinoSection)
 
 
 register_converter(IntTupleConverter, 'ints')
@@ -30,6 +31,10 @@ urlpatterns = [
     # Shapes of a vino
     path('api/vino/<int:pk>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
     path('api/vino/<int:pk>/bargrid/<ints:ppa>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
+
+    # Sections of a vino
+    path('api/vino/<int:pk>/regulargrid/section/<ints:plane>/<ints:at>/', VinoSection.as_view(), name='vino_section'),
+    path('api/vino/<int:pk>/regulargrid/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(), name='vino_section'),
 ]
 
 

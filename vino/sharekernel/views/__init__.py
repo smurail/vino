@@ -1,9 +1,9 @@
 from .main import (HomeView, ExploreView, ViabilityProblemView,
                    VisualizationDemoView, KernelData)
-from .api import VinoData, VinoShapes
+from .api import VinoData, VinoShapes, VinoSection
 
 
 __all__ = [
     'HomeView', 'ExploreView', 'ViabilityProblemView', 'VisualizationDemoView',
-    'KernelData', 'VinoData', 'VinoShapes',
+    'KernelData', 'VinoData', 'VinoShapes', 'VinoSection',
 ]
