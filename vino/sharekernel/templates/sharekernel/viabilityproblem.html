@@ -6,9 +6,6 @@
     <script src="{% static 'vendor/js/plotly-1.58.4.min.js' %}"></script>
     <script src="{% static 'js/visualize2.js' %}"></script>
     <script src="{% static 'js/viabilityproblem.js' %}"></script>
-    <script>
-        URL_KERNEL_DATA = (pk) => "{% url 'kernel_data' 42 %}".replace('42', pk);
-    </script>
     <script id="MathJax-script" async src="{% static 'vendor/js/mathjax-tex-chtml-3.0.5.min.js' %}"></script>
 {% endblock %}
 {% block body %}

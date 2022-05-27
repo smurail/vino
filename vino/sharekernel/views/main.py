@@ -4,10 +4,7 @@ from django.views.generic import TemplateView, ListView, DetailView
 from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
 
-from vino.kernels.distance import Matrix, EucNorm
-
 from ..models import Kernel, ViabilityProblem, Software, DataFormat
-from .json import JsonDetailView
 
 
 class ModalMixin:
@@ -60,43 +57,3 @@ class VisualizationDemoView(ListView):
     context_object_name = 'kernels'
     queryset = Kernel.objects.active().all()
     template_name = 'sharekernel/visualization_demo.html'
-
-
-class KernelData(JsonDetailView):
-    model = Kernel
-
-    def get_context_data(self, **kwargs):
-        kernel = self.get_object()
-
-        original_format = str(kernel.format)
-        ppa = self.kwargs.get('ppa')
-        if ppa is not None and ppa > 1:
-            debug = False
-            bgk = kernel.to_bargrid(ppa=ppa, debug=debug)
-            if bgk:
-                kernel = kernel if debug else bgk
-
-        distance = self.kwargs.get('distance')
-        if distance and ppa is not None:
-            borders = [True]*kernel.dimension
-            d = Matrix.initFromBarGridKernel(kernel)
-            d.distance(EucNorm(), borders, borders)
-            distances = d.toData(kernel)
-        else:
-            distances = None
-
-        return {
-            'vp': kernel.vp.id,
-            'format': str(kernel.format),
-            'originalFormat': original_format,
-            'variables': [
-                {
-                    'name': v.name,
-                    'fullname': v.fullname,
-                    'data': list(kernel.data_for_axis(i)) if distances is None else list(distances[:, i]),
-                }
-                for i, v in enumerate(kernel.variables)
-            ],
-            'rectangles': kernel.rectangles,
-            'distances': None if distances is None else list(distances[:, -1])
-        }
