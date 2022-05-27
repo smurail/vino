@@ -190,11 +190,7 @@ class Kernel(EntityWithMetadata):
         # Bind to source files
         kernel.sourcefiles.add(*sourcefiles)
 
-        # Check if declared format match detected one
-        detected = metadata.get('dataformat.name')
-        declared = metadata.get('resultformat.title')
-        msg = f'Declared format ({declared}) differs from detected one ({detected})'
-        assert detected == declared, msg
+        # FIXME Should check if declared format match detected one
 
         # Check if column count is valid
         column_count = len(metadata.get('dataformat.columns', []))
