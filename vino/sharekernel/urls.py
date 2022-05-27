@@ -10,26 +10,30 @@ from .views import (HomeView, ExploreView, ViabilityProblemView,
 register_converter(PositiveIntTupleConverter, 'ints')
 
 urlpatterns = [
+    # ∙∙ Website pages
+
     path('', HomeView.as_view(), name='home'),
     path('explore', ExploreView.as_view(), name='explore'),
     path('viabilityproblem/<int:pk>/', ViabilityProblemView.as_view(), name='viabilityproblem'),
     path('visualization-demo', VisualizationDemoView.as_view(), name='visualization_demo'),
     path('about', TemplateView.as_view(template_name='sharekernel/about.html'), name='about'),
 
-    # Original vino
+    # ∙∙ Web API endpoints
+
+    # -- Original vino
     path('api/vino/<int:pk>/', VinoData.as_view(), name='vino_data'),
     path('api/vino/<int:pk>/info/', VinoData.as_view(info_only=True), name='vino_data'),
 
-    # Coerced vino
+    # -- Coerced vino
     path('api/vino/<int:pk>/bargrid/<ints:ppa>/', VinoData.as_view(format='bargrid'), name='vino_data'),
     path('api/vino/<int:pk>/regulargrid/<ints:ppa>/', VinoData.as_view(format='regulargrid'), name='vino_data'),
     path('api/vino/<int:pk>/regulargrid[distance]/<ints:ppa>/', VinoData.as_view(format='regulargrid', weight='distance'), name='vino_data'),
 
-    # Shapes of a vino
+    # -- Shapes of a vino
     path('api/vino/<int:pk>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
     path('api/vino/<int:pk>/bargrid/<ints:ppa>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
 
-    # Section of a vino
+    # -- Section of a vino
     path('api/vino/<int:pk>/regulargrid/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(), name='vino_section'),
     path('api/vino/<int:pk>/regulargrid[distance]/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(weight='distance'), name='vino_section'),
 ]
