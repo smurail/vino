@@ -8,11 +8,11 @@
             <p class="lead">
                 <span class="text-primary">Vi</span>able <span class="text-primary">N</span>umericable <span class="text-primary">O</span>bject repository
             </p>
-            <hr class="mr-4">
+            <hr class="me-4">
             <p>Viability problems arise in several scientific fields (robotics, economics, environmental sciences). Once the set of constraints to be satisfied is specified and the dynamics described, the viability problem is the study of the compatibility between these constraints and these dynamics; Control strategies governing viable evolutions if any can then be deduced.</p>
             <p>Analytical solutions to sustainability problems are very rare. Approximations can then be calculated, we call them Viable Numerical Objects.</p>
             <div class="d-flex flex-column flex-md-row">
-                <a class="btn btn-primary mb-3 mr-md-3" href="{% url 'explore' %}" role="button">Explore</a>
+                <a class="btn btn-primary mb-3 me-md-3" href="{% url 'explore' %}" role="button">Explore</a>
                 <!--<a class="btn btn-dark mb-3" href="" role="button">Submit</a>-->
             </div>
         </div>
@@ -46,7 +46,7 @@
                             <span class="badge bg-secondary">{{ vp.dynamics_type }}</span>
                         </li>
                     </ul>
-                    <div class="card-body text-right">
+                    <div class="card-body text-end">
                         <p class="card-text"><small class="text-muted">Last updated {{ vp.date_updated|date:"DATETIME_FORMAT"|lowfirst }}</small></p>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                         <th scope="col">Published by</th>
                         <th scope="col">Software</th>
                         <th scope="col">Format</th>
-                        <th scope="col" class="text-right">Size</th>
+                        <th scope="col" class="text-end">Size</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,7 +88,7 @@
                                 {{ k.format }}
                             </abbr>
                         </td>
-                        <td class="text-right">{{ k.size_with_unit|default:"-" }}</td>
+                        <td class="text-end">{{ k.size_with_unit|default:"-" }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
