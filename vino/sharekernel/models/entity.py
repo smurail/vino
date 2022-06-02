@@ -4,8 +4,6 @@ from django.db import models
 from django.core.exceptions import FieldDoesNotExist
 from django_currentuser.db.models import CurrentUserField  # type: ignore
 
-from vino.core.data import parse_datafile, Metadata
-
 
 class EntityQuerySet(models.QuerySet):
     def active(self, is_active=True):
@@ -84,10 +82,7 @@ class Entity(models.Model):
 
     @classmethod
     def from_files(cls, *files, owner=None):
-        metadata = Metadata()
-        for filepath in files:
-            parse_datafile(filepath, metadata=metadata)
-        return cls.from_metadata(metadata)
+        raise NotImplementedError
 
 
 class EntityWithMetadata(Entity):

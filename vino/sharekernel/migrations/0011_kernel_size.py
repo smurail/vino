@@ -2,13 +2,11 @@
 
 from django.db import migrations, models
 
-from vino.core.data import parse_datafile
-
 
 def update_kernel_size(apps, schema_editor):
     Kernel = apps.get_model('sharekernel', 'Kernel')
     for kernel in Kernel.objects.all():
-        kernel.size = parse_datafile(kernel.datafile.path)
+        kernel.size = len(kernel.data)
         kernel.save()
 
 
