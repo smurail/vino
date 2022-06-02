@@ -5,11 +5,6 @@ from ..models import Kernel
 from .json import JsonDetailView
 
 
-def vino_from_kernel(kernel=None):
-    files = [sf.file for sf in kernel.sourcefiles.all()]
-    return vn.load(*files)
-
-
 def info_from_vino(kernel, vno, original=None, axes=None):
     dim = vno.dim
     ranges = vno.bounds.T.tolist()
@@ -83,7 +78,7 @@ class VinoData(VinoDetailView):
 
     def get_context_data(self, **kwargs):
         kernel = self.get_object()
-        vno = vino_from_kernel(kernel)
+        vno = kernel.data
         original = None
 
         if not self.info_only and vno.dim > 3:
@@ -124,7 +119,7 @@ class VinoShapes(VinoDetailView):
         if kernel.dimension != 2:
             return error("Only 2-dimensional vinos have shapes")
 
-        vno = vino_from_kernel(kernel)
+        vno = kernel.data
         original = None
 
         if self.ppa is not None:
@@ -164,7 +159,7 @@ class VinoSection(VinoDetailView):
             if a not in range(dim):
                 return error(f"Cutting plane axes must be between 0 and {dim-1}")
 
-        original = vino_from_kernel(kernel)
+        original = kernel.data
         vno = original.to_regulargrid(ppa=self.ppa)
         info = info_from_vino(kernel, vno, original, plane)
 
