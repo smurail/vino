@@ -145,6 +145,7 @@ STATIC_ROOT = Path(DATA_DIR, 'static').as_posix()
 
 MEDIA_URL = '/files/'
 MEDIA_ROOT = Path(DATA_DIR, 'files').as_posix()
+DEFAULT_FILE_STORAGE = 'vino.sharekernel.storage.CustomFileSystemStorage'
 
 
 # Debug toolbar
