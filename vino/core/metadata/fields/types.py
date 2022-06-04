@@ -1,10 +1,21 @@
 from ast import literal_eval
-from typing import Type, Optional, Any, Tuple
+from typing import TypeVar, Type, Optional, Any, Tuple
 from django.utils.dateparse import parse_datetime
 from datetime import datetime
 
-from ...utils import cast
 from .field import Field
+
+
+T = TypeVar('T', bound=int)
+
+
+def cast(to_type: Type[T], value: Any) -> T:
+    try:
+        if isinstance(value, to_type):
+            return value
+        return to_type(value)
+    except (ValueError, TypeError):
+        return to_type()
 
 
 class TupleField(Field):
