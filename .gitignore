@@ -1,8 +1,5 @@
 Thumbs.db
 *.pyc
-/vino-py/env/
-/vino-py/test-reports/
-/vinosite/static/
 /.mypy_cache/
 .env
 /data/

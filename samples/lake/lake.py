@@ -1,5 +1,11 @@
 # -*- coding: utf8 -*-
 
+# FIXME This code use legacy implementation of `RegularGrid` and `BarGrid`
+# FIXME `HDF5Manager` doesn't exist anymore
+# FIXME Shouldn't mess up with `sys.path`: just `import vino as vn` and use
+#       `vn.RegularGrid` and `vn.BarGrid`
+# FIXME Fix indentation
+
 import numpy
 from math import floor, ceil
 import sys
