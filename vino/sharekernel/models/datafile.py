@@ -16,9 +16,13 @@ from vino.typing import AnyPath
 from ..utils import hash_file
 
 
-def make_datafile(path, files: Sequence[AnyPath]) -> tuple[vn.Vino, Path]:
+def make_datafile(path: AnyPath, files: Sequence[AnyPath]) -> tuple[vn.Vino, Path]:
     # Create a Vino object from files
-    vno = vn.load(*files)
+    root = Path(default_storage.location)
+    vno = vn.load(*[
+        filepath if filepath.is_absolute() else root.joinpath(filepath)
+        for filepath in map(Path, files)
+    ])
 
     # Save the Vino to a temporary file in CSV format
     temp = NamedTemporaryFile(mode='w', newline='', delete=False)
@@ -32,10 +36,10 @@ def make_datafile(path, files: Sequence[AnyPath]) -> tuple[vn.Vino, Path]:
         hash_file(temp.name, algorithm='sha256'),
     )
     name = '_'.join(slugify(p) for p in parts) + '.csv'
-    path = Path(default_storage.path(Path(path) / name))
+    datafile = Path(default_storage.path(Path(path) / name))
 
     # Move temporary file to this path
-    path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.move(temp.name, path)
+    datafile.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(temp.name, datafile)
 
-    return vno, path
+    return vno, datafile

@@ -5,12 +5,12 @@ from typing import Optional, IO, AnyStr
 from django.db import models
 from django.db.models import QuerySet, Count, Q
 from django.db.models.query import ModelIterable
-from django.conf import settings
 from django.utils.functional import cached_property
 from django.contrib.auth.models import User
 
 import vino as vn
 
+from ..utils import media_relative_path
 from .entity import EntityWithMetadata, EntityManager
 from .parameterset import ParameterSet
 from .dataformat import DataFormat
@@ -131,7 +131,7 @@ class Kernel(EntityWithMetadata):
     def update_datafile(self) -> None:
         files = [sf.file for sf in self.sourcefiles.order_by('pk').all()]
         _, path = make_datafile(self.DATAFILE_PATH, files)
-        self.datafile = path.relative_to(settings.MEDIA_ROOT).as_posix()
+        self.datafile = media_relative_path(path)
 
     @classmethod
     def from_files(cls, *files: IO[AnyStr], owner: User | None = None) -> Kernel:
@@ -146,7 +146,7 @@ class Kernel(EntityWithMetadata):
             'params': ParameterSet.from_metadata(metadata, vp=vp, owner=owner),
             'software': Software.from_metadata(metadata, owner=owner),
             'format': DataFormat.from_metadata(metadata, owner=owner),
-            'datafile': path.relative_to(settings.MEDIA_ROOT).as_posix(),
+            'datafile': media_relative_path(path),
             'size': len(data),
             'owner': owner,
         }
