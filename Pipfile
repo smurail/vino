@@ -8,10 +8,10 @@ flake8 = "*"
 mypy = "*"
 django-debug-toolbar = "<3.3"
 django-debug-toolbar-force = "*"
-django-stubs = "*"
 pandas-stubs = "*"
 pytest = "*"
 types-pillow = "*"
+django-types = "*"
 
 [packages]
 numpy = "*"
