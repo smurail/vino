@@ -41,7 +41,6 @@ migrate:
 check:
 	@pipenv run ./tools/check.sh
 
-
 .PHONY: test
 test:
 	@echo "• pytest -vv"
