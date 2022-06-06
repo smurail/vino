@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.files.storage import default_storage
 
-from .entity import Entity
+from .entity import Entity, EntityQuerySet
 from ..utils import sorted_by_size
 
 
@@ -14,8 +14,16 @@ def save_file(path: str, file: IO[AnyStr]) -> str:
     return default_storage.path(name)
 
 
+class SourceFileQuerySet(EntityQuerySet):
+    def orphans(self):
+        return self.exclude(
+            pk__in=SourceFile.kernel_set.through.objects.values('sourcefile'))
+
+
 class SourceFile(Entity):
     FILE_PATH = 'import/%Y/%m/%d'
+
+    objects = SourceFileQuerySet.as_manager()
 
     file = models.FilePathField(path=FILE_PATH, verbose_name="Source file")
 
