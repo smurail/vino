@@ -10,7 +10,7 @@ from vino.sharekernel.models import Kernel
 class Command(BaseCommand):
     SAMPLES_PATH = 'samples'
 
-    help = 'Populate sharekernel database with samples data'
+    help = 'Populate sharekernel database with samples data.'
 
     def add_arguments(self, parser):
         parser.add_argument(
