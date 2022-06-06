@@ -12,7 +12,7 @@ class Command(BaseCommand):
     ROOT = Path(default_storage.location)
 
     help = (
-        "Clean up orphan sourcefile entries from database, and uploaded "
+        "Clean up orphan sourcefile entries from database, and media "
         "files that are not referenced anymore. Eventually clean up empty "
         "directories that may remain. Uploaded files and empty directories "
         f"are searched in {ROOT} directory."
@@ -20,12 +20,12 @@ class Command(BaseCommand):
 
     @classmethod
     def iterfiles(cls):
-        """Iterate over all uploaded files in ``ROOT`` directory."""
+        """Iterate over all media files in ``ROOT`` directory."""
         for filepath in cls.ROOT.glob("**/*"):
             if filepath.is_file():
                 yield filepath.relative_to(cls.ROOT)
 
-    def is_uploaded_orphan(self, path):
+    def is_orphan(self, path):
         """Return True if ``path`` is not found anywhere in database."""
         query = None
         for field in self.filefields:
@@ -57,12 +57,12 @@ class Command(BaseCommand):
         if self.force:
             sf_cleaned, _ = sf_orphan.delete()
 
-        # Handle orphan uploaded files
+        # Handle orphan media files
         up_count = up_orphan_count = up_cleaned = 0
         verb = "Remove" if self.force else "Would remove"
         for filepath in self.iterfiles():
             up_count += 1
-            if self.is_uploaded_orphan(filepath):
+            if self.is_orphan(filepath):
                 up_orphan_count += 1
                 self.stdout.write(f"{verb} {filepath}...")
                 if self.force:
@@ -98,7 +98,7 @@ class Command(BaseCommand):
 
         if up_orphan_count > 0:
             cleanup_needed = True
-            msg = f"{verb} {up_cleaned}/{up_count} orphan uploaded files."
+            msg = f"{verb} {up_cleaned}/{up_count} orphan media files."
             color = (
                 self.style.WARNING if not self.force else
                 self.style.SUCCESS if up_orphan_count == up_cleaned else
@@ -106,7 +106,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(color(msg))
         else:
-            self.stdout.write(self.style.SUCCESS("No orphans found in uploaded files!"))
+            self.stdout.write(self.style.SUCCESS("No orphans found in media files!"))
 
         if empty_dirs > 0:
             cleanup_needed = True
