@@ -27,7 +27,6 @@ urlpatterns = (
         path('', include('vino.sharekernel.urls')),
         path('admin/', admin.site.urls),
     ]
-    # See https://github.com/typeddjango/django-stubs/issues/550
-    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # type: ignore
-    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore
+    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 )
