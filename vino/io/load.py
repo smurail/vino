@@ -20,11 +20,14 @@ ENCODING = "utf-8"
 
 
 def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
-    with contextlib.ExitStack() as stack:
-        md_chunks: list[Metadata] = []
-        dt_chunks: list[Numo | NDArray] = []
+    # We are going to build a list of metadata chunks and another of data ones
+    md_chunks: list[Metadata] = []
+    dt_chunks: list[Numo | NDArray] = []
 
+    # Parse each file to get a data or metadata chunk
+    with contextlib.ExitStack() as stack:
         for file in files:
+            # Try first to open file as NPZ
             try:
                 vino = load_npz(file)  # type: ignore
                 if len(files) > 1:
@@ -64,21 +67,21 @@ def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
             else:
                 dt_chunks.append(r)
 
-        # Merge all numerical data into one numpy array
-        try:
-            data = np.concatenate(dt_chunks)  # type: ignore
-        except ValueError as e:
-            if not dt_chunks:
-                raise ValueError("No data found in input files") from e
-            raise ValueError("Can't concatenate data chunks") from e
+    # Merge all numerical data chunks into one numpy array
+    try:
+        data = np.concatenate(dt_chunks)  # type: ignore
+    except ValueError as e:
+        if not dt_chunks:
+            raise ValueError("No data found in input files") from e
+        raise ValueError("Can't concatenate data chunks") from e
 
-        # Merge all metadata into one Metadata object
-        try:
-            metadata = md_chunks[0]
-        except IndexError as e:
-            raise ValueError("No metadata found in input files") from e
+    # Merge all metadata chunks into one Metadata object
+    try:
+        metadata = md_chunks[0]
+    except IndexError as e:
+        raise ValueError("No metadata found in input files") from e
 
-        for md in md_chunks[1:]:
-            metadata.update(**md)
+    for md in md_chunks[1:]:
+        metadata.update(**md)
 
     return Vino(data, metadata)
