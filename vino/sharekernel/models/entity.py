@@ -59,7 +59,7 @@ class Entity(models.Model):
             return cls.METADATA_TO_FIELD.get(k, k)
 
         metadata = {
-            k: metadata.FIELDS[k].unparse(v) for k, v in metadata.items()
+            k: metadata.unparse_field(k, v) for k, v in metadata.items()
         }
 
         filtered_metadata = {
