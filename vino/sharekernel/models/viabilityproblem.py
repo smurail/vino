@@ -73,13 +73,14 @@ class ViabilityProblem(EntityWithMetadata):
 
     objects = ViabilityProblemQuerySet.as_manager()
 
-    STATEMENTS = [dynamics, constraints, controls, target]
-    STATEMENTS_SET = set(STATEMENTS)
+    STATEMENTS_FIELDS = ('dynamics', 'constraints', 'controls', 'target')
+    STATEMENTS_FIELDS_SET = set(STATEMENTS_FIELDS)
 
     def update_symbols(self):
         statements_items = [
-            (f, getattr(self, f.name)) for f in self.STATEMENTS
-            if getattr(self, f.name)]
+            (self._meta.get_field(f), getattr(self, f))
+            for f in self.STATEMENTS_FIELDS if getattr(self, f)
+        ]
 
         symbols = {}
         symbols_order = defaultdict(int)
@@ -128,7 +129,7 @@ class ViabilityProblem(EntityWithMetadata):
     @staticmethod
     def post_save(sender, instance, changed_fields=None, **kwargs):
         fields = set(changed_fields.keys())
-        if fields & instance.STATEMENTS_SET:
+        if fields & instance.STATEMENTS_FIELDS_SET:
             instance.update_symbols()
 
     @classmethod
