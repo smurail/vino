@@ -5,12 +5,7 @@ from django.db import models
 from django.core.files.storage import default_storage
 
 from .entity import Entity, EntityQuerySet
-from ..utils import sorted_by_size
-
-
-def save_file(path: str, file: IO[AnyStr]) -> str:
-    name = default_storage.save(Path(path) / Path(file.name).name, file)
-    return default_storage.path(name)
+from ..utils import sorted_by_size, media_save
 
 
 class SourceFileQuerySet(EntityQuerySet):
@@ -29,7 +24,7 @@ class SourceFile(Entity):
 
     @classmethod
     def from_files(cls, *files: IO[AnyStr]):
-        saved_files = [save_file(cls.FILE_PATH, f) for f in files]
+        saved_files = [media_save(cls.FILE_PATH, f) for f in files]
         return [
             cls.objects.get_or_create(file=Path(f).relative_to(cls.ROOT))[0]
             for f in sorted_by_size(saved_files)

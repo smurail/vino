@@ -4,7 +4,7 @@ import os
 import hashlib
 
 from pathlib import Path
-from typing import Union, Iterable
+from typing import Union, Iterable, IO, AnyStr
 
 from django.core.files.storage import default_storage
 
@@ -16,6 +16,11 @@ StringPath = Union[str, os.PathLike]
 
 def sorted_by_size(files: Iterable[StringPath]) -> list[StringPath]:
     return sorted(files, key=lambda f: Path(f).stat().st_size)
+
+
+def media_save(path: str, file: IO[AnyStr]) -> str:
+    name = default_storage.save(Path(path) / Path(file.name).name, file)
+    return default_storage.path(name)
 
 
 def media_relative_path(path: Path) -> str:
