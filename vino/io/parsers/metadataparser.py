@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import logging
 
 from typing import TextIO
 
@@ -8,7 +9,10 @@ from ...core.metadata import Metadata
 
 from .parser import Parser
 from .textparser import TextParserMixin
-from .exceptions import WrongFormatError
+from .exceptions import ParseError, WrongFormatError
+
+
+logger = logging.getLogger(__name__)
 
 
 class MetadataParserMixin(TextParserMixin):
@@ -60,7 +64,18 @@ class MetadataParserMixin(TextParserMixin):
                     interrupted = True
                     break
 
-                items.append((field, Metadata.parse(field, value)))
+                if Metadata.is_defined(field):
+                    try:
+                        parsed = Metadata.parse(field, value)
+                    except Exception as e:
+                        raise ParseError(
+                            f"Error while parsing metadatum {field!r}",
+                            (stream.name, self.lineno, None, line),
+                        ) from e
+                    items.append((field, parsed))
+                else:
+                    logger.info(
+                        "%s: Unknown metadata field %r", stream.name, field)
 
         except UnicodeDecodeError as e:
             self.handle_unicode_decode_error(stream, e, "Metadata parse error: ")
