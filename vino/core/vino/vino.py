@@ -49,8 +49,9 @@ class Vino(Numo):
                     f"{', '.join((repr(k) for k in _dataformats.keys()))})")
             cls = _dataformats[dataformat]
 
-        metadata = Metadata(metadata)
-        metadata[cls.DATAFORMAT_METADATUM] = cls.DATAFORMAT
+        metadata = Metadata(metadata, **{
+            cls.DATAFORMAT_METADATUM: cls.DATAFORMAT
+        })
 
         return cast(Vino, super().__new__(cls, data, metadata))
 

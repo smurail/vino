@@ -36,7 +36,7 @@ class MetadataParserMixin(TextParserMixin):
     def parse_metadata(self, stream: TextIO) -> Metadata:
         assert stream.seekable()
 
-        metadata = Metadata()
+        items = []
         line_size = 0
         byte_count = 0
         interrupted = False
@@ -50,17 +50,17 @@ class MetadataParserMixin(TextParserMixin):
                 if self.is_blank(line) or self.is_comment(line):
                     continue
 
-                key, value = self.parse_metadatum(line)
+                field, value = self.parse_metadatum(line)
 
                 # XXX Don't change this line! Let static type checking
-                #     understand that `key` can't be None after this block
-                if key is None:
+                #     understand that neither `field` nor `value` can be None
+                #     after this block
+                if field is None or value is None:
                     # We probably reached the end of metadata
                     interrupted = True
                     break
 
-                if metadata.is_defined_field(key):
-                    metadata[key] = value
+                items.append((field, Metadata.parse(field, value)))
 
         except UnicodeDecodeError as e:
             self.handle_unicode_decode_error(stream, e, "Metadata parse error: ")
@@ -72,7 +72,7 @@ class MetadataParserMixin(TextParserMixin):
         else:
             self.at_eof = True
 
-        return metadata
+        return Metadata(items)
 
 
 class MetadataParser(MetadataParserMixin, Parser[Metadata]):

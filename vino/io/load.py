@@ -76,12 +76,8 @@ def load(*files: TextIO | BinaryIO | AnyPath) -> Vino:
         raise ValueError("Can't concatenate data chunks") from e
 
     # Merge all metadata chunks into one Metadata object
-    try:
-        metadata = md_chunks[0]
-    except IndexError as e:
-        raise ValueError("No metadata found in input files") from e
-
-    for md in md_chunks[1:]:
-        metadata.update(**md)
+    if not md_chunks:
+        raise ValueError("No metadata found in input files")
+    metadata = Metadata(*md_chunks)
 
     return Vino(data, metadata)

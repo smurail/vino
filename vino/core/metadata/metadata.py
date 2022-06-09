@@ -1,35 +1,52 @@
-from typing import Dict, Any
+from __future__ import annotations
+
+from typing import Mapping, Any, Iterator, Iterable
 
 from .fields import (
     Field, TupleField, IntegerField, StringField, DateTimeField, LiteralField
 )
 
 
-class BaseMetadata(Dict[str, Any]):
-    FIELDS: Dict[str, Field] = {}
+class BaseMetadata(Mapping[str, Any]):
+    _fields: dict[str, Field] = {}
+    _values: dict[str, Any]
+
+    def __init__(self, *chunks: Iterable, **fields: Any):
+        self._values = {}
+
+        for md in chunks:
+            items = md.items() if isinstance(md, Mapping) else md
+            for k, v in items:
+                self._values[k] = v
+        for k, v in fields.items():
+            self._values[k] = v
 
     @classmethod
-    def is_defined_field(cls, field: str) -> bool:
-        return field in cls.FIELDS
+    def is_defined(cls, name: str) -> bool:
+        return name in cls._fields
 
     @classmethod
-    def parse_field(cls, field: str, value: str) -> Any:
-        return cls.FIELDS[field].parse(value)
+    def parse(cls, name: str, value: str) -> Any:
+        return cls._fields[name].parse(value)
 
-    @classmethod
-    def unparse_field(cls, field: str, value: Any) -> str:
-        return cls.FIELDS[field].unparse(value)
+    def __getitem__(self, name: str) -> Any:
+        return self._values[name]
 
-    def __setitem__(self, field: str, value: Any) -> None:
-        parsed_value = self.parse_field(field, value) if isinstance(value, str) else value
-        super().__setitem__(field, parsed_value)
+    def __iter__(self) -> Iterator[str]:
+        return self._values.__iter__()
+
+    def __len__(self) -> int:
+        return len(self._values)
+
+    def get_unparsed(self, name: str) -> str:
+        return self._fields[name].unparse(self[name])
 
     def __repr__(self):
-        return f'{type(self).__name__}({dict.__repr__(self)})'
+        return f'{type(self).__name__}({dict.__repr__(self._values)})'
 
 
 class Metadata(BaseMetadata):
-    FIELDS = {
+    _fields = {
         'MinimalValues': TupleField(float, sep=' '),
         'MaximalValues': TupleField(float, sep=' '),
         'PointNumberPerAxis': TupleField(int),

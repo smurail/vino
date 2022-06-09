@@ -21,9 +21,9 @@ def save_csv(file: TextIO | AnyPath, vino: Vino) -> None:
             file = stack.enter_context(open(file, 'w', newline=''))
 
         # Write metadata
-        for key, value in vino.metadata.items():
-            unparsed = vino.metadata.unparse_field(key, value)
-            file.write(f'#{key}: {unparsed}\n')
+        for field in vino.metadata:
+            value = vino.metadata.get_unparsed(field)
+            file.write(f'#{field}: {value}\n')
 
         # Write data
         pd.DataFrame(vino).to_csv(file, sep=' ', index=False)
