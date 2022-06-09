@@ -69,6 +69,7 @@ class Metadata(BaseMetadata):
         'results.title': StringField(),
         'software.author': StringField(),
         'software.contact': StringField(),
+        'software.description': StringField(),
         'software.parameters': TupleField(str),
         'software.title': StringField(),
         'software.version': StringField(),
