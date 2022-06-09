@@ -11,5 +11,5 @@ $FLAKE8 && echo "${GREEN}OK!${NC}"
 echo
 
 echo "∙ $MYPY"
-$MYPY && echo "${GREEN}OK!${NC}"
+$MYPY && echo "${GREEN}OK!${NC}" || exit 1
 echo
