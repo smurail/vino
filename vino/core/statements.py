@@ -148,7 +148,7 @@ class Statements:
     def __iter__(self):
         return iter(self.statements)
 
-    def __setitem__(self, index: int, value: StatementLiteral):  # type: ignore[no-untyped-def]
+    def __setitem__(self, index: int, value: StatementLiteral) -> None:
         assert 0 <= index < len(self.statements)
         self.statements[index] = value
 
