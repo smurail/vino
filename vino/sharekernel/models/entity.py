@@ -58,12 +58,12 @@ class Entity(models.Model):
             k = mk[len(cls.PREFIX):] if '.' in mk else mk
             return cls.METADATA_TO_FIELD.get(k, k)
 
-        metadata = {
+        unparsed_metadata = {
             k: metadata.get_unparsed(k) for k, v in metadata.items()
         }
 
         filtered_metadata = {
-            k: v for k, v in dict(metadata, **kwargs).items()
+            k: v for k, v in dict(unparsed_metadata, **kwargs).items()
             if '.' not in k or k.startswith(cls.PREFIX)
         }
 
