@@ -72,7 +72,8 @@ class MetadataParserMixin(TextParserMixin):
                             f"Error while parsing metadatum {field!r}",
                             (stream.name, self.lineno, None, line),
                         ) from e
-                    items.append((field, parsed))
+                    if parsed is not None:
+                        items.append((field, parsed))
                 else:
                     logger.info(
                         "%s: Unknown metadata field %r", stream.name, field)
