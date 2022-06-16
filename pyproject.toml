@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+addopts = "--ignore=data"
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "[%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
