@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 
 from typing import Sequence
@@ -28,6 +29,9 @@ def make_datafile(path: AnyPath, files: Sequence[AnyPath]) -> tuple[vn.Vino, Pat
     temp = NamedTemporaryFile(mode='w', newline='', delete=False)
     vn.save_csv(temp, vno)
     temp.close()
+
+    # Python temporary files doesn't take umask into account, need to chmod it
+    os.chmod(temp.name, 0o0644)
 
     # Generate datafile name and path
     parts = (
