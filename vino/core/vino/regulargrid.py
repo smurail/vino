@@ -67,6 +67,10 @@ class RegularGrid(Vino):
         assert len(self.ppa) == self.dim
 
     @property
+    def count(self) -> int:
+        return self.size
+
+    @property
     def dim(self) -> int:
         return self.ndim
 

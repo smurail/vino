@@ -82,6 +82,11 @@ class Vino(Numo):
         ]
 
     @property
+    def count(self) -> int:
+        """Data unit count (ie. points, bars, cells...)"""
+        return len(self)
+
+    @property
     def dim(self) -> int:
         """Rank (ie. number of dimensions) of the vino state space"""
         raise NotImplementedError
