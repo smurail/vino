@@ -25,5 +25,11 @@ def save_csv(file: TextIO | AnyPath, vino: Vino) -> None:
             value = vino.metadata.get_unparsed(field)
             file.write(f'#{field}: {value}\n')
 
+        # XXX If number of vino data array dimensions is greater than 2,
+        #     we have to flatten it to be able to save it in CSV format.
+        #     Vino subclasses are in charge of restoring original shape.
+        #     See `RegularGrid` class constructor in `vino.core` module.
+        data = vino.ravel().reshape((-1, 1)) if vino.ndim > 2 else vino
+
         # Write data
-        pd.DataFrame(vino).to_csv(file, sep=' ', index=False)
+        pd.DataFrame(data).to_csv(file, sep=' ', index=False)

@@ -55,7 +55,16 @@ class RegularGrid(Vino):
         self.origin = np.array(self.metadata['MinimalValues'])
         self.opposite = np.array(self.metadata['MaximalValues'])
 
-        assert len(self.ppa) == len(self.origin) == len(self.opposite)
+        assert len(self.ppa) == len(self.origin)
+        assert len(self.ppa) == len(self.opposite)
+
+        # If `data` array is a flattened array, we need to give it back its
+        # original shape -- for example when loading from a CSV file.
+        # See also `save_csv` implementation in `vino.io` module.
+        if type(self) is RegularGrid and self.dim == 2 and self.shape[-1] == 1:
+            self.shape = self.ppa
+
+        assert len(self.ppa) == self.dim
 
     @property
     def dim(self) -> int:
