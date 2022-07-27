@@ -162,6 +162,16 @@ class Kernel(EntityWithMetadata):
         return kernel
 
 
+class RegularGridKernel(Kernel):
+    class Meta:
+        proxy = True
+
+    FORMAT = 'regulargrid'
+    DATA_UNIT = 'point'
+
+    objects = KernelManager.create('RegularGrid', FORMAT)()
+
+
 class BarGridKernel(Kernel):
     class Meta:
         proxy = True
