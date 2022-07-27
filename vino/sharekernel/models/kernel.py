@@ -147,7 +147,7 @@ class Kernel(EntityWithMetadata):
             'software': Software.from_metadata(metadata, owner=owner),
             'format': DataFormat.from_metadata(metadata, owner=owner),
             'datafile': media_relative_path(path),
-            'size': len(data),
+            'size': data.count,
             'owner': owner,
         }
         kernel = Kernel.from_metadata(metadata, **fields)
