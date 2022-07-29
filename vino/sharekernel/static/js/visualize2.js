@@ -393,7 +393,7 @@ function hookVisualization(element) {
     }
 
     function updateForm(info) {
-        const defaultFormat = FORMAT_BARGRID,
+        const defaultFormat = info.format == FORMAT_REGULARGRID ? '' : FORMAT_BARGRID,
               defaultPPA = info.dim == 2 ? 1000 : 50,
               elementPPA = fields.ppa.parentNode.parentNode;
 
@@ -409,7 +409,10 @@ function hookVisualization(element) {
             if (!fields.section.checked)
                 fields.distance.checked = false;
         }
-        if (fields.section.checked != state.section || fields.distance.checked != state.distance) {
+        if (defaultFormat == '') {
+            fields.format.value = '';
+            fields.format.disabled = true;
+        } else if (fields.section.checked != state.section || fields.distance.checked != state.distance) {
             const lock = fields.section.checked || fields.distance.checked;
             fields.format.value = lock ? FORMAT_REGULARGRID : defaultFormat;
             fields.format.disabled = lock;
@@ -417,7 +420,11 @@ function hookVisualization(element) {
 
         const currentFormat = fields.format.value;
 
-        elementPPA.style.display = currentFormat ? '' : 'none';
+        elementPPA.style.display = currentFormat == '' && !info.grid ? 'none' : '';
+        fields.ppa.disabled = currentFormat == '';
+        if (currentFormat == '' && info.grid) {
+            fields.ppa.value = info.grid.ppa.join(',');
+        }
         if (currentFormat != state.format && (fields.section.checked == state.section || fields.ppa.value == '')) {
             if (currentFormat == FORMAT_BARGRID)
                 fields.ppa.value = info.dim == 2 ? 1000 : 50;
@@ -548,20 +555,20 @@ class VinoPlot {
     toTrace(data) {
         const color = '#80d0d0',
               size = data.format == FORMAT_REGULARGRID ? 3 : null,
-              distances = data.distances ? data.distances.values : null;
+              weights = data.distances || data.weights || {};
         let V, trace;
 
         if ((V = data.shapes))
             trace = shapes(V[0], V[1], color);
         else if ((V = data.values))
-            trace = points(V[0], V[1], V[2], distances || V[2] || V[1], size);
+            trace = points(V[0], V[1], V[2], weights.values || V[2] || V[1], size);
 
         if (data.format == FORMAT_POLYGON) {
             trace.mode = 'lines+markers';
             trace.line = {width: 1, dash: "dash"};
-        } else if (data.distances && data.distances.range && trace.marker) {
-            trace.marker.cmin = data.distances.range[0];
-            trace.marker.cmax = data.distances.range[1];
+        } else if (weights && weights.range && trace.marker) {
+            trace.marker.cmin = weights.range[0];
+            trace.marker.cmax = weights.range[1];
         }
 
         return trace;
