@@ -83,6 +83,9 @@ class RegularGrid(Vino):
     def unit(self) -> NDArrayFloat:
         return cast(NDArrayFloat, (self.opposite - self.origin)) / (self.ppa - 1)
 
+    def has_weight(self) -> bool:
+        return not np.issubdtype(self.dtype, np.bool_)
+
     def grid_coordinates(self, axes: Sequence[int] | None = None) -> NDArrayFloat:
         if axes is None:
             origin, opposite, ppa = self.origin, self.opposite, self.ppa
@@ -102,7 +105,8 @@ class RegularGrid(Vino):
 
     def points_coordinates(self) -> NDArrayFloat:
         coordinates = self.grid_coordinates()
-        points = coordinates[self.ravel()]
+        mask = self.ravel() > 0 if self.has_weight() else self.ravel()
+        points = coordinates[mask]
 
         return cast(NDArrayFloat, points)
 
@@ -120,9 +124,16 @@ class RegularGrid(Vino):
 
         return cast(NDArrayFloat, points)
 
+    def weights(self) -> NDArrayFloat:
+        assert self.has_weight()
+
+        weights = self.ravel()
+
+        return cast(NDArrayFloat, np.asarray(weights[weights > 0].ravel()))
+
     def with_distance(self, domain: str | None = None) -> RegularGrid:
         assert domain is None
-        assert np.issubdtype(self.dtype, np.bool_)
+        assert not self.has_weight()
 
         # Add border of False around data
         padded = np.pad(self, 1, mode='constant', constant_values=False)  # type: ignore
@@ -136,11 +147,9 @@ class RegularGrid(Vino):
         return RegularGrid(distances, self.metadata)
 
     def distances(self, domain: str | None = None) -> NDArrayFloat:
-        assert np.issubdtype(self.dtype, np.bool_)
+        assert not self.has_weight()
 
-        nonzero_distances = self.with_distance(domain)[self]
-
-        return cast(NDArrayFloat, np.asarray(nonzero_distances.ravel()))
+        return cast(NDArrayFloat, self.with_distance(domain).weights())
 
     def to_bargrid(self, ppa: int | npt.ArrayLike = -1, baraxis: int = -1) -> BarGrid:
         from .bargrid import BarGrid
