@@ -26,7 +26,7 @@ urlpatterns = [
     # -- Coerced vino
     path('api/vino/<int:pk>/bargrid/<ints:ppa>/', VinoData.as_view(format='bargrid'), name='vino_data'),
     path('api/vino/<int:pk>/regulargrid/<ints:ppa>/', VinoData.as_view(format='regulargrid'), name='vino_data'),
-    path('api/vino/<int:pk>/regulargrid[distance]/<ints:ppa>/', VinoData.as_view(format='regulargrid', weight='distance'), name='vino_data'),
+    path('api/vino/<int:pk>/regulargrid+distance/<ints:ppa>/', VinoData.as_view(format='regulargrid', weight='distance'), name='vino_data'),
 
     # -- Shapes of a vino
     path('api/vino/<int:pk>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
@@ -34,7 +34,7 @@ urlpatterns = [
 
     # -- Section of a vino
     path('api/vino/<int:pk>/regulargrid/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(), name='vino_section'),
-    path('api/vino/<int:pk>/regulargrid[distance]/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(weight='distance'), name='vino_section'),
+    path('api/vino/<int:pk>/regulargrid+distance/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(weight='distance'), name='vino_section'),
 ]
 
 

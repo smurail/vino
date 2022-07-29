@@ -284,7 +284,7 @@ function hookVisualization(element) {
     function vinoURL(state, shapes) {
         const format = ({
                   'bars': 'bargrid',
-                  'regulargrid': `regulargrid${state.distance?'[distance]':''}`
+                  'regulargrid': `regulargrid${state.distance?'+distance':''}`
               })[state.format] || null,
               conv = format ? `/${format}/${state.ppa}` : '',
               base = `/api/vino/${state.id}${conv}/`;
