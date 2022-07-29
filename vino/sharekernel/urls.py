@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/vino/<int:pk>/bargrid/<ints:ppa>/shapes/', VinoShapes.as_view(), name='vino_shapes'),
 
     # -- Section of a vino
+    path('api/vino/<int:pk>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(), name='vino_section'),
     path('api/vino/<int:pk>/regulargrid/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(), name='vino_section'),
     path('api/vino/<int:pk>/regulargrid+distance/<ints:ppa>/section/<ints:plane>/<ints:at>/', VinoSection.as_view(weight='distance'), name='vino_section'),
 ]

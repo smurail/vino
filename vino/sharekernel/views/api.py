@@ -102,10 +102,15 @@ class VinoData(VinoDetailView):
 
         data = vno.points_coordinates()
 
-        if type(vno) is vn.RegularGrid and self.weight == 'distance':
-            info['distances'] = dict(
-                values=vno.distances(),
-            )
+        if type(vno) is vn.RegularGrid:
+            if self.weight == 'distance':
+                info['distances'] = dict(
+                    values=vno.distances(),
+                )
+            if vno.has_weight():
+                info['weights'] = dict(
+                    values=vno.weights(),
+                )
 
         return dict(info, values=[
             np.ascontiguousarray(data[:, v.order]) for v in vno.variables
@@ -159,20 +164,27 @@ class VinoSection(VinoDetailView):
             if a not in range(dim):
                 return error(f"Cutting plane axes must be between 0 and {dim-1}")
 
-        original = kernel.data
-        vno = original.to_regulargrid(ppa=self.ppa)
+        vno = original = kernel.data
+        if type(vno) is not vn.RegularGrid or (self.ppa is not None and np.any(self.ppa != vno.ppa)):
+            vno = original.to_regulargrid(ppa=self.ppa)
         info = info_from_vino(kernel, vno, original, plane)
 
         if self.weight == 'distance':
             vno = vno.with_distance()
 
         section = vno.section(plane, at).ravel()
-        mask = section if self.weight is None else (section > 0)
+        mask = section if self.weight is None and not vno.has_weight() else (section > 0)
         coordinates = vno.grid_coordinates(plane)
         points = coordinates[mask]
 
         if self.weight == 'distance':
             info['distances'] = dict(
+                range=[np.min(vno.ravel()).item(), np.max(vno.ravel()).item()],
+                values=np.asarray(section[mask]),
+            )
+
+        if vno.has_weight():
+            info['weights'] = dict(
                 range=[np.min(vno.ravel()).item(), np.max(vno.ravel()).item()],
                 values=np.asarray(section[mask]),
             )
