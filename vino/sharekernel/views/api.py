@@ -14,7 +14,7 @@ def info_from_vino(kernel, vno, original=None, axes=None):
         title=kernel.title,
         dim=dim,
         format=vno.DATAFORMAT,
-        size=len(vno),
+        size=vno.count,
         axes=axes or list(range(dim)),
         variables=[
             dict(
@@ -31,7 +31,7 @@ def info_from_vino(kernel, vno, original=None, axes=None):
     if original is not None:
         info['original'] = dict(
             format=original.DATAFORMAT,
-            size=len(original),
+            size=original.count,
         )
 
     if isinstance(vno, vn.RegularGrid):
